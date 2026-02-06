@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Digital | DNorte Distribuidora</title> <link rel="stylesheet" href="style.css">
+    <title>Catálogo Digital | DNorte Distribuidora</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -22,12 +23,16 @@
             <div class="icone-passo"><i class="fas fa-cart-plus"></i></div>
             <p><strong>1. Escolha</strong><br>Adicione itens ao carrinho</p>
         </div>
+        
         <div class="seta-passo"><i class="fas fa-chevron-right"></i></div>
+
         <div class="passo">
             <div class="icone-passo"><i class="fas fa-user-edit"></i></div>
             <p><strong>2. Preencha</strong><br>Coloque Nome, Loja e Cidade</p>
         </div>
+
         <div class="seta-passo"><i class="fas fa-chevron-right"></i></div>
+
         <div class="passo">
             <div class="icone-passo"><i class="fab fa-whatsapp"></i></div>
             <p><strong>3. Envie</strong><br>Finalize o pedido no WhatsApp</p>
@@ -36,7 +41,14 @@
 
     <div class="main-container">
         <section class="catalogo-area">
+            
+            <div class="barra-busca">
+                <i class="fas fa-search"></i>
+                <input type="text" id="inputBusca" placeholder="Buscar por nome ou código..." onkeyup="filtrarProdutos()">
+            </div>
+
             <h2><i class="fas fa-boxes"></i> Produtos Disponíveis</h2>
+            
             <div id="produtos" class="grid-produtos">
                 <p>Carregando produtos...</p>
             </div>
@@ -46,30 +58,22 @@
             <div class="carrinho-box">
                 <div class="carrinho-header">
                     <h2><i class="fas fa-shopping-cart"></i> Seu Pedido</h2>
-                    <section class="catalogo-area">
-    <h2><i class="fas fa-boxes"></i> Produtos Disponíveis</h2>
-
-    <div class="barra-busca">
-        <i class="fas fa-search"></i>
-        <input type="text" id="inputBusca" placeholder="Buscar por nome ou código..." onkeyup="filtrarProdutos()">
-    </div>
-
-    <div id="produtos" class="grid-produtos">
-        <p>Carregando produtos...</p>
-    </div>
-</section>
                 </div>
+                
                 <div id="itensCarrinho" class="lista-itens">
                     <p class="carrinho-vazio">Seu carrinho está vazio.</p>
                 </div>
+                
                 <div class="resumo-pedido">
                     <div id="total"></div>
+                    
                     <div class="dados-cliente">
                         <label>Seus Dados (Obrigatório):</label>
                         <input type="text" id="inputNome" class="input-dados" placeholder="SEU NOME COMPLETO">
                         <input type="text" id="inputLoja" class="input-dados" placeholder="NOME DA SUA LOJA">
                         <input type="text" id="inputCidade" class="input-dados" placeholder="CIDADE">
                     </div>
+
                     <button onclick="finalizarPedido()" class="btn-finalizar">
                         <i class="fab fa-whatsapp"></i> Enviar Pedido
                     </button>

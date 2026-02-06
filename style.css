@@ -1,75 +1,92 @@
-/* ARQUIVO: style.css - TEMAS DNORTE */
+/* ARQUIVO: style.css - VERSÃO FINAL DNORTE */
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-body { margin: 0; padding: 0; background-color: #fcfdfd; color: #333; } /* Fundo Branco Novo */
+body { margin: 0; padding: 0; background-color: #fcfdfd; color: #333; }
 
-/* CABEÇALHO */
+/* --- CABEÇALHO --- */
 header {
-    background-color: #03264c;
-    color: white;
-    padding: 20px; /* Ajustei levemente o padding */
+    background-color: #03264c; /* AZUL ESCURO */
+    color: white; 
+    padding: 15px 20px; 
     text-align: center;
     box-shadow: 0 4px 15px rgba(3, 38, 76, 0.3);
-    border-bottom: 5px solid #fb7815;
+    border-bottom: 5px solid #fb7815; /* LARANJA */
 }
 
-/* ESTILO DA NOVA LOGO */
+/* LOGO NOVA */
 .header-logo {
-    max-width: 100%; /* Garante que não vaze no celular */
-    height: auto; /* Mantém a proporção */
-    max-height: 80px; /* Altura máxima para não ficar exagerado. Aumente ou diminua se precisar. */
-    margin-bottom: 5px; /* Espaço entre a logo e o subtítulo "Catálogo Digital..." */
-    display: inline-block; /* Ajuda na centralização */
+    max-width: 100%;
+    height: auto;
+    max-height: 80px; /* Tamanho controlado */
+    margin-bottom: 5px;
+    display: inline-block;
 }
 
-/* Remova ou comente o estilo antigo do H1, já que ele não existe mais */
-/* header h1 { margin: 0; font-size: 2rem; font-weight: 700; letter-spacing: 1px; } */
+header p { margin: 0; opacity: 0.9; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
 
-header p { margin: 5px 0 0; opacity: 0.8; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
-/* ... */
-/* BANNER DE INSTRUÇÕES */
+/* --- BANNER DE INSTRUÇÕES --- */
 .instrucoes-container {
-    background-color: #eef4fa; /* Azulzinho muito claro */
+    background-color: #eef4fa; /* Azul bem clarinho */
     border-bottom: 1px solid #dcebf7;
-    padding: 15px; display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;
+    padding: 15px;
+    display: flex; justify-content: center; align-items: center; gap: 20px;
+    margin-bottom: 20px;
 }
 .passo { display: flex; align-items: center; gap: 10px; text-align: left; }
 .icone-passo {
-    background-color: #03264c; /* Ícone Azul */
+    background-color: #03264c;
     color: white; width: 40px; height: 40px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
 }
 .passo p { margin: 0; font-size: 13px; color: #03264c; line-height: 1.3; }
-.seta-passo { color: #fb7815; font-size: 14px; } /* Seta Laranja */
+.seta-passo { color: #fb7815; font-size: 14px; }
 
-/* LAYOUT */
+/* --- LAYOUT PRINCIPAL --- */
 .main-container { display: flex; max-width: 1200px; margin: 20px auto; padding: 0 15px; gap: 20px; }
 .catalogo-area { flex: 3; }
-.catalogo-area h2 { 
-    border-bottom: 2px solid #fb7815; /* Linha Laranja */
-    padding-bottom: 10px; color: #03264c; /* Texto Azul */
+
+/* BARRA DE BUSCA */
+.barra-busca {
+    margin-bottom: 25px; /* Espaço para o título de baixo */
+    position: relative;
+    max-width: 100%;
+}
+.barra-busca i {
+    position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+    color: #fb7815; font-size: 18px;
+}
+.barra-busca input {
+    width: 100%; padding: 12px 15px 12px 45px;
+    border: 2px solid #e0e0e0; border-radius: 50px;
+    font-size: 16px; outline: none; transition: 0.3s; color: #03264c;
+}
+.barra-busca input:focus {
+    border-color: #03264c; box-shadow: 0 4px 10px rgba(3, 38, 76, 0.1);
 }
 
-/* GRADE DE PRODUTOS (Com ajuste 160px para mobile) */
+/* TÍTULO DA SEÇÃO */
+.catalogo-area h2 { 
+    border-bottom: 2px solid #fb7815; 
+    padding-bottom: 10px; color: #03264c; margin-top: 0;
+}
+
+/* GRADE DE PRODUTOS (MOBILE FRIENDLY 160px) */
 .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
 
-/* CARTÃO PRODUTO */
+/* --- CARTÃO PRODUTO --- */
 .produto {
     background: white; border-radius: 8px; padding: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s;
     display: flex; flex-direction: column; justify-content: space-between; text-align: center; border: 1px solid #eee;
 }
-.produto:hover { transform: translateY(-3px); border-color: #fb7815; } /* Borda laranja ao passar mouse */
+.produto:hover { transform: translateY(-3px); border-color: #fb7815; }
 
 .produto h3 { 
     font-size: 13px; color: #03264c; margin: 10px 0; height: 36px; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; 
 }
 .produto img { transition: opacity 0.3s; mix-blend-mode: multiply; max-width: 100%; height: auto; }
-
-/* Preço */
 .produto p { color: #03264c; font-weight: 800; font-size: 16px; margin: 5px 0; }
 
-/* Botão Adicionar (Laranja) */
 .produto button.btn-add {
     background-color: #fff; border: 1px solid #fb7815; color: #fb7815;
     padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; margin-top: 5px; font-size: 12px;
@@ -85,13 +102,13 @@ header p { margin: 5px 0 0; opacity: 0.8; font-size: 0.9rem; letter-spacing: 2px
 .qtd-selector button:hover { background-color: #dcebf7; }
 .qtd-selector span { font-weight: bold; font-size: 15px; width: 25px; text-align: center; color: #03264c; }
 
-/* CARRINHO */
+/* --- CARRINHO FIXO --- */
 .carrinho-area { flex: 1; }
 .carrinho-box { 
     background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
     position: sticky; top: 20px;
     max-height: calc(100vh - 40px); display: flex; flex-direction: column;
-    border-top: 4px solid #03264c; /* Detalhe Azul no topo do carrinho */
+    border-top: 4px solid #03264c;
 }
 .carrinho-header { padding: 20px 20px 10px 20px; flex-shrink: 0; }
 .carrinho-header h2 { font-size: 1.2rem; margin: 0; color: #03264c; }
@@ -111,9 +128,8 @@ header p { margin: 5px 0 0; opacity: 0.8; font-size: 0.9rem; letter-spacing: 2px
     text-transform: uppercase; font-weight: bold; font-size: 13px; color: #03264c;
     background-color: #fcfdfd;
 }
-.input-dados:focus { border-color: #fb7815; outline: none; box-shadow: 0 0 0 2px rgba(251, 120, 21, 0.2); }
+.input-dados:focus { border-color: #fb7815; outline: none; }
 
-/* BOTÃO FINALIZAR (LARANJA FORTE) */
 .btn-finalizar {
     background-color: #fb7815; color: white; border: none; width: 100%;
     padding: 15px; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 10px;
@@ -122,48 +138,12 @@ header p { margin: 5px 0 0; opacity: 0.8; font-size: 0.9rem; letter-spacing: 2px
 .btn-finalizar:hover { background-color: #e06000; transform: translateY(-1px); }
 .aviso-pdf { font-size: 11px; color: #888; text-align: center; margin-top: 8px; }
 
-/* MOBILE */
+/* --- MOBILE --- */
 .botao-flutuante {
     display: none; position: fixed; bottom: 20px; right: 20px;
     background-color: #fb7815; color: white; padding: 15px 25px;
     border-radius: 50px; box-shadow: 0 4px 15px rgba(251, 120, 21, 0.4);
     text-decoration: none; font-weight: bold; z-index: 999;
-}
-
-/* BARRA DE BUSCA */
-.barra-busca {
-    margin-bottom: 20px;
-    position: relative;
-    max-width: 100%;
-}
-
-.barra-busca i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #fb7815; /* Lupa Laranja */
-    font-size: 18px;
-}
-
-.barra-busca input {
-    width: 100%;
-    padding: 12px 15px 12px 45px; /* Espaço para o ícone */
-    border: 2px solid #e0e0e0;
-    border-radius: 50px; /* Redondinha */
-    font-size: 16px;
-    outline: none;
-    transition: 0.3s;
-    color: #03264c; /* Texto Azul */
-}
-
-.barra-busca input:focus {
-    border-color: #03264c; /* Borda Azul ao digitar */
-    box-shadow: 0 4px 10px rgba(3, 38, 76, 0.1);
-}
-
-.barra-busca input::placeholder {
-    color: #aaa;
 }
 
 @media (max-width: 768px) {
@@ -177,4 +157,7 @@ header p { margin: 5px 0 0; opacity: 0.8; font-size: 0.9rem; letter-spacing: 2px
     .instrucoes-container { flex-direction: column; align-items: flex-start; gap: 10px; }
     .seta-passo { display: none; }
     .passo { width: 100%; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    
+    /* Esconde subtítulo no mobile para dar destaque à logo */
+    header p { display: none; }
 }
