@@ -4464,7 +4464,7 @@ const produtos = [
 // --- 2. CONFIGURAÇÕES ---
 let carrinho = [];
 let numeroPedido = Math.floor(Math.random() * 100000);
-const WHATSAPP_LOJA = "5511999999999"; // <--- SEU NÚMERO AQUI
+const WHATSAPP_LOJA = "5569999107161"; // <--- SEU NÚMERO AQUI
 
 // --- 3. INICIALIZAÇÃO ---
 document.addEventListener("DOMContentLoaded", () => {
