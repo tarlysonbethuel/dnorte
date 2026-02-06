@@ -1,9 +1,9 @@
-/* CATÁLOGO DIGITAL - DISTRIBUIDORA MARÉ MANSA
-   Arquivo: script.js (Versão Final + Cidade)
+/* CATÁLOGO DIGITAL - DNORTE DISTRIBUIDORA
+   Arquivo: script.js (Versão Otimizada - Ultra Rápida)
 */
 
 // --- 1. LISTA DE PRODUTOS ---
-// 👇 COLE AQUI A LISTA DO SEU ARQUIVO DE TEXTO
+// 👇 COLE AQUI A LISTA DO SEU ARQUIVO DE TEXTO (AQUELA QUE GERAMOS COM OS CÓDIGOS REAIS)
 const produtos = [
   {
     "sku": "3541",
@@ -4457,31 +4457,30 @@ const produtos = [
     "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/c5773d23-c6b0-4928-b61d-1aad7f6dd24c/600.jpeg",
     "unidade": "UN"
   }
-]; 
-// 👆
+];
+// 👆 Certifique-se de manter o padrão ]; no final
 
 
 // --- 2. CONFIGURAÇÕES ---
 let carrinho = [];
 let numeroPedido = Math.floor(Math.random() * 100000);
-const WHATSAPP_LOJA = "5569999107161"; // <--- SEU NÚMERO AQUI
+const WHATSAPP_LOJA = "5511999999999"; // <--- SEU NÚMERO AQUI
 
 // --- 3. INICIALIZAÇÃO ---
 document.addEventListener("DOMContentLoaded", () => {
     if (Array.isArray(produtos) && produtos.length > 0) {
-        renderProdutos();
+        // Carregamento inicial otimizado
+        renderProdutos(produtos);
     } else {
         document.getElementById("produtos").innerHTML = "<p style='padding:20px; text-align:center'>Cole a lista de produtos no script.js</p>";
     }
 });
 
-/* --- 4. FUNÇÕES DE EXIBIÇÃO E BUSCA --- */
+// --- 4. FUNÇÕES DE EXIBIÇÃO (AGORA OTIMIZADAS) ---
 
-// Agora a função aceita uma lista opcional. Se não passar nada, usa a lista completa.
 function renderProdutos(lista = produtos) {
   const div = document.getElementById("produtos");
-  div.innerHTML = "";
-
+  
   // Se a busca não encontrar nada:
   if (lista.length === 0) {
       div.innerHTML = `
@@ -4493,43 +4492,171 @@ function renderProdutos(lista = produtos) {
       return;
   }
 
-  lista.forEach(p => {
+  // 🔥 OTIMIZAÇÃO DE PERFORMANCE:
+  // Em vez de usar "innerHTML +=", criamos um array gigante e juntamos no final.
+  // Isso faz o site carregar 600 produtos em milissegundos.
+  
+  const htmlBuffer = lista.map(p => {
     const idQtd = `qtd-${p.sku}`;
-    div.innerHTML += `
+    
+    // loading="lazy" faz a imagem só baixar quando aparece na tela
+    return `
       <div class="produto">
         <div style="height: 180px; overflow: hidden; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
-            <img src="${p.imagem}" alt="${p.nome}" onerror="this.src='https://via.placeholder.com/200?text=Sem+Foto'" style="max-height: 100%; max-width: 100%;">
+            <img src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.src='https://via.placeholder.com/200?text=Sem+Foto'" style="max-height: 100%; max-width: 100%;">
         </div>
         <h3 title="${p.nome}">${p.nome}</h3>
-        <p style="color: #03264c; font-weight: bold; font-size: 16px;">R$ ${p.preco.toFixed(2)}</p>
+        <p>R$ ${p.preco.toFixed(2)}</p>
         
         <div class="qtd-selector">
-            <button onclick="alterarQtd('${p.sku}', -1)">-</button>
+            <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
             <span id="${idQtd}">1</span>
-            <button onclick="alterarQtd('${p.sku}', 1)">+</button>
+            <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
         </div>
 
-        <button class="btn-add" onclick="adicionar('${p.sku}')">Adicionar ao Carrinho</button>
+        <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar ao Carrinho</button>
       </div>
     `;
-  });
+  }).join('');
+
+  // Atualiza a tela UMA VEZ SÓ
+  div.innerHTML = htmlBuffer;
 }
 
-// NOVA FUNÇÃO DE BUSCA
+// BUSCA OTIMIZADA
 function filtrarProdutos() {
     const termo = document.getElementById('inputBusca').value.toLowerCase();
     
-    // Filtra por NOME ou CÓDIGO (SKU)
+    // Se o termo for curto demais, não faz nada para economizar processamento
+    // (Opcional, mas ajuda se a lista for gigante)
+    
     const listaFiltrada = produtos.filter(produto => {
-        const nomeMatch = produto.nome.toLowerCase().includes(termo);
-        const skuMatch = produto.sku.toString().toLowerCase().includes(termo);
+        // Verifica nome
+        const nomeMatch = produto.nome && produto.nome.toLowerCase().includes(termo);
+        // Verifica SKU (converte para string antes)
+        const skuMatch = produto.sku && produto.sku.toString().toLowerCase().includes(termo);
+        
         return nomeMatch || skuMatch;
     });
 
     renderProdutos(listaFiltrada);
 }
 
-// --- 5. FINALIZAÇÃO ---
+
+// --- FUNÇÕES DE LÓGICA (CARRINHO E BOTÕES) ---
+
+function alterarQtd(sku, mudanca) {
+    const spanQtd = document.getElementById(`qtd-${sku}`);
+    if(spanQtd) {
+        let qtd = parseInt(spanQtd.innerText) + mudanca;
+        // Garante que não fique menor que 1
+        spanQtd.innerText = qtd < 1 ? 1 : qtd;
+    }
+}
+
+function adicionar(sku) {
+  // Procura o produto na lista original (mais seguro)
+  const produto = produtos.find(p => String(p.sku) === String(sku));
+  
+  if (!produto) {
+      console.error("Produto não encontrado:", sku);
+      return;
+  }
+
+  const spanQtd = document.getElementById(`qtd-${sku}`);
+  const qtd = parseInt(spanQtd.innerText);
+  
+  // Verifica se já tem no carrinho
+  const itemIndex = carrinho.findIndex(i => String(i.sku) === String(sku));
+
+  if (itemIndex > -1) {
+    carrinho[itemIndex].qtd += qtd;
+  } else {
+    carrinho.push({ ...produto, qtd: qtd });
+  }
+  
+  renderCarrinho();
+  
+  // Feedback visual rápido no botão (Opcional)
+  const btn = event.target; // Pega o botão clicado
+  const textoOriginal = btn.innerText;
+  btn.innerText = "Adicionado!";
+  btn.style.backgroundColor = "#03264c";
+  btn.style.color = "white";
+  setTimeout(() => {
+      btn.innerText = textoOriginal;
+      btn.style.backgroundColor = "";
+      btn.style.color = "";
+  }, 1000);
+
+  // Reseta o contador visual para 1
+  spanQtd.innerText = "1";
+}
+
+function renderCarrinho() {
+  const div = document.getElementById("itensCarrinho");
+  const totalDiv = document.getElementById("total");
+  
+  if (!div) return;
+  div.innerHTML = "";
+  let total = 0;
+
+  if (carrinho.length === 0) {
+      div.innerHTML = "<p class='carrinho-vazio'>Seu carrinho está vazio.</p>";
+      if(totalDiv) totalDiv.innerHTML = "";
+      atualizarBotaoFlutuante(); // Esconde botão mobile
+      return;
+  }
+
+  carrinho.forEach((i) => {
+    total += i.preco * i.qtd;
+    div.innerHTML += `
+      <div class="item" style="border-bottom: 1px solid #eee; padding: 10px 0; font-size: 13px;">
+        <div style="display:flex; justify-content:space-between;">
+            <strong>${i.nome}</strong>
+            <span>x${i.qtd}</span>
+        </div>
+        <div style="color: #666; font-size: 11px;">SKU: ${i.sku}</div>
+        <div style="text-align: right; margin-top: 2px;">
+            R$ ${(i.qtd * i.preco).toFixed(2)} 
+            <a href="#" onclick="remover('${i.sku}')" style="color: red; margin-left: 5px; text-decoration: none; font-weight:bold;">[X]</a>
+        </div>
+      </div>
+    `;
+  });
+  
+  if(totalDiv) totalDiv.innerHTML = `<h3 style="margin-top:15px; text-align: right; color: #03264c;">Total: R$ ${total.toFixed(2)}</h3>`;
+  
+  atualizarBotaoFlutuante();
+}
+
+function remover(sku) {
+    const index = carrinho.findIndex(i => String(i.sku) === String(sku));
+    if(index > -1) { 
+        carrinho.splice(index, 1); 
+        renderCarrinho(); 
+    }
+}
+
+function atualizarBotaoFlutuante() {
+    const btn = document.getElementById("btn-whatsapp"); 
+    if(btn) {
+        if (carrinho.length > 0) {
+            btn.style.display = "block";
+            const totalItens = carrinho.reduce((acc, item) => acc + item.qtd, 0);
+            btn.innerHTML = `<i class="fas fa-check"></i> Ver Carrinho (${totalItens})`;
+        } else {
+            btn.style.display = "none";
+        }
+    }
+}
+
+function abrirModalMobile() {
+    document.querySelector('.carrinho-area').scrollIntoView({ behavior: 'smooth' });
+}
+
+
+// --- 5. FINALIZAÇÃO E PDF ---
 
 function finalizarPedido() {
   if (carrinho.length === 0) { alert("Carrinho vazio!"); return; }
@@ -4547,11 +4674,9 @@ function finalizarPedido() {
       return;
   }
 
-  // Gera PDF com as cores novas
   gerarPDF(nomeCliente, nomeLoja, nomeCidade);
   
-  // Mensagem WhatsApp com nome DNORTE
-  let mensagem = `🔔 *NOVO PEDIDO - DNORTE*\n`; // Mudei aqui
+  let mensagem = `🔔 *NOVO PEDIDO - DNORTE*\n`;
   mensagem += `👤 Cliente: *${nomeCliente}*\n`;
   mensagem += `🏪 Loja: *${nomeLoja}*\n`;
   mensagem += `🏙️ Cidade: *${nomeCidade}*\n`;
@@ -4577,14 +4702,13 @@ function gerarPDF(nomeCliente, nomeLoja, nomeCidade) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   
-  // Cabeçalho AZUL ESCURO (#03264c -> RGB: 3, 38, 76)
+  // Cabeçalho AZUL ESCURO
   doc.setFillColor(3, 38, 76); 
   doc.rect(0, 0, 210, 40, 'F');
   
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22); 
-  doc.text("DNORTE DISTRIBUIDORA", 105, 15, null, null, "center"); // Nome Novo
-  
+  doc.text("DNORTE DISTRIBUIDORA", 105, 15, null, null, "center");
   doc.setFontSize(14); 
   doc.text("Catálogo Digital", 105, 25, null, null, "center");
   
@@ -4593,14 +4717,12 @@ function gerarPDF(nomeCliente, nomeLoja, nomeCidade) {
   doc.text(`Pedido Nº: ${numeroPedido}`, 10, 50);
   doc.text(`Data: ${new Date().toLocaleDateString()}`, 10, 55);
   
-  // Dados do Cliente
   doc.setFont("helvetica", "bold");
   doc.text(`CLIENTE: ${nomeCliente}`, 10, 65);
   doc.text(`LOJA: ${nomeLoja}`, 10, 70);
   doc.text(`CIDADE: ${nomeCidade}`, 10, 75);
   
   let y = 85;
-  // Cabeçalho da Tabela (Cinza Claro)
   doc.setFillColor(240, 240, 240); doc.rect(10, y-5, 190, 8, 'F');
   doc.text("QTD", 12, y);
   doc.text("SKU", 30, y);
@@ -4620,7 +4742,7 @@ function gerarPDF(nomeCliente, nomeLoja, nomeCidade) {
 
     doc.text(String(i.qtd), 12, y);
     doc.setFontSize(9);
-    doc.text(i.sku, 30, y);
+    doc.text(String(i.sku), 30, y);
     doc.setFontSize(10);
     doc.text(nome, 70, y);
     doc.text(`R$ ${subtotal.toFixed(2)}`, 180, y);
@@ -4629,7 +4751,6 @@ function gerarPDF(nomeCliente, nomeLoja, nomeCidade) {
 
   doc.line(10, y, 200, y); y += 10;
   doc.setFont("helvetica", "bold"); doc.setFontSize(14);
-  // Total em Azul
   doc.setTextColor(3, 38, 76);
   doc.text(`TOTAL A PAGAR: R$ ${totalGeral.toFixed(2)}`, 110, y);
   
