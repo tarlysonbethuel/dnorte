@@ -1,163 +1,98 @@
-/* ARQUIVO: style.css - VERSÃO FINAL DNORTE */
-* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+/* ARQUIVO: style.css - VERSÃO REVISADA */
+* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 body { margin: 0; padding: 0; background-color: #fcfdfd; color: #333; }
 
-/* --- CABEÇALHO --- */
-header {
-    background-color: #03264c; /* AZUL ESCURO */
-    color: white; 
-    padding: 15px 20px; 
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(3, 38, 76, 0.3);
-    border-bottom: 5px solid #fb7815; /* LARANJA */
-}
+/* CABEÇALHO */
+header { background-color: #03264c; color: white; padding: 15px; text-align: center; border-bottom: 5px solid #fb7815; }
+.header-logo { max-width: 100%; height: auto; max-height: 80px; margin-bottom: 5px; display: inline-block; }
+header p { margin: 0; opacity: 0.9; font-size: 0.9rem; text-transform: uppercase; }
 
-/* LOGO NOVA */
-.header-logo {
-    max-width: 100%;
-    height: auto;
-    max-height: 80px; /* Tamanho controlado */
-    margin-bottom: 5px;
-    display: inline-block;
-}
+/* INSTRUÇÕES */
+.instrucoes-container { background-color: #eef4fa; border-bottom: 1px solid #dcebf7; padding: 10px; display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
+.passo { display: flex; align-items: center; gap: 8px; }
+.icone-passo { background-color: #03264c; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.passo p { margin: 0; font-size: 12px; color: #03264c; line-height: 1.2; }
+.seta-passo { color: #fb7815; font-size: 12px; }
 
-header p { margin: 0; opacity: 0.9; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
-
-/* --- BANNER DE INSTRUÇÕES --- */
-.instrucoes-container {
-    background-color: #eef4fa; /* Azul bem clarinho */
-    border-bottom: 1px solid #dcebf7;
-    padding: 15px;
-    display: flex; justify-content: center; align-items: center; gap: 20px;
-    margin-bottom: 20px;
-}
-.passo { display: flex; align-items: center; gap: 10px; text-align: left; }
-.icone-passo {
-    background-color: #03264c;
-    color: white; width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
-}
-.passo p { margin: 0; font-size: 13px; color: #03264c; line-height: 1.3; }
-.seta-passo { color: #fb7815; font-size: 14px; }
-
-/* --- LAYOUT PRINCIPAL --- */
+/* LAYOUT */
 .main-container { display: flex; max-width: 1200px; margin: 20px auto; padding: 0 15px; gap: 20px; }
 .catalogo-area { flex: 3; }
+.carrinho-area { flex: 1; }
 
 /* BARRA DE BUSCA */
-.barra-busca {
-    margin-bottom: 25px; /* Espaço para o título de baixo */
-    position: relative;
-    max-width: 100%;
-}
-.barra-busca i {
-    position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-    color: #fb7815; font-size: 18px;
-}
-.barra-busca input {
-    width: 100%; padding: 12px 15px 12px 45px;
-    border: 2px solid #e0e0e0; border-radius: 50px;
-    font-size: 16px; outline: none; transition: 0.3s; color: #03264c;
-}
-.barra-busca input:focus {
-    border-color: #03264c; box-shadow: 0 4px 10px rgba(3, 38, 76, 0.1);
+.barra-busca { margin-bottom: 20px; position: relative; }
+.barra-busca i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #fb7815; }
+.barra-busca input { width: 100%; padding: 12px 15px 12px 40px; border: 2px solid #e0e0e0; border-radius: 50px; font-size: 16px; outline: none; color: #03264c; }
+.barra-busca input:focus { border-color: #03264c; }
+
+h2 { border-bottom: 2px solid #fb7815; padding-bottom: 10px; color: #03264c; font-size: 1.5rem; margin-top: 0; }
+
+/* MENU DE CATEGORIAS */
+.menu-categorias-wrapper { margin-bottom: 25px; }
+.botoes-principais { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-categoria { background: white; border: 1px solid #dcebf7; color: #03264c; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; flex: 1; text-align: center; min-width: 80px; }
+.btn-categoria:hover { border-color: #fb7815; background: #fff8f0; }
+.btn-categoria.ativo { background: #fb7815; color: white; border-color: #fb7815; }
+.btn-ver-mais:hover { 
+    background-color: #fb7815; /* Laranja da sua marca */
+    transform: translateY(-2px); /* Efeito pulinho pra cima (opcional) */
 }
 
-/* TÍTULO DA SEÇÃO */
-.catalogo-area h2 { 
-    border-bottom: 2px solid #fb7815; 
-    padding-bottom: 10px; color: #03264c; margin-top: 0;
-}
+.menu-extra { background: #f8fbfd; border: 1px solid #e1eef7; border-radius: 10px; margin-top: 15px; padding: 15px; animation: slideDown 0.3s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.menu-extra-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+.grid-categorias-extra { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
-/* GRADE DE PRODUTOS (MOBILE FRIENDLY 160px) */
-.grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-
-/* --- CARTÃO PRODUTO --- */
-.produto {
-    background: white; border-radius: 8px; padding: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s;
-    display: flex; flex-direction: column; justify-content: space-between; text-align: center; border: 1px solid #eee;
-}
-.produto:hover { transform: translateY(-3px); border-color: #fb7815; }
-
+/* PRODUTOS */
+.grid-produtos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+.produto { background: white; border-radius: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+.produto:hover { border-color: #fb7815; transform: translateY(-3px); }
 .produto h3 { 
-    font-size: 13px; color: #03264c; margin: 10px 0; height: 36px; overflow: hidden;
-    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; 
+    font-size: 13px; 
+    color: #03264c; 
+    margin: 10px 0; 
+    height: 36px; 
+    overflow: hidden;
+    
+    /* COMANDOS DE CORTE DE LINHA */
+    display: -webkit-box; 
+    -webkit-line-clamp: 2; /* Versão antiga (obrigatória para funcionar hoje) */
+    line-clamp: 2;         /* <--- ADICIONE ESSA LINHA (Versão moderna) */
+    -webkit-box-orient: vertical; 
 }
-.produto img { transition: opacity 0.3s; mix-blend-mode: multiply; max-width: 100%; height: auto; }
 .produto p { color: #03264c; font-weight: 800; font-size: 16px; margin: 5px 0; }
+.btn-add { background: white; border: 1px solid #fb7815; color: #fb7815; padding: 8px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px; }
+.btn-add:hover { background: #fb7815; color: white; }
 
-.produto button.btn-add {
-    background-color: #fff; border: 1px solid #fb7815; color: #fb7815;
-    padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; margin-top: 5px; font-size: 12px;
-}
-.produto button.btn-add:hover { background-color: #fb7815; color: white; }
+/* QTD SELECTOR */
+.qtd-selector { display: flex; justify-content: center; gap: 5px; margin: 5px 0; }
+.qtd-selector button { background: #f0f4f8; border: none; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.qtd-selector span { width: 25px; text-align: center; font-weight: bold; }
 
-/* SELETOR QUANTIDADE */
-.qtd-selector { display: flex; align-items: center; justify-content: center; margin: 5px 0; gap: 5px; }
-.qtd-selector button {
-    background-color: #f0f4f8; color: #03264c; border: none;
-    width: 28px; height: 28px; border-radius: 4px; font-weight: bold; cursor: pointer;
-}
-.qtd-selector button:hover { background-color: #dcebf7; }
-.qtd-selector span { font-weight: bold; font-size: 15px; width: 25px; text-align: center; color: #03264c; }
+/* CARRINHO */
+.carrinho-box { background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); position: sticky; top: 20px; border-top: 4px solid #03264c; display: flex; flex-direction: column; max-height: 90vh; }
+.carrinho-header { padding: 15px; border-bottom: 1px solid #eee; }
+.lista-itens { padding: 10px 20px; overflow-y: auto; flex: 1; }
+.resumo-pedido { padding: 15px; background: #fff; border-radius: 0 0 10px 10px; }
+.input-dados { width: 100%; padding: 10px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px; text-transform: uppercase; }
+.btn-finalizar { background: #fb7815; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
-/* --- CARRINHO FIXO --- */
-.carrinho-area { flex: 1; }
-.carrinho-box { 
-    background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
-    position: sticky; top: 20px;
-    max-height: calc(100vh - 40px); display: flex; flex-direction: column;
-    border-top: 4px solid #03264c;
-}
-.carrinho-header { padding: 20px 20px 10px 20px; flex-shrink: 0; }
-.carrinho-header h2 { font-size: 1.2rem; margin: 0; color: #03264c; }
+/* MODAL */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+.modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 500px; width: 100%; text-align: center; position: relative; }
+.modal-close { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
+.modal-img { max-width: 100%; max-height: 250px; object-fit: contain; }
 
-.lista-itens { padding: 0 20px; overflow-y: auto; flex: 1; min-height: 100px; border-bottom: 1px solid #eee; }
-.carrinho-vazio { color: #999; text-align: center; font-style: italic; margin-top: 20px;}
-
-.resumo-pedido { padding: 15px 20px 20px 20px; background-color: #fff; border-radius: 0 0 10px 10px; flex-shrink: 0; }
-#total h3 { color: #03264c; margin-top: 15px; text-align: right; }
-
-/* FORMULÁRIO */
-.dados-cliente { margin-top: 10px; }
-.dados-cliente label { font-size: 12px; font-weight: bold; color: #03264c; display: block; margin-bottom: 5px; }
-.input-dados {
-    width: 100%; padding: 12px; margin-bottom: 8px;
-    border: 1px solid #ddd; border-radius: 6px;
-    text-transform: uppercase; font-weight: bold; font-size: 13px; color: #03264c;
-    background-color: #fcfdfd;
-}
-.input-dados:focus { border-color: #fb7815; outline: none; }
-
-.btn-finalizar {
-    background-color: #fb7815; color: white; border: none; width: 100%;
-    padding: 15px; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 10px;
-    box-shadow: 0 4px 10px rgba(251, 120, 21, 0.3);
-}
-.btn-finalizar:hover { background-color: #e06000; transform: translateY(-1px); }
-.aviso-pdf { font-size: 11px; color: #888; text-align: center; margin-top: 8px; }
-
-/* --- MOBILE --- */
-.botao-flutuante {
-    display: none; position: fixed; bottom: 20px; right: 20px;
-    background-color: #fb7815; color: white; padding: 15px 25px;
-    border-radius: 50px; box-shadow: 0 4px 15px rgba(251, 120, 21, 0.4);
-    text-decoration: none; font-weight: bold; z-index: 999;
-}
+/* MOBILE */
+.botao-flutuante { display: none; position: fixed; bottom: 20px; right: 20px; background: #fb7815; color: white; padding: 15px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
 @media (max-width: 768px) {
     .main-container { flex-direction: column; }
+    .grid-produtos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .grid-categorias-extra { grid-template-columns: repeat(2, 1fr); }
     .carrinho-area { display: block; order: 2; }
-    .carrinho-box { position: static; max-height: none; display: block; }
-    .lista-itens { max-height: 300px; overflow-y: auto; }
-    .botao-flutuante { display: block; bottom: 20px; } 
-    
-    /* Ajuste banner mobile */
-    .instrucoes-container { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .botao-flutuante { display: block; }
+    .instrucoes-container { flex-direction: column; align-items: flex-start; }
     .seta-passo { display: none; }
-    .passo { width: 100%; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    
-    /* Esconde subtítulo no mobile para dar destaque à logo */
     header p { display: none; }
 }

@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
+<body>
 
     <header>
         <div class="header-container">
             <img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora" class="header-logo">
-            
             <p>Catálogo Digital de Pedidos</p>
         </div>
     </header>
@@ -23,37 +23,47 @@
     <div class="instrucoes-container">
         <div class="passo">
             <div class="icone-passo"><i class="fas fa-cart-plus"></i></div>
-            <p><strong>1. Escolha</strong><br>Adicione itens ao carrinho</p>
+            <p><strong>1. Escolha</strong><br>Adicione itens</p>
         </div>
-        
         <div class="seta-passo"><i class="fas fa-chevron-right"></i></div>
-
         <div class="passo">
             <div class="icone-passo"><i class="fas fa-user-edit"></i></div>
-            <p><strong>2. Preencha</strong><br>Coloque Nome, Loja e Cidade</p>
+            <p><strong>2. Preencha</strong><br>Seus dados</p>
         </div>
-
         <div class="seta-passo"><i class="fas fa-chevron-right"></i></div>
-
         <div class="passo">
             <div class="icone-passo"><i class="fab fa-whatsapp"></i></div>
-            <p><strong>3. Envie</strong><br>Finalize o pedido no WhatsApp</p>
+            <p><strong>3. Envie</strong><br>No WhatsApp</p>
         </div>
     </div>
 
     <div class="main-container">
+        
         <section class="catalogo-area">
-            
+    
             <div class="barra-busca">
                 <i class="fas fa-search"></i>
-                <input type="text" id="inputBusca" placeholder="Buscar por nome ou código..." onkeyup="filtrarProdutos()">
+                <input type="text" id="inputBusca" placeholder="Buscar por nome, código ou categoria..." onkeyup="filtrarProdutos()">
             </div>
 
             <h2><i class="fas fa-boxes"></i> Produtos Disponíveis</h2>
-            
+
+            <div class="menu-categorias-wrapper">
+                <div id="botoes-principais" class="botoes-principais"></div>
+                
+                <div id="menu-extra" class="menu-extra" style="display: none;">
+                    <div class="menu-extra-header">
+                        <span>Mais Categorias</span>
+                        <i class="fas fa-times" onclick="alternarMenuCategorias()" style="cursor: pointer;"></i>
+                    </div>
+                    <div id="lista-botoes-extra" class="grid-categorias-extra"></div>
+                </div>
+            </div>
+
             <div id="produtos" class="grid-produtos">
                 <p>Carregando produtos...</p>
             </div>
+
         </section>
 
         <aside class="carrinho-area">
@@ -61,21 +71,17 @@
                 <div class="carrinho-header">
                     <h2><i class="fas fa-shopping-cart"></i> Seu Pedido</h2>
                 </div>
-                
                 <div id="itensCarrinho" class="lista-itens">
                     <p class="carrinho-vazio">Seu carrinho está vazio.</p>
                 </div>
-                
                 <div class="resumo-pedido">
                     <div id="total"></div>
-                    
                     <div class="dados-cliente">
                         <label>Seus Dados (Obrigatório):</label>
                         <input type="text" id="inputNome" class="input-dados" placeholder="SEU NOME COMPLETO">
                         <input type="text" id="inputLoja" class="input-dados" placeholder="NOME DA SUA LOJA">
                         <input type="text" id="inputCidade" class="input-dados" placeholder="CIDADE">
                     </div>
-
                     <button onclick="finalizarPedido()" class="btn-finalizar">
                         <i class="fab fa-whatsapp"></i> Enviar Pedido
                     </button>
@@ -88,6 +94,16 @@
     <a href="#" onclick="abrirModalMobile()" id="btn-whatsapp" class="botao-flutuante">
         <i class="fas fa-check"></i> Ver Carrinho
     </a>
+
+    <div id="modalProduto" class="modal-overlay" onclick="fecharModal(event)">
+        <div class="modal-content">
+            <span class="modal-close" onclick="fecharModal(true)">&times;</span>
+            <img id="modalImg" src="" class="modal-img" alt="Produto">
+            <h3 id="modalNome" class="modal-nome"></h3>
+            <p id="modalPreco" class="modal-preco"></p>
+            <div id="modalAcoes"></div> 
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

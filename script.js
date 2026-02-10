@@ -1,9 +1,6 @@
-/* CATÁLOGO DIGITAL - DNORTE DISTRIBUIDORA
-   Arquivo: script.js (Versão Otimizada - Ultra Rápida)
-*/
+/* ARQUIVO: script.js */
 
-// --- 1. LISTA DE PRODUTOS ---
-// 👇 COLE AQUI A LISTA DO SEU ARQUIVO DE TEXTO (AQUELA QUE GERAMOS COM OS CÓDIGOS REAIS)
+// 👇👇👇 IMPORTANTE: COLE SUA LISTA AQUI! 👇👇👇
 const produtos = [
   {
     "sku": "3541",
@@ -4457,302 +4454,305 @@ const produtos = [
     "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/c5773d23-c6b0-4928-b61d-1aad7f6dd24c/600.jpeg",
     "unidade": "UN"
   }
-];
-// 👆 Certifique-se de manter o padrão ]; no final
+]; 
+// 👆👆👆
 
 
-// --- 2. CONFIGURAÇÕES ---
+// --- CONFIGURAÇÕES DO SITE ---
 let carrinho = [];
 let numeroPedido = Math.floor(Math.random() * 100000);
-const WHATSAPP_LOJA = "5569999107161"; // <--- SEU NÚMERO AQUI
+const WHATSAPP_LOJA = "5511999999999"; // <--- SEU NÚMERO
 
-// --- 3. INICIALIZAÇÃO ---
+// --- CATEGORIAS ---
+const configCategorias = [
+    { nome: "BRINQUEDOS", termos: ["KIT COZINHA", "BOLA", "CARRINHO", "CAVALO", "VEICULOS", "DRAGÃO", "LANÇA ÁGUA", "BOLHA", "LOUSA", "ROBO", "CUBO"], excecoes: [] },
+    { nome: "CALCULADORA", termos: ["CALCULADORA"], excecoes: [] },
+    { nome: "CONTROLES AR", termos: ["AR CONDICIONADO", "AR-CONDICIONADO", "SPLIT", "AR E COMPONENTES"], excecoes: ["TV", "UNIVERSAL P/ TV", "CAPA"] },
+    { nome: "CONTROLES TV", termos: ["CONTROLE TV", "CONTROLE P/ TV", "CONTROLE DE TV", "SMART", "SAMSUNG", "LG", "AOC", "TCL", "PHILCO", "PHILIPS", "TOSHIBA", "SEMP", "PANASONIC", "LCD", "LED"], excecoes: ["BOX", "AR", "SPLIT", "GAME", "XBOX", "PLAYSTATION", "SUPORTE"] },
+    { nome: "CONTROLES BOX", termos: ["TV BOX", "MXQ", "TX"], excecoes: ["FONTE", "RECEPTOR"] },
+    { nome: "CONTROLES RECEPTOR", termos: ["RECEPTOR", "SKY", "NET", "CLARO", "VIVO", "HTV", "BTV"], excecoes: ["FONTE", "TV", "AR", "BOX"] },
+    { nome: "CABOS/ADAPTADORES", termos: ["CABO", "ADAPTADOR", "CONVERSOR", "PLUG", "CONECTOR", "P2", "RCA", "HDMI", "VGA"], excecoes: ["FACA", "VASSOURA", "TOMADA", "PANELA", "SOMBRINHA", "REDE", "CARREGADOR", "CONTROLE", "FONTE", "MARTELO", "TRANSFERENCIA"] },
+    { nome: "MEMÓRIA/PENDRIVE", termos: ["CARTÃO DE MEMÓRIA", "PENDRIVE", "PEN DRIVE", "MICRO SD"], excecoes: [] },
+    { nome: "CINTOS", termos: ["CINTO"], excecoes: [] },
+    { nome: "EXTENSOR", termos: ["EXTENSOR", "REDE CAPACETE"], excecoes: [] },
+    { nome: "BOLSA/MOCHILA", termos: ["MOCHILA", "BOLSA", "POCHETE"], excecoes: [] },
+    { nome: "RELÓGIOS", termos: ["RELÓGIO", "RELOGIO", "MAQUINA PARA RELÓGIO"], excecoes: [] },
+    { nome: "PILHAS/BATERIAS", termos: ["PILHA", "BATERIA", "MOEDA", "ALCALINA"], excecoes: ["CABO"] },
+    { nome: "FERRAMENTAS", termos: ["ALICATE", "ABRAÇADEIRA", "CHAVE", "CABO PARA TRANSFERENCIA", "FITA ISOLANTE", "PULVERIZADOR", "TRENA", "MARTELO", "SERROTE", "DISCO", "ESGUICHO"], excecoes: ["AFIADOR", "CHAVEIRO", "FACA"] },
+    { nome: "FONE DE OUVIDO", termos: ["FONE DE OUVIDO", "HEADSET", "EARPHONE"], excecoes: [] },
+    { nome: "LANTERNAS", termos: ["LUMINÁRIA DE EMERGÊNCIA", "LANTERNA"], excecoes: [] },
+    { nome: "SOMBRINHAS/CAPAS", termos: ["SOMBRINHA", "GUARDA-CHUVA", "GUARDA CHUVA", "CAPA DE CHUVA", "GUARDA-SOL"], excecoes: [] },
+    { nome: "TOMADA/ELÉTRICA", termos: ["TOMADA", "FILTRO DE LINHA", "ADAPTADOR PLUG", "ADAPTADOR TOMADA", "EXTENSÃO", "INTERRUPTOR", "INTEROPITO", "BENJAMIM"], excecoes: [] },
+    { nome: "UTILIDADES", termos: ["AFIADOR", "COLHER", "CONCHA", "COLA", "FACA", "CHURRASCO", "CORTADOR", "DESCASCADOR", "PENEIRA", "RODO", "TÁBUA", "TESOURA", "VARAL", "SACOLA", "PINÇA", "LIXA", "ESCUMADEIRA", "CANIVETE", "ESCOVA"], excecoes: ["FITA"] },
+    { nome: "DIVERSOS", termos: [], excecoes: [] }
+];
+
+// --- INICIALIZAÇÃO ---
 document.addEventListener("DOMContentLoaded", () => {
-    if (Array.isArray(produtos) && produtos.length > 0) {
-        // Carregamento inicial otimizado
+    if (typeof produtos !== 'undefined' && Array.isArray(produtos) && produtos.length > 0) {
+        autoClassificarProdutos();
+        renderizarBotoesCategoria();
         renderProdutos(produtos);
     } else {
-        document.getElementById("produtos").innerHTML = "<p style='padding:20px; text-align:center'>Cole a lista de produtos no script.js</p>";
+        document.getElementById("produtos").innerHTML = "<p style='grid-column:1/-1;text-align:center;'>⚠️ Lista de produtos vazia! Verifique o script.js</p>";
     }
 });
 
-// --- 4. FUNÇÕES DE EXIBIÇÃO (AGORA OTIMIZADAS) ---
-
-function renderProdutos(lista = produtos) {
-  const div = document.getElementById("produtos");
-  
-  // Se a busca não encontrar nada:
-  if (lista.length === 0) {
-      div.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
-            <i class="fas fa-search" style="font-size: 40px; margin-bottom: 10px; opacity: 0.5;"></i>
-            <p>Nenhum produto encontrado.</p>
-        </div>
-      `;
-      return;
-  }
-
-  // 🔥 OTIMIZAÇÃO DE PERFORMANCE:
-  // Em vez de usar "innerHTML +=", criamos um array gigante e juntamos no final.
-  // Isso faz o site carregar 600 produtos em milissegundos.
-  
-  const htmlBuffer = lista.map(p => {
-    const idQtd = `qtd-${p.sku}`;
-    
-    // loading="lazy" faz a imagem só baixar quando aparece na tela
-    return `
-      <div class="produto">
-        <div style="height: 180px; overflow: hidden; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
-            <img src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.src='https://via.placeholder.com/200?text=Sem+Foto'" style="max-height: 100%; max-width: 100%;">
-        </div>
-        <h3 title="${p.nome}">${p.nome}</h3>
-        <p>R$ ${p.preco.toFixed(2)}</p>
-        
-        <div class="qtd-selector">
-            <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
-            <span id="${idQtd}">1</span>
-            <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
-        </div>
-
-        <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar ao Carrinho</button>
-      </div>
-    `;
-  }).join('');
-
-  // Atualiza a tela UMA VEZ SÓ
-  div.innerHTML = htmlBuffer;
+// 1. CLASSIFICAR
+function autoClassificarProdutos() {
+    produtos.forEach(p => {
+        const nome = p.nome.toUpperCase();
+        let categoriaFinal = "DIVERSOS"; 
+        for (let config of configCategorias) {
+            if (config.nome === "DIVERSOS") continue;
+            const temProibida = config.excecoes.some(proibida => nome.includes(proibida));
+            if (temProibida) continue;
+            const temTermo = config.termos.some(termo => nome.includes(termo));
+            if (temTermo) {
+                categoriaFinal = config.nome;
+                break;
+            }
+        }
+        p.categoria = categoriaFinal;
+    });
 }
 
-// BUSCA OTIMIZADA
-function filtrarProdutos() {
-    const termo = document.getElementById('inputBusca').value.toLowerCase();
+// 2. BOTÕES + MENU
+function alternarMenuCategorias() {
+    const menu = document.getElementById("menu-extra");
+    const btnVerMais = document.getElementById("btn-ver-mais-cat");
+    if (!menu) return;
+
+    if (menu.style.display === "none") {
+        menu.style.display = "block";
+        if(btnVerMais) btnVerMais.innerHTML = '<i class="fas fa-minus"></i> MENOS';
+    } else {
+        menu.style.display = "none";
+        if(btnVerMais) btnVerMais.innerHTML = '<i class="fas fa-plus"></i> MAIS';
+    }
+}
+
+function renderizarBotoesCategoria() {
+    const containerPrincipal = document.getElementById("botoes-principais");
+    const containerExtra = document.getElementById("lista-botoes-extra");
     
-    // Se o termo for curto demais, não faz nada para economizar processamento
-    // (Opcional, mas ajuda se a lista for gigante)
+    if (!containerPrincipal || !containerExtra) return;
     
-    const listaFiltrada = produtos.filter(produto => {
-        // Verifica nome
-        const nomeMatch = produto.nome && produto.nome.toLowerCase().includes(termo);
-        // Verifica SKU (converte para string antes)
-        const skuMatch = produto.sku && produto.sku.toString().toLowerCase().includes(termo);
-        
-        return nomeMatch || skuMatch;
+    containerPrincipal.innerHTML = ""; 
+    containerExtra.innerHTML = "";
+
+    const btnTodos = document.createElement("button");
+    btnTodos.className = "btn-categoria ativo";
+    btnTodos.innerText = "TODOS";
+    btnTodos.onclick = () => {
+        filtrarPorCategoria("TODOS");
+        const menu = document.getElementById("menu-extra");
+        if(menu) menu.style.display = "none"; 
+    };
+    containerPrincipal.appendChild(btnTodos);
+
+    const categoriasUsadas = [...new Set(produtos.map(p => p.categoria))].sort();
+    const destaque = categoriasUsadas.slice(0, 3);
+    const resto = categoriasUsadas.slice(3);
+
+    destaque.forEach(cat => {
+        if(cat === "TODOS") return;
+        criarBotao(cat, containerPrincipal);
     });
 
+    if (resto.length > 0) {
+        const btnVerMais = document.createElement("button");
+        btnVerMais.id = "btn-ver-mais-cat";
+        btnVerMais.className = "btn-categoria btn-ver-mais";
+        btnVerMais.innerHTML = '<i class="fas fa-plus"></i> MAIS';
+        btnVerMais.onclick = alternarMenuCategorias;
+        containerPrincipal.appendChild(btnVerMais);
+
+        resto.forEach(cat => {
+            criarBotao(cat, containerExtra);
+        });
+    }
+}
+
+function criarBotao(cat, local) {
+    const btn = document.createElement("button");
+    btn.className = "btn-categoria";
+    btn.innerText = cat;
+    btn.onclick = () => {
+        filtrarPorCategoria(cat);
+        if (local.id === "lista-botoes-extra") alternarMenuCategorias();
+    };
+    local.appendChild(btn);
+}
+
+function filtrarPorCategoria(categoriaSelecionada) {
+    document.querySelectorAll(".btn-categoria").forEach(btn => {
+        btn.classList.remove("ativo");
+        if(btn.innerText === categoriaSelecionada) btn.classList.add("ativo");
+    });
+    if(categoriaSelecionada === "TODOS") {
+        const btnTodos = document.querySelector(".botoes-principais .btn-categoria");
+        if(btnTodos) btnTodos.classList.add("ativo");
+    }
+    const lista = categoriaSelecionada === "TODOS" ? produtos : produtos.filter(p => p.categoria === categoriaSelecionada);
+    renderProdutos(lista);
+}
+
+// 3. RENDERIZAR
+function renderProdutos(lista = produtos) {
+    const div = document.getElementById("produtos");
+    if (!div) return;
+
+    if (lista.length === 0) {
+        div.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">Nenhum produto encontrado.</div>`;
+        return;
+    }
+
+    const htmlBuffer = lista.map(p => {
+        return `
+        <div class="produto">
+            <div style="height: 160px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="abrirModal('${p.sku}')">
+                <img src="${p.imagem}" alt="${p.nome}" loading="lazy" style="max-height: 100%; max-width: 100%;" onerror="this.style.display='none'">
+            </div>
+            <h3 title="${p.nome}" onclick="abrirModal('${p.sku}')" style="cursor:pointer">${p.nome}</h3>
+            <p>R$ ${p.preco.toFixed(2)}</p>
+            <div class="qtd-selector">
+                <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
+                <span id="qtd-${p.sku}">1</span>
+                <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
+            </div>
+            <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar</button>
+        </div>`;
+    }).join('');
+
+    div.innerHTML = htmlBuffer;
+}
+
+function filtrarProdutos() {
+    const termo = document.getElementById('inputBusca').value.toLowerCase();
+    const listaFiltrada = produtos.filter(p => 
+        p.nome.toLowerCase().includes(termo) || 
+        String(p.sku).includes(termo) ||
+        p.categoria.toLowerCase().includes(termo)
+    );
     renderProdutos(listaFiltrada);
 }
 
-
-// --- FUNÇÕES DE LÓGICA (CARRINHO E BOTÕES) ---
-
+// 4. CARRINHO E MODAL
 function alterarQtd(sku, mudanca) {
-    const spanQtd = document.getElementById(`qtd-${sku}`);
-    if(spanQtd) {
-        let qtd = parseInt(spanQtd.innerText) + mudanca;
-        // Garante que não fique menor que 1
-        spanQtd.innerText = qtd < 1 ? 1 : qtd;
+    const span = document.getElementById(`qtd-${sku}`);
+    if(span) {
+        let novaQtd = parseInt(span.innerText) + mudanca;
+        if(novaQtd < 1) novaQtd = 1;
+        span.innerText = novaQtd;
     }
 }
 
 function adicionar(sku) {
-  // Procura o produto na lista original (mais seguro)
-  const produto = produtos.find(p => String(p.sku) === String(sku));
-  
-  if (!produto) {
-      console.error("Produto não encontrado:", sku);
-      return;
-  }
-
-  const spanQtd = document.getElementById(`qtd-${sku}`);
-  const qtd = parseInt(spanQtd.innerText);
-  
-  // Verifica se já tem no carrinho
-  const itemIndex = carrinho.findIndex(i => String(i.sku) === String(sku));
-
-  if (itemIndex > -1) {
-    carrinho[itemIndex].qtd += qtd;
-  } else {
-    carrinho.push({ ...produto, qtd: qtd });
-  }
-  
-  renderCarrinho();
-  
-  // Feedback visual rápido no botão (Opcional)
-  const btn = event.target; // Pega o botão clicado
-  const textoOriginal = btn.innerText;
-  btn.innerText = "Adicionado!";
-  btn.style.backgroundColor = "#03264c";
-  btn.style.color = "white";
-  setTimeout(() => {
-      btn.innerText = textoOriginal;
-      btn.style.backgroundColor = "";
-      btn.style.color = "";
-  }, 1000);
-
-  // Reseta o contador visual para 1
-  spanQtd.innerText = "1";
+    const p = produtos.find(prod => String(prod.sku) === String(sku));
+    if (!p) return;
+    
+    const span = document.getElementById(`qtd-${sku}`);
+    const qtd = span ? parseInt(span.innerText) : 1;
+    
+    const index = carrinho.findIndex(i => String(i.sku) === String(sku));
+    if (index > -1) carrinho[index].qtd += qtd;
+    else carrinho.push({ ...p, qtd: qtd });
+    
+    renderCarrinho();
+    if(span) span.innerText = "1"; 
+    
+    const btn = event.target;
+    if(btn) {
+        const txtOriginal = btn.innerText;
+        btn.innerText = "OK!";
+        setTimeout(() => btn.innerText = txtOriginal, 1000);
+    }
 }
 
 function renderCarrinho() {
-  const div = document.getElementById("itensCarrinho");
-  const totalDiv = document.getElementById("total");
-  
-  if (!div) return;
-  div.innerHTML = "";
-  let total = 0;
+    const div = document.getElementById("itensCarrinho");
+    const divTotal = document.getElementById("total");
+    const btnMobile = document.getElementById("btn-whatsapp");
+    
+    if(!div) return;
+    div.innerHTML = "";
+    let total = 0;
+    let totalItens = 0;
 
-  if (carrinho.length === 0) {
-      div.innerHTML = "<p class='carrinho-vazio'>Seu carrinho está vazio.</p>";
-      if(totalDiv) totalDiv.innerHTML = "";
-      atualizarBotaoFlutuante(); // Esconde botão mobile
-      return;
-  }
+    if (carrinho.length === 0) {
+        div.innerHTML = "<p class='carrinho-vazio'>Vazio</p>";
+        if(btnMobile) btnMobile.style.display = "none";
+        if(divTotal) divTotal.innerHTML = "";
+        return;
+    }
 
-  carrinho.forEach((i) => {
-    total += i.preco * i.qtd;
-    div.innerHTML += `
-      <div class="item" style="border-bottom: 1px solid #eee; padding: 10px 0; font-size: 13px;">
-        <div style="display:flex; justify-content:space-between;">
-            <strong>${i.nome}</strong>
-            <span>x${i.qtd}</span>
-        </div>
-        <div style="color: #666; font-size: 11px;">SKU: ${i.sku}</div>
-        <div style="text-align: right; margin-top: 2px;">
-            R$ ${(i.qtd * i.preco).toFixed(2)} 
-            <a href="#" onclick="remover('${i.sku}')" style="color: red; margin-left: 5px; text-decoration: none; font-weight:bold;">[X]</a>
-        </div>
-      </div>
-    `;
-  });
-  
-  if(totalDiv) totalDiv.innerHTML = `<h3 style="margin-top:15px; text-align: right; color: #03264c;">Total: R$ ${total.toFixed(2)}</h3>`;
-  
-  atualizarBotaoFlutuante();
+    carrinho.forEach(i => {
+        total += i.preco * i.qtd;
+        totalItens += i.qtd;
+        div.innerHTML += `
+        <div style="border-bottom:1px solid #eee; padding:5px 0; font-size:12px;">
+            <div style="display:flex; justify-content:space-between;">
+                <strong>${i.nome}</strong> <span>x${i.qtd}</span>
+            </div>
+            <div style="text-align:right;">R$ ${(i.preco * i.qtd).toFixed(2)} <a href="#" onclick="remover('${i.sku}')" style="color:red; margin-left:5px;">[X]</a></div>
+        </div>`;
+    });
+
+    if(divTotal) divTotal.innerHTML = `<h3 style="text-align:right; color:#03264c;">Total: R$ ${total.toFixed(2)}</h3>`;
+    
+    if(btnMobile) {
+        btnMobile.style.display = "block";
+        btnMobile.innerHTML = `<i class="fas fa-check"></i> Ver Carrinho (${totalItens})`;
+    }
 }
 
 function remover(sku) {
     const index = carrinho.findIndex(i => String(i.sku) === String(sku));
-    if(index > -1) { 
-        carrinho.splice(index, 1); 
-        renderCarrinho(); 
-    }
+    if (index > -1) carrinho.splice(index, 1);
+    renderCarrinho();
 }
 
-function atualizarBotaoFlutuante() {
-    const btn = document.getElementById("btn-whatsapp"); 
-    if(btn) {
-        if (carrinho.length > 0) {
-            btn.style.display = "block";
-            const totalItens = carrinho.reduce((acc, item) => acc + item.qtd, 0);
-            btn.innerHTML = `<i class="fas fa-check"></i> Ver Carrinho (${totalItens})`;
-        } else {
-            btn.style.display = "none";
-        }
-    }
+function abrirModal(sku) {
+    const p = produtos.find(prod => String(prod.sku) === String(sku));
+    if(!p) return;
+    document.getElementById("modalImg").src = p.imagem;
+    document.getElementById("modalNome").innerText = p.nome;
+    document.getElementById("modalPreco").innerText = `R$ ${p.preco.toFixed(2)}`;
+    document.getElementById("modalAcoes").innerHTML = `<button class="btn-add" style="background:#fb7815; color:white; padding:15px; width:100%;" onclick="adicionarNoModal('${p.sku}')">ADICIONAR AO PEDIDO</button>`;
+    document.getElementById("modalProduto").style.display = "flex";
 }
-
-function abrirModalMobile() {
-    document.querySelector('.carrinho-area').scrollIntoView({ behavior: 'smooth' });
+function fecharModal(e) {
+    if (e === true || e.target.id === "modalProduto") document.getElementById("modalProduto").style.display = "none";
 }
+function adicionarNoModal(sku) { adicionar(sku); fecharModal(true); }
+function abrirModalMobile() { document.querySelector('.carrinho-area').scrollIntoView({ behavior: 'smooth' }); }
 
-
-// --- 5. FINALIZAÇÃO E PDF ---
-
+// 5. FINALIZAR
 function finalizarPedido() {
-  if (carrinho.length === 0) { alert("Carrinho vazio!"); return; }
+    if (carrinho.length === 0) { alert("Carrinho vazio!"); return; }
+    const nome = document.getElementById("inputNome").value.toUpperCase();
+    const loja = document.getElementById("inputLoja").value.toUpperCase();
+    const cidade = document.getElementById("inputCidade").value.toUpperCase();
+    if(!nome || !loja || !cidade) { alert("Preencha Nome, Loja e Cidade!"); return; }
 
-  const inputNome = document.getElementById("inputNome");
-  const inputLoja = document.getElementById("inputLoja");
-  const inputCidade = document.getElementById("inputCidade");
-  
-  const nomeCliente = inputNome.value.toUpperCase().trim();
-  const nomeLoja = inputLoja.value.toUpperCase().trim();
-  const nomeCidade = inputCidade.value.toUpperCase().trim();
+    if (window.jspdf) {
+        const doc = new window.jspdf.jsPDF();
+        doc.setFillColor(3, 38, 76); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFontSize(18); doc.text("DNORTE DISTRIBUIDORA", 105, 25, null, null, "center");
+        doc.setTextColor(0,0,0); doc.setFontSize(10);
+        doc.text(`Cliente: ${nome} | Loja: ${loja} | Cidade: ${cidade}`, 10, 50);
+        let y = 60;
+        carrinho.forEach(i => {
+            doc.text(`${i.qtd}x ${i.nome} - R$ ${(i.preco*i.qtd).toFixed(2)}`, 10, y);
+            y += 7;
+        });
+        doc.save(`Pedido_${nome}.pdf`);
+    }
 
-  if (nomeCliente === "" || nomeLoja === "" || nomeCidade === "") {
-      alert("⚠️ ATENÇÃO:\n\nPreencha NOME, LOJA e CIDADE para continuar.");
-      return;
-  }
-
-  gerarPDF(nomeCliente, nomeLoja, nomeCidade);
-  
-  let mensagem = `🔔 *NOVO PEDIDO - DNORTE*\n`;
-  mensagem += `👤 Cliente: *${nomeCliente}*\n`;
-  mensagem += `🏪 Loja: *${nomeLoja}*\n`;
-  mensagem += `🏙️ Cidade: *${nomeCidade}*\n`;
-  mensagem += `📄 Pedido Nº: ${numeroPedido}\n`;
-  mensagem += `----------------------------\n`;
-  
-  let total = 0;
-  carrinho.forEach(i => {
-    mensagem += `📦 ${i.qtd}x [${i.sku}] ${i.nome}\n`;
-    total += i.qtd * i.preco;
-  });
-
-  mensagem += `----------------------------\n`;
-  mensagem += `💰 *TOTAL: R$ ${total.toFixed(2)}*\n\n`;
-  mensagem += `📎 *Anexe o PDF gerado se possível.*`;
-
-  const link = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(mensagem)}`;
-  window.open(link, "_blank");
-}
-
-function gerarPDF(nomeCliente, nomeLoja, nomeCidade) {
-  if (!window.jspdf) return;
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  
-  // Cabeçalho AZUL ESCURO
-  doc.setFillColor(3, 38, 76); 
-  doc.rect(0, 0, 210, 40, 'F');
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22); 
-  doc.text("DNORTE DISTRIBUIDORA", 105, 15, null, null, "center");
-  doc.setFontSize(14); 
-  doc.text("Catálogo Digital", 105, 25, null, null, "center");
-  
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(10);
-  doc.text(`Pedido Nº: ${numeroPedido}`, 10, 50);
-  doc.text(`Data: ${new Date().toLocaleDateString()}`, 10, 55);
-  
-  doc.setFont("helvetica", "bold");
-  doc.text(`CLIENTE: ${nomeCliente}`, 10, 65);
-  doc.text(`LOJA: ${nomeLoja}`, 10, 70);
-  doc.text(`CIDADE: ${nomeCidade}`, 10, 75);
-  
-  let y = 85;
-  doc.setFillColor(240, 240, 240); doc.rect(10, y-5, 190, 8, 'F');
-  doc.text("QTD", 12, y);
-  doc.text("SKU", 30, y);
-  doc.text("PRODUTO", 70, y);
-  doc.text("TOTAL", 180, y);
-  
-  y += 10;
-  doc.setFont("helvetica", "normal");
-  
-  let totalGeral = 0;
-  carrinho.forEach(i => {
-    let subtotal = i.qtd * i.preco;
-    totalGeral += subtotal;
-    let nome = i.nome.length > 45 ? i.nome.substring(0, 42) + "..." : i.nome;
-    
-    if (y > 270) { doc.addPage(); y = 20; }
-
-    doc.text(String(i.qtd), 12, y);
-    doc.setFontSize(9);
-    doc.text(String(i.sku), 30, y);
-    doc.setFontSize(10);
-    doc.text(nome, 70, y);
-    doc.text(`R$ ${subtotal.toFixed(2)}`, 180, y);
-    y += 8;
-  });
-
-  doc.line(10, y, 200, y); y += 10;
-  doc.setFont("helvetica", "bold"); doc.setFontSize(14);
-  doc.setTextColor(3, 38, 76);
-  doc.text(`TOTAL A PAGAR: R$ ${totalGeral.toFixed(2)}`, 110, y);
-  
-  doc.save(`Pedido_${numeroPedido}_DNorte.pdf`);
+    let msg = `*NOVO PEDIDO - DNORTE*\n👤 ${nome} | ${loja}\n📍 ${cidade}\n----------------\n`;
+    let total = 0;
+    carrinho.forEach(i => { msg += `${i.qtd}x ${i.nome}\n`; total += i.preco*i.qtd; });
+    msg += `----------------\n💰 *TOTAL: R$ ${total.toFixed(2)}*`;
+    window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, "_blank");
 }
