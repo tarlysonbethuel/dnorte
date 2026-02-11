@@ -4465,26 +4465,151 @@ const WHATSAPP_LOJA = "5511999999999"; // <--- SEU NÚMERO
 
 // --- CATEGORIAS ---
 const configCategorias = [
-    { nome: "BRINQUEDOS", termos: ["KIT COZINHA", "BOLA", "CARRINHO", "CAVALO", "VEICULOS", "DRAGÃO", "LANÇA ÁGUA", "BOLHA", "LOUSA", "ROBO", "CUBO"], excecoes: [] },
-    { nome: "CALCULADORA", termos: ["CALCULADORA"], excecoes: [] },
-    { nome: "CONTROLES AR", termos: ["AR CONDICIONADO", "AR-CONDICIONADO", "SPLIT", "AR E COMPONENTES"], excecoes: ["TV", "UNIVERSAL P/ TV", "CAPA"] },
-    { nome: "CONTROLES TV", termos: ["CONTROLE TV", "CONTROLE P/ TV", "CONTROLE DE TV", "SMART", "SAMSUNG", "LG", "AOC", "TCL", "PHILCO", "PHILIPS", "TOSHIBA", "SEMP", "PANASONIC", "LCD", "LED"], excecoes: ["BOX", "AR", "SPLIT", "GAME", "XBOX", "PLAYSTATION", "SUPORTE"] },
-    { nome: "CONTROLES BOX", termos: ["TV BOX", "MXQ", "TX"], excecoes: ["FONTE", "RECEPTOR"] },
-    { nome: "CONTROLES RECEPTOR", termos: ["RECEPTOR", "SKY", "NET", "CLARO", "VIVO", "HTV", "BTV"], excecoes: ["FONTE", "TV", "AR", "BOX"] },
-    { nome: "CABOS/ADAPTADORES", termos: ["CABO", "ADAPTADOR", "CONVERSOR", "PLUG", "CONECTOR", "P2", "RCA", "HDMI", "VGA"], excecoes: ["FACA", "VASSOURA", "TOMADA", "PANELA", "SOMBRINHA", "REDE", "CARREGADOR", "CONTROLE", "FONTE", "MARTELO", "TRANSFERENCIA"] },
-    { nome: "MEMÓRIA/PENDRIVE", termos: ["CARTÃO DE MEMÓRIA", "PENDRIVE", "PEN DRIVE", "MICRO SD"], excecoes: [] },
-    { nome: "CINTOS", termos: ["CINTO"], excecoes: [] },
-    { nome: "EXTENSOR", termos: ["EXTENSOR", "REDE CAPACETE"], excecoes: [] },
-    { nome: "BOLSA/MOCHILA", termos: ["MOCHILA", "BOLSA", "POCHETE"], excecoes: [] },
-    { nome: "RELÓGIOS", termos: ["RELÓGIO", "RELOGIO", "MAQUINA PARA RELÓGIO"], excecoes: [] },
-    { nome: "PILHAS/BATERIAS", termos: ["PILHA", "BATERIA", "MOEDA", "ALCALINA"], excecoes: ["CABO"] },
-    { nome: "FERRAMENTAS", termos: ["ALICATE", "ABRAÇADEIRA", "CHAVE", "CABO PARA TRANSFERENCIA", "FITA ISOLANTE", "PULVERIZADOR", "TRENA", "MARTELO", "SERROTE", "DISCO", "ESGUICHO"], excecoes: ["AFIADOR", "CHAVEIRO", "FACA"] },
-    { nome: "FONE DE OUVIDO", termos: ["FONE DE OUVIDO", "HEADSET", "EARPHONE"], excecoes: [] },
-    { nome: "LANTERNAS", termos: ["LUMINÁRIA DE EMERGÊNCIA", "LANTERNA"], excecoes: [] },
-    { nome: "SOMBRINHAS/CAPAS", termos: ["SOMBRINHA", "GUARDA-CHUVA", "GUARDA CHUVA", "CAPA DE CHUVA", "GUARDA-SOL"], excecoes: [] },
-    { nome: "TOMADA/ELÉTRICA", termos: ["TOMADA", "FILTRO DE LINHA", "ADAPTADOR PLUG", "ADAPTADOR TOMADA", "EXTENSÃO", "INTERRUPTOR", "INTEROPITO", "BENJAMIM"], excecoes: [] },
-    { nome: "UTILIDADES", termos: ["AFIADOR", "COLHER", "CONCHA", "COLA", "FACA", "CHURRASCO", "CORTADOR", "DESCASCADOR", "PENEIRA", "RODO", "TÁBUA", "TESOURA", "VARAL", "SACOLA", "PINÇA", "LIXA", "ESCUMADEIRA", "CANIVETE", "ESCOVA"], excecoes: ["FITA"] },
-    { nome: "DIVERSOS", termos: [], excecoes: [] }
+    { 
+        nome: "ACESSÓRIOS PARA CABELO", 
+        termos: ["ELÁSTICO DE CABELO", "RABICO GRANDE", "RABICO PEQUENO", "ELASTICO SILICONE", "ELASTICO DE CABELO", "MINI PIRANHA", "ELÁSTICO SILICONE"], 
+        excecoes: [] 
+    },
+   { 
+        nome: "BATERIAS", 
+        termos: ["BATERIA", "MOEDA","BATERIA P/ LANTERNA 2.500MAH"], 
+        excecoes: ["CABO"] 
+    },
+    { 
+        nome: "BOLSA/MOCHILA", 
+        termos: ["MOCHILA", "BOLSA", "POCHETE"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "BRINQUEDOS", 
+        termos: ["ANIMAIS DO MUNDO", "KIT COZINHA", "BOLA", "CARRINHO", "CAVALO", "VEICULOS", "DRAGÃO", "LANÇA ÁGUA", "BOLHA", "LOUSA", "ROBO", "CUBO"], 
+        excecoes: ["ADAPTADOR TOMADA"] 
+    },
+    { 
+        nome: "CABOS/ADAPTADORES", 
+        termos: ["CABO", "ADAPTADOR", "CONVERSOR", "PLUG", "CONECTOR", "P2", "RCA", "HDMI", "VGA"], 
+        excecoes: ["FACA", "VASSOURA", "TOMADA", "PANELA", "SOMBRINHA", "REDE", "CARREGADOR", "CONTROLE", "FONTE", "MARTELO", "TRANSFERENCIA"] 
+    },
+    { 
+        nome: "CALCULADORA", 
+        termos: ["CALCULADORA"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "CARREGADORES", 
+        termos: ["CARREGADOR", "FONTE"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "CHAVEIROS", 
+        termos: ["CHAVEIRO"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "CINTOS", 
+        termos: ["CINTO"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "CONTROLES AR", 
+        termos: ["AR CONDICIONADO", "AR-CONDICIONADO", "SPLIT", "AR E COMPONENTES", "CONTROLE UNIVERSAL P/ AR-CONDICONADO"], 
+        excecoes: ["TV", "UNIVERSAL P/ TV", "CAPA"] 
+    },
+    { 
+        nome: "CONTROLES BOX", 
+        termos: ["TV BOX", "MXQ", "TX", "CONTROLE RECEPTOR BTV - FBG - 9035"], 
+        excecoes: ["FONTE", "RECEPTOR"] 
+    },
+    { 
+        nome: "CONTROLES DVD", 
+        termos: ["CONTROLE DVD"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "CONTROLES RECEPTOR", 
+        termos: ["CONTROLE RECEPTOR", "RECEPTOR", "CONTROLE CONVERSOR", "AZMARECIA", "CINEBOX", "NAZABOX", "CENTURY", "OI TV", "ELSYS", "TOCOMBOX", "AZBOX", "CONVERSOR", "MEGA BOX", "FITBOX", "BRAVISSIMO", "SKY"], 
+        excecoes: ["AR CONDICIONADO", "SPLIT", "UNIVERSAL TV"] 
+    },
+    { 
+        nome: "CONTROLES TV", 
+        termos: ["CONTROLE TV", "CONTROLE UNIVERSAL PARA TV'S LG", "CONTROLE TOSHIBA LCD", "CONTOLE TV", "CONTROLE DE TV", "SMART", "CONTROLE TV SAMSUNG", "CONTROLE TV LG", "CONTROLE TV AOC", "CONTROLE TV TCL", "CONTROLE TV PHILCO", "CONTROLE TV PHILIPS", "CONTROLE TV TOSHIBA", "CONTROLE TV SEMP", "CONTROLE TV PANASONIC", "CONTROLE TV LCD", "CONTROLE TV LED", "CONTROLE TV MULTILASER", "CONTROLE TV UNIVERSAL"], 
+        excecoes: ["CINTO INFANTIL", "DVD", "TV BOX"] 
+    },
+    { 
+        nome: "CUIDADOS PESSOAL", 
+        termos: ["BARBEADOR DESCARTAVEL", "BARBERADOR DESCARTAVEL", "APARELHO DE BARBEAR", "APARADOR DE CABELOS", "LÂMINA", "MAQUINA DE ACABAMENTO", "MAQUINHA DE ACABAMENTO", "NAVALHETE", "MAQUINNHA DE ACABAMENTO"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "EXTENSOR", 
+        termos: ["EXTENSOR", "REDE CAPACETE"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "FERRAMENTAS", 
+        termos: ["ALICATE", "ABRAÇADEIRA", "CHAVE", "CABO PARA TRANSFERENCIA", "FITA ISOLANTE", "PULVERIZADOR", "TRENA", "MARTELO", "SERROTE", "DISCO", "ESGUICHO"], 
+        excecoes: ["AFIADOR", "CHAVEIRO", "FACA"] 
+    },
+    { 
+        nome: "FONE DE OUVIDO", 
+        termos: ["FONE DE OUVIDO", "HEADSET", "EARPHONE"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "INFORMATICA", 
+        termos: ["INFORMATICA", "NOTEBOOK", "COMPUTADOR", "MONITOR", "ADAPTADOR WIFI", "TECLADO", "MOUSE"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "LANTERNAS", 
+        termos: ["LUMINÁRIA DE EMERGÊNCIA", "LANTERNA"], 
+        excecoes: ["RÁDIO PORTÁTIL"] 
+    },
+    { 
+        nome: "MEMÓRIA/PENDRIVE", 
+        termos: ["CARTÃO DE MEMÓRIA", "PENDRIVE", "PEN DRIVE", "MICRO SD"], 
+        excecoes: [] 
+    },
+        { 
+        nome: "PILHAS", 
+        termos: ["PILHA", "PILHAS", "PILHA AA", "PILHA AAA", "PILHA ALCALINA", "PILHA D"], 
+        excecoes: ["CABO"] 
+    },
+    { 
+        nome: "RÁDIOS", 
+        termos: ["RÁDIO", "RADIO"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "RELÓGIOS", 
+        termos: ["RELÓGIO", "RELOGIO", "MAQUINA PARA RELÓGIO"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "SOMBRINHAS/CAPAS", 
+        termos: ["SOMBRINHA", "GUARDA-CHUVA", "GUARDA CHUVA", "CAPA DE CHUVA", "GUARDA-SOL"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "SUPORTES", 
+        termos: ["SUPORTE"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "TOMADA/ELÉTRICA", 
+        termos: ["BOCAL DE LAMPADA", "TOMADA", "FILTRO DE LINHA", "ADAPTADOR PLUG", "ADAPTADOR TOMADA", "EXTENSÃO", "INTERRUPTOR", "INTEROPITO", "BENJAMIM", "BOCAL"], 
+        excecoes: [] 
+    },
+    { 
+        nome: "UTILIDADES", 
+        termos: ["AFIADOR", "COLHER", "CONCHA", "COLA", "MINI PROCESSADOR", "FACA", "CHURRASCO", "CORTADOR", "DESCASCADOR", "PENEIRA", "RODO", "TÁBUA", "TESOURA", "VARAL", "SACOLA", "PINÇA", "LIXA", "ESCUMADEIRA", "CANIVETE", "ESCOVA", "PANO"], 
+        excecoes: ["FITA"] 
+    },
+    { 
+        nome: "DIVERSOS", 
+        termos: [], 
+        excecoes: [] 
+    }
 ];
 
 // --- INICIALIZAÇÃO ---
