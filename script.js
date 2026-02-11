@@ -926,6 +926,13 @@ const produtos = [
     "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/76e10121-354a-44eb-ba51-25a25bd9dd7b/600.jpeg",
     "unidade": "UN"
   },
+    {
+    "sku": "3764",
+    "nome": "CAPA DE CHUVA CINZA TRANSPARENTE ADULTO - TAMANHO M, G E GG - PACOTE COM 5 UN - CP15F",
+    "preco": 52,
+    "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/7189f2e8-5b74-4b61-8027-982b108b9c73/600.jpeg",
+    "unidade": "UN"
+  },
   {
     "sku": "3668",
     "nome": "CAPA DE CHUVA MOTOQUEIRO COM FAIXA REFLETIVA BRANCA - CM58",
@@ -3300,17 +3307,17 @@ const produtos = [
     "unidade": "UN"
   },
   {
-    "sku": "3558",
-    "nome": "GUARDA-CHUVA - COMPRIMENTO 57CM - MANUAL - F1816SD",
-    "preco": 21.5,
-    "imagem": "",
-    "unidade": "UN"
-  },
-  {
     "sku": "3076",
     "nome": "GUARDA-CHUVA C TECIDO DUPLO MANUAL - G1816S",
     "preco": 22.5,
     "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/6a16049c-254b-4bf7-9a8f-4f61f1a925dc/600.jpeg",
+    "unidade": "UN"
+  },
+    {
+    "sku": "3763",
+    "nome": "GUARDA-CHUVA 50CM / AUTOMATICO - F5076GS",
+    "preco": 15.5,
+    "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/c27a8f60-c728-4534-9223-1a412cb6a3f2/600.jpeg",
     "unidade": "UN"
   },
   {
@@ -4424,20 +4431,6 @@ const produtos = [
     "nome": "TRENA 7.5M - PN117",
     "preco": 10.9,
     "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/2c7135fd-f814-4164-9204-2b43476d3cd7/600.jpeg",
-    "unidade": "UN"
-  },
-  {
-    "sku": "3263",
-    "nome": "TRIPÉ DE SELFIE SEM FIO HMASTON - ZP11",
-    "preco": 54,
-    "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/a4697152-6bfb-4e4f-8b36-e316c8aff93f/600.jpeg",
-    "unidade": "UN"
-  },
-  {
-    "sku": "3328",
-    "nome": "TV BOX MXQ PRO 4k 5G",
-    "preco": 140,
-    "imagem": "https://hiper-gestao.s3.amazonaws.com/a289da4e-133e-49be-be68-d1fe6430717f/imagem-de-produto/072bf093-8554-4fd2-b123-f88cef5c701a/600.jpeg",
     "unidade": "UN"
   },
   {
