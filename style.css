@@ -27,15 +27,54 @@ header p { margin: 0; opacity: 0.9; font-size: 0.9rem; text-transform: uppercase
 
 h2 { border-bottom: 2px solid #fb7815; padding-bottom: 10px; color: #03264c; font-size: 1.5rem; margin-top: 0; }
 
-/* MENU DE CATEGORIAS */
-.menu-categorias-wrapper { margin-bottom: 25px; }
-.botoes-principais { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn-categoria { background: white; border: 1px solid #dcebf7; color: #03264c; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; flex: 1; text-align: center; min-width: 80px; }
-.btn-categoria:hover { border-color: #fb7815; background: #fff8f0; }
-.btn-categoria.ativo { background: #fb7815; color: white; border-color: #fb7815; }
+/* =========================================
+   MENU DE CATEGORIAS E DEPARTAMENTOS
+   ========================================= */
+.menu-categorias-wrapper { 
+    margin-bottom: 25px; 
+}
+
+.botoes-principais, #lista-botoes-extra { 
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    justify-content: center; /* Centraliza os botões na tela */
+}
+
+.btn-categoria { 
+    background: white; 
+    border: 1px solid #dcebf7; 
+    color: #03264c; 
+    padding: 10px 15px; 
+    border-radius: 8px; 
+    font-size: 13px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    text-transform: uppercase; 
+    
+    /* A mágica que impede o texto de vazar: */
+    width: auto; 
+    min-width: fit-content; 
+    text-align: center; 
+    white-space: normal; 
+    transition: all 0.3s ease;
+}
+
+.btn-categoria:hover { 
+    border-color: #fb7815; 
+    background: #fff8f0; 
+}
+
+.btn-categoria.ativo { 
+    background: #fb7815; 
+    color: white; 
+    border-color: #fb7815; 
+}
+
 .btn-ver-mais:hover { 
-    background-color: #fb7815; /* Laranja da sua marca */
-    transform: translateY(-2px); /* Efeito pulinho pra cima (opcional) */
+    background-color: #fb7815; 
+    color: white;
+    transform: translateY(-2px); 
 }
 
 .menu-extra { background: #f8fbfd; border: 1px solid #e1eef7; border-radius: 10px; margin-top: 15px; padding: 15px; animation: slideDown 0.3s ease; }
