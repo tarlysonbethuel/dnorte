@@ -1,45 +1,180 @@
 /* =======================================================
-   CATÁLOGO AUTOMÁTICO - DNORTE DISTRIBUIDORA
-   SISTEMA DE DEPARTAMENTOS E CATEGORIAS EM CASCATA
+   CATÁLOGO AUTOMÁTICO DNORTE 2.0 - SISTEMA MISTO
+   VITRINE PÚBLICA (SEM PREÇO) + ÁREA DO LOJISTA COM SENHA
    ======================================================= */
 
-// 1. CONFIGURAÇÕES PRINCIPAIS
 const WHATSAPP_LOJA = "5569999107161"; 
 const ID_PLANILHA = "1oneVF4MfT-sQJx-Sa7wfr0AjnHQpZ6zgGZuSaelER7c"; 
 
 let carrinho = [];
 let produtos = []; 
+let clientesCadastrados = [];
+let lojistaLogado = null; 
 
-// Controles de Filtros Atuais
 let departamentoAtual = "TODOS";
 let categoriaAtual = "TODAS";
 
-// Gera o código do pedido único no formato: CA-XXXX
 let numAleatorio = Math.floor(Math.random() * 9999) + 1;
 let numeroPedido = "CA-" + String(numAleatorio).padStart(4, '0');
 
 document.addEventListener("DOMContentLoaded", () => {
+    verificarSessaoSalva();
+    carregarClientesDoSheets();
     carregarProdutosDaPlanilha();
 });
 
 // =======================================================
-// 2. BUSCA AUTOMÁTICA DE DADOS (API)
+// 2. CONTROLE DE SESSÃO E LOGIN (COM CORREÇÃO DE ZEROS)
 // =======================================================
-async function carregarProdutosDaPlanilha() {
-    const divProdutos = document.getElementById("produtos");
-    divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center; padding: 50px; font-size: 18px;'><i class='fas fa-spinner fa-spin'></i> Carregando estoque ao vivo da DNorte...</p>";
-    
+async function carregarClientesDoSheets() {
     try {
-        const url = `https://docs.google.com/spreadsheets/d/${ID_PLANILHA}/gviz/tq?tqx=out:json`;
-        const response = await fetch(url);
+        const urlClientes = `https://docs.google.com/spreadsheets/d/${ID_PLANILHA}/gviz/tq?sheet=CLIENTES&tqx=out:json`;
+        const response = await fetch(urlClientes);
         const text = await response.text();
-        
         const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
         const data = JSON.parse(jsonString);
         
-        // Mapeamento exato das suas colunas
-        let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6, idxPreco = 7;
+        clientesCadastrados = [];
         
+        // MAPEAMENTO: 0=CLIENTE(A), 1=CNPJ(B), 2=SENHA(C), 3=LOJA(D), 4=HIPER(E)
+        data.table.rows.forEach(row => {
+            const c = row.c;
+            if(!c || !c[1]) return;
+            
+            const cnpjBruto = c[1].f ? String(c[1].f).trim() : (c[1].v !== null ? String(c[1].v).trim() : '');
+            const senhaBruta = c[2].f ? String(c[2].f).trim() : (c[2].v !== null ? String(c[2].v).trim() : '');
+            const clienteBruto = c[0].f ? String(c[0].f).trim() : (c[0].v !== null ? String(c[0].v).trim() : '');
+            const lojaBruta = c[3].f ? String(c[3].f).trim() : (c[3].v !== null ? String(c[3].v).trim() : 'LOJISTA PARCEIRO');
+            const hiperBruto = c[4].f ? String(c[4].f).trim() : (c[4].v !== null ? String(c[4].v).trim() : '');
+            
+            if (cnpjBruto === '') return;
+
+            clientesCadastrados.push({
+                cliente: clienteBruto,
+                cnpj: cnpjBruto.replace(/\D/g, ""), // Guarda o CNPJ limpo apenas com números
+                senha: senhaBruta,
+                loja: lojaBruta,
+                hiper: hiperBruto
+            });
+        });
+        console.log("CLIENTES CARREGADOS NA MEMÓRIA:", clientesCadastrados.length);
+    } catch (e) {
+        console.error("Erro ao carregar banco de clientes. Verifique se a aba está publicada.", e);
+    }
+}
+
+function abrirModalLogin() {
+    document.getElementById("login-erro").style.display = "none";
+    document.getElementById("modalLogin").style.display = "flex";
+}
+
+function fecharModalLogin(e) {
+    if (e.target.id === "modalLogin") document.getElementById("modalLogin").style.display = "none";
+}
+
+function executarLogin() {
+    const valorDigitadoLimpo = document.getElementById("loginCnpj").value.replace(/\D/g, "");
+    const senhaDigitada = document.getElementById("loginSenha").value.trim();
+    const divErro = document.getElementById("login-erro");
+    
+    const clienteEncontrado = clientesCadastrados.find(c => {
+        // .padStart protege contra zeros que o Google Planilhas costuma engolir à esquerda
+        const cpfCnpjPlanilhaLimpo = String(c.cnpj).replace(/\D/g, "").padStart(valorDigitadoLimpo.length, "0");
+        const senhaPlanilhaLimpa = String(c.senha).trim();
+        
+        return cpfCnpjPlanilhaLimpo === valorDigitadoLimpo && senhaPlanilhaLimpa === senhaDigitada;
+    });
+    
+    if (clienteEncontrado) {
+        lojistaLogado = clienteEncontrado;
+        localStorage.setItem("dnorte_session", JSON.stringify(clienteEncontrado));
+        
+        document.getElementById("modalLogin").style.display = "none";
+        ajustarInterfaceModoLogado();
+        filtrarProdutosFinal(); 
+    } else {
+        divErro.style.display = "block";
+    }
+}
+
+function verificarSessaoSalva() {
+    const sessaoSalva = localStorage.getItem("dnorte_session");
+    if (sessaoSalva) {
+        lojistaLogado = JSON.parse(sessaoSalva);
+        ajustarInterfaceModoLogado();
+    }
+}
+
+function ajustarInterfaceModoLogado() {
+    if (lojistaLogado) {
+        const divAviso = document.getElementById("aviso-cliente-logado");
+        if(divAviso) divAviso.style.display = "block";
+        
+        const spanNome = document.getElementById("nome-loja-logada");
+        if(spanNome) spanNome.innerText = lojistaLogado.loja;
+        
+        const divCarrinho = document.getElementById("carrinho-lateral");
+        if(divCarrinho) divCarrinho.style.display = "block";
+        
+        const inpLoja = document.getElementById("inputLoja");
+        if(inpLoja) inpLoja.value = lojistaLogado.loja;
+        
+        const inpNome = document.getElementById("inputNome");
+        if(inpNome) inpNome.value = lojistaLogado.cliente || lojistaLogado.loja;
+    }
+}
+
+function fazerLogout() {
+    localStorage.removeItem("dnorte_session");
+    lojistaLogado = null;
+    
+    const divAviso = document.getElementById("aviso-cliente-logado");
+    if(divAviso) divAviso.style.display = "none";
+    
+    const divCarrinho = document.getElementById("carrinho-lateral");
+    if(divCarrinho) divCarrinho.style.display = "none";
+    
+    const btnZap = document.getElementById("btn-whatsapp");
+    if(btnZap) btnZap.style.display = "none";
+    
+    carrinho = [];
+    renderCarrinho();
+    filtrarProdutosFinal(); 
+}
+
+// =======================================================
+// MÁSCARA AUTOMÁTICA PARA CPF E CNPJ
+// =======================================================
+function mascaraCpfCnpj(input) {
+    let v = input.value.replace(/\D/g, ""); 
+    if (v.length <= 11) { 
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else { 
+        v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+        v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+        v = v.replace(/(\d{4})(\d)/, "$1-$2");
+    }
+    input.value = v;
+}
+
+// =======================================================
+// 3. BUSCA AUTOMÁTICA DE PRODUTOS
+// =======================================================
+async function carregarProdutosDaPlanilha() {
+    const divProdutos = document.getElementById("produtos");
+    
+    try {
+        // Vai buscar à aba padrão (Produtos)
+        const url = `https://docs.google.com/spreadsheets/d/${ID_PLANILHA}/gviz/tq?tqx=out:json`;
+        const response = await fetch(url);
+        const text = await response.text();
+        const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
+        const data = JSON.parse(jsonString);
+        
+        let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6, idxPreco = 7;
         produtos = [];
         
         data.table.rows.forEach(row => {
@@ -51,7 +186,6 @@ async function carregarProdutosDaPlanilha() {
             
             const sku = c[idxCodigo] && c[idxCodigo].v !== null ? String(c[idxCodigo].v).split('.')[0] : '';
             const nome = c[idxProduto].v;
-            
             const departamento = c[idxDepartamento] && c[idxDepartamento].v !== null ? String(c[idxDepartamento].v).trim().toUpperCase() : 'GERAL';
             const categoria = c[idxCategoria] && c[idxCategoria].v !== null ? String(c[idxCategoria].v).trim().toUpperCase() : 'DIVERSOS';
             
@@ -77,17 +211,16 @@ async function carregarProdutosDaPlanilha() {
             construirFiltros();
             filtrarProdutosFinal();
         } else {
-            divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>⚠️ Nenhum produto encontrado com a situação 'ATIVO'.</p>";
+            if(divProdutos) divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>⚠️ Nenhum produto encontrado.</p>";
         }
-        
     } catch (error) {
-        console.error(error);
-        divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:red; font-weight:bold;'>❌ Erro ao conectar com o Google Planilhas.</p>";
+        console.error("Erro nos produtos:", error);
+        if(divProdutos) divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:red;'>❌ Erro ao carregar base de dados. Verifique a planilha.</p>";
     }
 }
 
 // =======================================================
-// 3. MENU DINÂMICO (DEPARTAMENTOS E CATEGORIAS)
+// 4. MENU DINÂMICO DE FILTROS E BUSCA
 // =======================================================
 function alternarMenuCategorias() {
     const menu = document.getElementById("menu-extra");
@@ -110,22 +243,20 @@ function construirFiltros() {
     let deptoContainer = document.getElementById("container-departamentos");
     if (!deptoContainer) {
         let labelDepto = document.createElement("div");
-        labelDepto.innerHTML = "<strong style='color:#03264c; font-size:16px;'><i class='fas fa-building'></i> 1. Escolha o Departamento:</strong>";
-        labelDepto.style.width = "100%";
+        labelDepto.innerHTML = "<strong style='color:#03264c; font-size:15px;'><i class='fas fa-building'></i> 1. Filtre por Departamento:</strong>";
         labelDepto.style.marginBottom = "8px";
         wrapper.insertBefore(labelDepto, wrapper.firstChild);
 
         deptoContainer = document.createElement("div");
         deptoContainer.id = "container-departamentos";
         deptoContainer.className = "botoes-principais";
-        deptoContainer.style.marginBottom = "20px";
+        deptoContainer.style.marginBottom = "15px";
         deptoContainer.style.borderBottom = "2px solid #eee";
-        deptoContainer.style.paddingBottom = "15px";
+        deptoContainer.style.paddingBottom = "10px";
         wrapper.insertBefore(deptoContainer, labelDepto.nextSibling);
         
         let labelCat = document.createElement("div");
-        labelCat.innerHTML = "<strong style='color:#fb7815; font-size:16px;'><i class='fas fa-tags'></i> 2. Filtre por Categoria:</strong>";
-        labelCat.style.width = "100%";
+        labelCat.innerHTML = "<strong style='color:#fb7815; font-size:15px;'><i class='fas fa-tags'></i> 2. Sub-Categoria:</strong>";
         labelCat.style.marginBottom = "8px";
         wrapper.insertBefore(labelCat, document.getElementById("botoes-principais"));
     }
@@ -145,7 +276,6 @@ function renderizarDepartamentos() {
     container.appendChild(btnTodos);
     
     const departamentos = [...new Set(produtos.map(p => p.departamento))].sort();
-    
     departamentos.forEach(dep => {
         if (!dep || dep === "TODOS") return;
         const btn = document.createElement("button");
@@ -165,7 +295,6 @@ function selecionarDepartamento(dep) {
     filtrarProdutosFinal();
 }
 
-// Gerenciador de categorias menores
 function renderizarCategorias() {
     const containerPrincipal = document.getElementById("botoes-principais");
     const containerExtra = document.getElementById("lista-botoes-extra");
@@ -226,10 +355,11 @@ function selecionarCategoria(cat) {
 }
 
 // =======================================================
-// 4. VITRINE DE PRODUTOS E BUSCA
+// 5. MÓDULO INTELIGENTE DE VITRINE E LOGIN
 // =======================================================
 function filtrarProdutosFinal() {
-    const termo = document.getElementById('inputBusca').value.toLowerCase();
+    const inputBusca = document.getElementById('inputBusca');
+    const termo = inputBusca ? inputBusca.value.toLowerCase() : "";
     
     const listaFiltrada = produtos.filter(p => {
         const matchDepto = departamentoAtual === "TODOS" || p.departamento === departamentoAtual;
@@ -237,8 +367,7 @@ function filtrarProdutosFinal() {
         const matchBusca = termo === "" || 
                            p.nome.toLowerCase().includes(termo) || 
                            String(p.sku).includes(termo) || 
-                           p.categoria.toLowerCase().includes(termo) || 
-                           p.departamento.toLowerCase().includes(termo);
+                           p.categoria.toLowerCase().includes(termo);
         
         return matchDepto && matchCat && matchBusca;
     });
@@ -246,53 +375,59 @@ function filtrarProdutosFinal() {
     renderProdutos(listaFiltrada);
 }
 
-function filtrarProdutos() {
-    filtrarProdutosFinal();
-}
+function filtrarProdutos() { filtrarProdutosFinal(); }
 
 function renderProdutos(lista) {
     const div = document.getElementById("produtos");
     if (!div) return;
 
     if (lista.length === 0) {
-        div.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">Nenhum produto encontrado.</div>`;
+        div.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">Nenhum item localizado.</div>`;
         return;
     }
 
     const htmlBuffer = lista.map(p => {
+        let blocoPrecoEAcao = "";
+        
+        if (lojistaLogado) {
+            blocoPrecoEAcao = `
+                <p class="preco-produto">R$ ${p.preco.toFixed(2)}</p>
+                <div class="qtd-selector">
+                    <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
+                    <span id="qtd-${p.sku}">1</span>
+                    <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
+                </div>
+                <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar ao Pedido</button>
+            `;
+        } else {
+            blocoPrecoEAcao = `
+                <p class="aviso-preco-vitrine"><i class="fas fa-lock"></i> Preço restrito a lojistas</p>
+                <button type="button" class="btn-solicitar-preco" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar Atacado <i class="fab fa-whatsapp"></i></button>
+            `;
+        }
+
         return `
         <div class="produto">
-            <div style="height: 160px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="abrirModal('${p.sku}')">
-                <img src="${p.imagem}" alt="${p.nome}" loading="lazy" style="max-height: 100%; max-width: 100%;" onerror="this.src='favicon.png'; this.style.opacity='0.2'">
+            <div class="img-prod-wrapper" onclick="abrirModal('${p.sku}')">
+                <img src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.src='favicon.png'; this.style.opacity='0.2'">
             </div>
-            <h3 title="${p.nome}" onclick="abrirModal('${p.sku}')" style="cursor:pointer">${p.nome}</h3>
-            <p>R$ ${p.preco.toFixed(2)}</p>
-            <div class="qtd-selector">
-                <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
-                <span id="qtd-${p.sku}">1</span>
-                <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
-            </div>
-            <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar</button>
+            <h3 title="${p.nome}" onclick="abrirModal('${p.sku}')">${p.nome}</h3>
+            <small class="sku-label">Cód: #${p.sku}</small>
+            ${blocoPrecoEAcao}
         </div>`;
     }).join('');
 
     div.innerHTML = htmlBuffer;
 }
 
-// =======================================================
-// 5. GERENCIAMENTO DO CARRINHO E POPUPS
-// =======================================================
-function ajustarQtdDiretoNoCarrinho(sku, mudanca) {
-    const index = carrinho.findIndex(i => String(i.sku) === String(sku));
-    if (index > -1) {
-        carrinho[index].qtd += mudanca;
-        if (carrinho[index].qtd < 1) {
-            carrinho.splice(index, 1);
-        }
-        renderCarrinho();
-    }
+function solicitarPrecoViaZap(sku, nomeProd) {
+    const msg = `Olá! Vi o produto *${nomeProd}* (Cód: #${sku}) na sua Vitrine Virtual e gostaria de saber as tabelas de preço e condições de atacado para a minha loja.`;
+    window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
+// =======================================================
+// 6. GERENCIAMENTO DE PEDIDOS E MODAIS
+// =======================================================
 function alterarQtd(sku, mudanca) {
     const span = document.getElementById(`qtd-${sku}`);
     if(span) {
@@ -318,9 +453,17 @@ function adicionar(sku) {
     
     const btn = event.target;
     if(btn && btn.classList.contains('btn-add')) {
-        const txtOriginal = btn.innerText;
-        btn.innerText = "OK!";
-        setTimeout(() => btn.innerText = txtOriginal, 1000);
+        btn.innerText = "Adicionado!";
+        setTimeout(() => btn.innerText = "Adicionar ao Pedido", 1000);
+    }
+}
+
+function ajustarQtdDiretoNoCarrinho(sku, mudanca) {
+    const index = carrinho.findIndex(i => String(i.sku) === String(sku));
+    if (index > -1) {
+        carrinho[index].qtd += mudanca;
+        if (carrinho[index].qtd < 1) carrinho.splice(index, 1);
+        renderCarrinho();
     }
 }
 
@@ -345,34 +488,27 @@ function renderCarrinho() {
         total += i.preco * i.qtd;
         totalItens += i.qtd;
         div.innerHTML += `
-        <div style="border-bottom:1px solid #eee; padding:8px 0; font-size:13px; display:flex; flex-direction:column; gap:4px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-                <strong style="color:#222; max-width:80%;">${i.nome}</strong>
-                <span style="color:#666; font-weight:bold; white-space:nowrap;">x${i.qtd}</span>
+        <div class="item-carrinho-box">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <strong style="max-width:80%;">${i.nome}</strong>
+                <span>x${i.qtd}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
                 <span style="color:#fb7815; font-weight:bold;">R$ ${(i.preco * i.qtd).toFixed(2)}</span>
-                <div style="display:flex; gap:5px; align-items:center;">
-                    <button onclick="ajustarQtdDiretoNoCarrinho('${i.sku}', -1)" style="padding:2px 8px; background:#ddd; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">-</button>
-                    <button onclick="ajustarQtdDiretoNoCarrinho('${i.sku}', 1)" style="padding:2px 8px; background:#ddd; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">+</button>
-                    <a href="#" onclick="remover('${i.sku}')" style="color:#d9534f; font-weight:bold; text-decoration:none; margin-left:10px; font-size:11px;">Excluir</a>
+                <div style="display:flex; gap:5px;">
+                    <button onclick="ajustarQtdDiretoNoCarrinho('${i.sku}', -1)">-</button>
+                    <button onclick="ajustarQtdDiretoNoCarrinho('${i.sku}', 1)">+</button>
                 </div>
             </div>
         </div>`;
     });
 
-    if(divTotal) divTotal.innerHTML = `<h3 style="text-align:right; color:#03264c; margin-top:15px; font-size:18px;">Total: R$ ${total.toFixed(2)}</h3>`;
+    if(divTotal) divTotal.innerHTML = `<h3>Total: R$ ${total.toFixed(2)}</h3>`;
     
-    if(btnMobile) {
+    if(btnMobile && lojistaLogado) {
         btnMobile.style.display = "block";
-        btnMobile.innerHTML = `<i class="fas fa-check"></i> Ver Carrinho (${totalItens})`;
+        btnMobile.innerHTML = `<i class="fas fa-shopping-basket"></i> Pedido (${totalItens})`;
     }
-}
-
-function remover(sku) {
-    const index = carrinho.findIndex(i => String(i.sku) === String(sku));
-    if (index > -1) carrinho.splice(index, 1);
-    renderCarrinho();
 }
 
 function abrirModal(sku) {
@@ -380,8 +516,20 @@ function abrirModal(sku) {
     if(!p) return;
     document.getElementById("modalImg").src = p.imagem;
     document.getElementById("modalNome").innerText = p.nome;
-    document.getElementById("modalPreco").innerText = `R$ ${p.preco.toFixed(2)}`;
-    document.getElementById("modalAcoes").innerHTML = `<button class="btn-add" style="background:#fb7815; color:white; padding:15px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;" onclick="adicionarNoModal('${p.sku}')">ADICIONAR AO PEDIDO</button>`;
+    
+    const pPreco = document.getElementById("modalPreco");
+    const pAcoes = document.getElementById("modalAcoes");
+    
+    if (lojistaLogado) {
+        pPreco.innerText = `R$ ${p.preco.toFixed(2)}`;
+        pPreco.style.color = "#fb7815";
+        pAcoes.innerHTML = `<button class="btn-add" style="width:100%; padding:15px;" onclick="adicionarNoModal('${p.sku}')">ADICIONAR AO PEDIDO</button>`;
+    } else {
+        pPreco.innerHTML = `<i class="fas fa-lock"></i> Valores visíveis apenas para lojistas parceiros.`;
+        pPreco.style.color = "#888";
+        pAcoes.innerHTML = `<button class="btn-solicitar-preco" style="width:100%; padding:15px;" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar via WhatsApp <i class="fab fa-whatsapp"></i></button>`;
+    }
+    
     document.getElementById("modalProduto").style.display = "flex";
 }
 
@@ -390,11 +538,10 @@ function fecharModal(e) {
 }
 
 function adicionarNoModal(sku) { adicionar(sku); fecharModal(true); }
-
 function abrirModalMobile() { document.querySelector('.carrinho-area').scrollIntoView({ behavior: 'smooth' }); }
 
 // =======================================================
-// 6. DISPARAR PEDIDO EXCLUSIVO VIA WHATSAPP (PDF REMOVIDO)
+// 7. FINALIZAÇÃO DO PEDIDO
 // =======================================================
 function finalizarPedido() {
     if (carrinho.length === 0) { alert("Carrinho vazio!"); return; }
@@ -403,24 +550,30 @@ function finalizarPedido() {
     const loja = document.getElementById("inputLoja").value.toUpperCase();
     const city = document.getElementById("inputCidade").value.toUpperCase();
     
-    if(!nome || !loja || !city) { alert("Por favor, preencha o Nome, Nome da Loja e sua Cidade!"); return; }
+    if(!nome || !loja || !city) { alert("Por favor, preencha todos os campos do cabeçalho do pedido!"); return; }
 
-    // --- MENSAGEM DO WHATSAPP ---
-    let msg = "*PEDIDO: " + numeroPedido + "*\n";
-    msg += "----------------\n";
-    msg += "👤 *Cliente:* " + nome + "\n";
-    msg += "🏠 *Loja:* " + loja + "\n"; 
-    msg += "📍 *Cidade:* " + city + "\n";
-    msg += "----------------\n*ITENS SOLICITADOS:*\n";
+    let msg = `*NOVO PEDIDO DE COMPRA - DNORTE*\n`;
+    msg += `=============================\n`;
+    msg += `👤 *Lojista:* ${loja}\n`;
+    msg += `🙋‍♂️ *Comprador:* ${nome}\n`;
+    msg += `📍 *Cidade:* ${city}\n`;
+    
+    if (lojistaLogado) {
+        msg += `🆔 *CNPJ/CPF:* ${lojistaLogado.cnpj}\n`;
+        if(lojistaLogado.hiper) msg += `📊 *Cód. Hiper:* ${lojistaLogado.hiper}\n`;
+    }
+    
+    msg += `=============================\n\n`;
+    msg += `📦 *ITENS SOLICITADOS:*\n`;
     
     let totalZap = 0;
     carrinho.forEach(i => { 
-        msg += i.qtd + "x " + i.nome + "\n"; 
+        msg += `▪️ ${i.qtd}x ${i.nome} (Cód: #${i.sku})\n`; 
         totalZap += i.preco * i.qtd; 
     });
     
-    msg += "----------------\n💰 *TOTAL DA COMPRA: R$ " + totalZap.toFixed(2) + "*";
+    msg += `\n-----------------------------\n`;
+    msg += `💰 *TOTAL DO PEDIDO: R$ ${totalZap.toFixed(2)}*`;
 
-    const urlZap = "https://wa.me/" + WHATSAPP_LOJA + "?text=" + encodeURIComponent(msg);
-    window.open(urlZap, "_blank");
+    window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, "_blank");
 }

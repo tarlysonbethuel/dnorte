@@ -3,104 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Digital | DNorte Distribuidora</title>
+    <title>DNorte Distribuidora - Catálogo & Vitrine</title>
     
-    <link rel="icon" href="favicon.png" type="image/png">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="favicon.PNG">
+    
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-    <header>
-        <div class="header-container">
-            <img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora" class="header-logo">
-            <p>Catálogo Digital de Pedidos</p>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                 <img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora" class="img-logo">
+             </div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#quem-somos">Quem Somos</a></li>
+                <li><a href="#como-trabalhamos">Diferenciais</a></li>
+                <li><a href="#vitrine-ancora" id="lnk-vitrine">Vitrine Pública</a></li>
+                <li><button class="btn-login-nav" onclick="abrirModalLogin()"><i class="fas fa-lock"></i> Área do Lojista</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="aviso-cliente-logado" class="aviso-logado" style="display: none;">
+        <p><i class="fas fa-unlock"></i> Modo: <strong>Catálogo com Preço Ativado</strong> | Bem-vindo, <span id="nome-loja-logada">Lojista</span>! <a href="#" onclick="fazerLogout()">[Sair / Bloquear Preços]</a></p>
+    </div>
+
+    <header id="inicio" class="hero-section">
+        <div class="hero-content">
+            <h1>A força que abastece o seu negócio.</h1>
+            <p>Logística inteligente, catálogo completo e parceria de verdade para lojistas exigentes. Conheça a nossa vitrine e descubra como podemos acelerar as suas vendas.</p>
+            <a href="#vitrine-ancora" class="btn-hero">Ver Produtos</a>
         </div>
     </header>
 
-    <div class="instrucoes-container">
-        <div class="passo">
-            <div class="icone-passo"><i class="fas fa-cart-plus"></i></div>
-            <p><strong>1. Escolha</strong><br>Adicione itens</p>
-        </div>
-        <div class="seta-passo"><i class="fas fa-chevron-right"></i></div>
-        <div class="passo">
-            <div class="icone-passo"><i class="fas fa-user-edit"></i></div>
-            <p><strong>2. Preencha</strong><br>Seus dados</p>
-        </div>
-        <div class="seta-passo"><i class="fas fa-chevron-right"></i></div>
-        <div class="passo">
-            <div class="icone-passo"><i class="fab fa-whatsapp"></i></div>
-            <p><strong>3. Envie</strong><br>No WhatsApp</p>
-        </div>
-    </div>
-
-    <div class="main-container">
-        
-        <section class="catalogo-area">
-    
-            <div class="barra-busca">
-                <i class="fas fa-search"></i>
-                <input type="text" id="inputBusca" placeholder="Buscar por nome, código ou categoria..." onkeyup="filtrarProdutos()">
+    <section id="quem-somos" class="section-historia">
+        <div class="container">
+            <h2>Tradição que evolui com você.</h2>
+            <div class="historia-grid">
+                <p>Com raízes firmes em Jaru, Rondônia, a DNorte Distribuidora carrega a experiência de quem entende o ritmo do varejo. Nascemos da base sólida e do trabalho duro de anos sob a marca Distribuidora Maré Mansa. Hoje, com uma identidade renovada e processos tecnológicos avançados, damos um passo à frente.</p>
+                <p>Mais do que entregar caixas, nós entregamos soluções. Nosso estoque é gerenciado de forma rigorosa para garantir que a sua loja nunca fique sem os produtos que seus clientes mais procuram. Estamos no centro do estado para levar agilidade, precisão e confiança diretamente para a sua prateleira.</p>
             </div>
+        </div>
+    </section>
 
-            <h2><i class="fas fa-boxes"></i> Produtos Disponíveis</h2>
-
-            <div class="menu-categorias-wrapper">
-                <div id="botoes-principais" class="botoes-principais"></div>
-                
-                <div id="menu-extra" class="menu-extra" style="display: none;">
-                    <div class="menu-extra-header">
-                        <span>Mais Categorias</span>
-                        <i class="fas fa-times" onclick="alternarMenuCategorias()" style="cursor: pointer;"></i>
-                    </div>
-                    <div id="lista-botoes-extra" class="grid-categorias-extra"></div>
+    <section id="como-trabalhamos" class="section-diferenciais">
+        <div class="container">
+            <h2>Como Trabalhamos</h2>
+            <div class="diferenciais-grid">
+                <div class="card-diferencial">
+                    <div class="icon-box"><i class="fas fa-truck-fast"></i></div>
+                    <h3>Agilidade e Logística</h3>
+                    <p>Localização estratégica em Jaru para despachar mercadorias com a velocidade que o seu estoque exige.</p>
+                </div>
+                <div class="card-diferencial">
+                    <div class="icon-box"><i class="fas fa-boxes-stacked"></i></div>
+                    <h3>Mix de Produtos</h3>
+                    <p>Catálogo diversificado e catalogado nos mínimos detalhes para facilitar a sua escolha.</p>
+                </div>
+                <div class="card-diferencial">
+                    <div class="icon-box"><i class="fas fa-comments"></i></div>
+                    <h3>Atendimento Focado</h3>
+                    <p>Suporte humano e rápido pelo WhatsApp para tirar dúvidas, fechar pedidos e garantir o seu pós-venda.</p>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div id="produtos" class="grid-produtos">
-                <p>Carregando produtos...</p>
+    <span id="vitrine-ancora"></span>
+    <main class="catalogo-container">
+        
+        <section class="busca-area">
+            <div class="busca-wrapper">
+                <i class="fas fa-search icon-busca"></i>
+                <input type="text" id="inputBusca" oninput="filtrarProdutos()" placeholder="Procure por código, produto ou marca...">
             </div>
-
         </section>
 
-        <aside class="carrinho-area">
-            <div class="carrinho-box">
-                <div class="carrinho-header">
-                    <h2><i class="fas fa-shopping-cart"></i> Seu Pedido</h2>
-                </div>
-                <div id="itensCarrinho" class="lista-itens">
-                    <p class="carrinho-vazio">Seu carrinho está vazio.</p>
-                </div>
-                <div class="resumo-pedido">
-                    <div id="total"></div>
-                    <div class="dados-cliente">
-                        <label>Seus Dados (Obrigatório):</label>
-                        <input type="text" id="inputNome" class="input-dados" placeholder="SEU NOME COMPLETO">
-                        <input type="text" id="inputLoja" class="input-dados" placeholder="NOME DA SUA LOJA">
-                        <input type="text" id="inputCidade" class="input-dados" placeholder="CIDADE">
-                    </div>
-                    <button onclick="finalizarPedido()" class="btn-finalizar">
-                        <i class="fab fa-whatsapp"></i> Enviar Pedido
-                    </button>
-                </div>
+        <section class="menu-categorias-wrapper">
+            <div id="botoes-principais" class="botoes-principais"></div>
+            <div id="menu-extra" class="menu-extra" style="display: none;">
+                <div id="lista-botoes-extra" class="lista-botoes-extra"></div>
             </div>
-        </aside>
+        </section>
+
+        <div class="conteudo-principal">
+            <section id="produtos" class="produtos-grid"></section>
+
+            <aside id="carrinho-lateral" class="carrinho-area" style="display: none;">
+                <h2><i class="fas fa-shopping-cart"></i> Seu Pedido</h2>
+                <div class="Form-cliente">
+                    <input type="text" id="inputNome" placeholder="Seu Nome completo">
+                    <input type="text" id="inputLoja" placeholder="Nome da Loja">
+                    <input type="text" id="inputCidade" placeholder="Sua Cidade / UF">
+                </div>
+                <div id="itensCarrinho" class="itens-carrinho"></div>
+                <div id="total" class="total-carrinho"></div>
+                <button class="btn-finalizar" onclick="finalizarPedido()">Enviar Pedido via WhatsApp <i class="fab fa-whatsapp"></i></button>
+            </aside>
+        </div>
+    </main>
+
+    <section class="section-cta">
+        <div class="cta-content">
+            <h2>Pronto para ter a DNorte na sua loja?</h2>
+            <p>Acesse nossa vitrine online para conhecer nossa linha de produtos. Se você já é lojista, chame nossa equipe no WhatsApp para ter acesso à tabela de preços exclusiva e condições de atacado.</p>
+            <div class="cta-buttons">
+                <a href="#vitrine-ancora" class="btn-cta-vitrine">Acessar Vitrine Online</a>
+                <a href="https://wa.me/5569999107161?text=Olá,%20gostaria%20de%20me%20cadastrar%20como%20lojista%20na%20DNorte." target="_blank" class="btn-cta-zap">Falar com um Consultor <i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-site">
+        <p>&copy; 2026 DNorte Distribuidora. Todos os direitos reservados. Jaru - RO.</p>
+    </footer>
+
+    <button id="btn-whatsapp" class="btn-carrinho-mobile" onclick="abrirModalMobile()" style="display: none;"></button>
+
+    <div id="modalLogin" class="modal" onclick="fecharModalLogin(event)">
+        <div class="modal-content login-box">
+            <span class="close-btn" onclick="document.getElementById('modalLogin').style.display='none'">&times;</span>
+            <h3><i class="fas fa-lock"></i> Autenticação do Lojista</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Insira os seus dados cadastrados na DNorte para liberar os preços de atacado e o carrinho.</p>
+            <div class="input-group">
+                <label>CNPJ / Login:</label>
+                <input type="text" id="loginCnpj" placeholder="Digite o CPF ou CNPJ" oninput="mascaraCpfCnpj(this)" maxlength="18">
+            </div>
+            <div class="input-group">
+                <label>Senha de Acesso:</label>
+                <input type="password" id="loginSenha" placeholder="Digite sua senha">
+            </div>
+            <div id="login-erro" style="color: red; font-size: 13px; margin-bottom: 15px; display: none; font-weight: bold;">❌ CNPJ ou Senha incorretos. Chame o suporte.</div>
+            <button class="btn-efetuar-login" onclick="executarLogin()">Liberar Preços <i class="fas fa-unlock"></i></button>
+        </div>
     </div>
 
-    <a href="#" onclick="abrirModalMobile()" id="btn-whatsapp" class="botao-flutuante">
-        <i class="fas fa-check"></i> Ver Carrinho
-    </a>
-
-    <div id="modalProduto" class="modal-overlay" onclick="fecharModal(event)">
+    <div id="modalProduto" class="modal" onclick="fecharModal(event)">
         <div class="modal-content">
-            <span class="modal-close" onclick="fecharModal(true)">&times;</span>
-            <img id="modalImg" src="" class="modal-img" alt="Produto">
-            <h3 id="modalNome" class="modal-nome"></h3>
-            <p id="modalPreco" class="modal-preco"></p>
-            <div id="modalAcoes"></div> 
+            <span class="close-btn" onclick="fecharModal(true)">&times;</span>
+            <div class="modal-body">
+                <div class="modal-img-container">
+                    <img id="modalImg" src="" alt="Produto">
+                </div>
+                <div class="modal-info">
+                    <h2 id="modalNome"></h2>
+                    <div id="modalPrecoContainer">
+                        <p id="modalPreco" class="modal-preco"></p>
+                    </div>
+                    <div id="modalAcoes"></div>
+                </div>
+            </div>
         </div>
     </div>
 
