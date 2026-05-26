@@ -36,8 +36,9 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
 .aviso-logado a { color: white; font-weight: bold; margin-left: 10px; }
 
 /* --- HERO SECTION (BANNER PRINCIPAL) --- */
+/* --- HERO SECTION (BANNER PRINCIPAL) --- */
 .hero-section { 
-    background: linear-gradient(rgba(3, 38, 76, 0.85), rgba(3, 38, 76, 0.95)), url('prateleira_dnorte1.PNG'); 
+    background: linear-gradient(rgba(3, 38, 76, 0.85), rgba(3, 38, 76, 0.95)), url('prateleira_dnorte1.png'); /* <-- AQUI: .png minúsculo! */
     background-position: center;
     background-size: cover;
     background-attachment: fixed; 
