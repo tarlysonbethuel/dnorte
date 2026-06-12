@@ -149,20 +149,52 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
 
 /* --- RESPONSIVIDADE (MOBILE) --- */
 @media (max-width: 768px) {
-    /* --- CORREÇÃO DO MENU MOBILE --- */
+    /* --- MENU SUPERIOR MOBILE --- */
     .nav-links { display: flex; gap: 10px; }
-    .nav-links li:not(:last-child) { display: none; } /* Esconde só os textos, salva o último item (o botão) */
-    .btn-login-nav { padding: 8px 15px; font-size: 13px; } /* Diminui um pouco o botão para caber perfeitamente ao lado da logo */
-    /* ------------------------------- */
+    .nav-links li:not(:last-child) { display: none; } 
+    .btn-login-nav { padding: 8px 15px; font-size: 13px; } 
 
+    /* --- AJUSTES DE TEXTO MOBILE --- */
     .hero-content h1 { font-size: 38px; }
     .historia-grid { grid-template-columns: 1fr; }
     .modal-body { grid-template-columns: 1fr; }
     .cta-buttons { flex-direction: column; }
-    
     .conteudo-principal { grid-template-columns: 1fr; }
-    .carrinho-area { display: none !important; } 
-    .btn-carrinho-mobile { display: block; position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; border: none; padding: 15px 25px; border-radius: 30px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 99; cursor: pointer; }
+    
+    /* --- POPUP DO CARRINHO MOBILE --- */
+    .carrinho-area { display: none; } /* Escondido por padrão */
+    .carrinho-area.mostrar-mobile {
+        display: block !important;
+        position: fixed;
+        bottom: 85px; 
+        right: 5%;
+        width: 90%;
+        max-height: 70vh; 
+        overflow-y: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0px 10px 40px rgba(0,0,0,0.6);
+        z-index: 1000;
+    }
+
+    /* --- BOTÃO VERDE FLUTUANTE --- */
+    .btn-carrinho-mobile { 
+        display: block; 
+        position: fixed; 
+        bottom: 20px; 
+        right: 20px; 
+        background: #25D366; 
+        color: white; 
+        border: none; 
+        padding: 15px 25px; 
+        border-radius: 30px; 
+        font-size: 16px; 
+        font-weight: bold; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+        z-index: 999; 
+        cursor: pointer; 
+    }
 }
 
 @media (min-width: 769px) {

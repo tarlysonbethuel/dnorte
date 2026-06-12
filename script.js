@@ -161,7 +161,7 @@ function mascaraCpfCnpj(input) {
 }
 
 // =======================================================
-// 3. BUSCA AUTOMÁTICA DE PRODUTOS
+// 3. BUSCA AUTOMÁTICA DE PRODUTOS (ATUALIZADA PARA HIPER)
 // =======================================================
 async function carregarProdutosDaPlanilha() {
     const divProdutos = document.getElementById("produtos");
@@ -195,13 +195,10 @@ async function carregarProdutosDaPlanilha() {
                 if (isNaN(preco)) preco = 0;
             }
             
-            let imagem = "";
-            if (c[idxFoto] && c[idxFoto].v !== null) {
-                let fotoPath = String(c[idxFoto].v);
-                let filename = fotoPath.split('\\').pop().split('/').pop(); 
-                imagem = `imagens_produtos/${filename}`; 
-            } else {
-                imagem = "favicon.png"; 
+            // 🚀 MUDANÇA PRINCIPAL: Agora lê o link de internet diretamente da folha de cálculo!
+            let imagem = "favicon.png";
+            if (c[idxFoto] && c[idxFoto].v !== null && String(c[idxFoto].v).trim() !== "") {
+                imagem = String(c[idxFoto].v).trim(); 
             }
             
             produtos.push({ sku, nome, departamento, categoria, preco, imagem });
@@ -215,10 +212,9 @@ async function carregarProdutosDaPlanilha() {
         }
     } catch (error) {
         console.error("Erro nos produtos:", error);
-        if(divProdutos) divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:red;'>❌ Erro ao carregar base de dados. Verifique a planilha.</p>";
+        if(divProdutos) divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:red;'>❌ Erro ao carregar base de dados. Verifique a folha de cálculo.</p>";
     }
 }
-
 // =======================================================
 // 4. MENU DINÂMICO DE FILTROS E BUSCA
 // =======================================================
@@ -538,7 +534,13 @@ function fecharModal(e) {
 }
 
 function adicionarNoModal(sku) { adicionar(sku); fecharModal(true); }
-function abrirModalMobile() { document.querySelector('.carrinho-area').scrollIntoView({ behavior: 'smooth' }); }
+function abrirModalMobile() { 
+    const carrinhoArea = document.querySelector('.carrinho-area');
+    if (carrinhoArea) {
+        // O toggle faz o botão funcionar como um interruptor: clica liga, clica desliga!
+        carrinhoArea.classList.toggle('mostrar-mobile');
+    }
+}
 
 // =======================================================
 // 7. FINALIZAÇÃO DO PEDIDO
@@ -554,26 +556,26 @@ function finalizarPedido() {
 
     let msg = `*NOVO PEDIDO DE COMPRA - DNORTE*\n`;
     msg += `=============================\n`;
-    msg += `👤 *Lojista:* ${loja}\n`;
-    msg += `🙋‍♂️ *Comprador:* ${nome}\n`;
-    msg += `📍 *Cidade:* ${city}\n`;
+    msg += `*Lojista:* ${loja}\n`;
+    msg += `*Comprador:* ${nome}\n`;
+    msg += `*Cidade:* ${city}\n`;
     
     if (lojistaLogado) {
-        msg += `🆔 *CNPJ/CPF:* ${lojistaLogado.cnpj}\n`;
-        if(lojistaLogado.hiper) msg += `📊 *Cód. Hiper:* ${lojistaLogado.hiper}\n`;
+        msg += `*CNPJ/CPF:* ${lojistaLogado.cnpj}\n`;
+        if(lojistaLogado.hiper) msg += `*Cód. Hiper:* ${lojistaLogado.hiper}\n`;
     }
     
     msg += `=============================\n\n`;
-    msg += `📦 *ITENS SOLICITADOS:*\n`;
+    msg += `*ITENS SOLICITADOS:*\n`;
     
     let totalZap = 0;
     carrinho.forEach(i => { 
-        msg += `▪️ ${i.qtd}x ${i.nome} (Cód: #${i.sku})\n`; 
+        msg += `${i.qtd}x ${i.nome} (Cód: #${i.sku})\n`; 
         totalZap += i.preco * i.qtd; 
     });
     
     msg += `\n-----------------------------\n`;
-    msg += `💰 *TOTAL DO PEDIDO: R$ ${totalZap.toFixed(2)}*`;
+    msg += `*TOTAL DO PEDIDO: R$ ${totalZap.toFixed(2)}*`;
 
     window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, "_blank");
 }
