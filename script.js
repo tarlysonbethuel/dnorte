@@ -24,7 +24,45 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =======================================================
-// 2. CONTROLE DE SESSÃO E LOGIN (COM CORREÇÃO DE ZEROS)
+// 1. VERIFICAÇÃO DE SESSÃO E LOGOUT
+// =======================================================
+function verificarSessaoSalva() {
+    const salvo = localStorage.getItem("dnorte_lojista");
+    if (salvo) {
+        lojistaLogado = JSON.parse(salvo);
+        const aviso = document.getElementById("aviso-cliente-logado");
+        const spanNome = document.getElementById("nome-loja-logada");
+        
+        if (aviso && spanNome) {
+            spanNome.innerText = lojistaLogado.loja || lojistaLogado.usuario;
+            aviso.style.display = "block";
+        }
+    }
+}
+
+function fazerLogout() {
+    localStorage.removeItem("dnorte_lojista");
+    lojistaLogado = null;
+    location.reload();
+}
+
+function abrirModalLogin() {
+    if (lojistaLogado) {
+        alert("Você já está logado como: " + (lojistaLogado.loja || lojistaLogado.usuario));
+        return;
+    }
+    const modal = document.getElementById('modalLogin');
+    if (modal) modal.style.display = 'flex';
+}
+
+function fecharModalLogin(event) {
+    if (event.target.id === 'modalLogin') {
+        document.getElementById('modalLogin').style.display = 'none';
+    }
+}
+
+// =======================================================
+// 2. CONTROLE DE LOGIN (USUÁRIO E SENHA)
 // =======================================================
 async function carregarClientesDoSheets() {
     try {
@@ -33,148 +71,75 @@ async function carregarClientesDoSheets() {
         const text = await response.text();
         const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
         const data = JSON.parse(jsonString);
-        
+
         clientesCadastrados = [];
-        
-        // MAPEAMENTO: 0=CLIENTE(A), 1=CNPJ(B), 2=SENHA(C), 3=LOJA(D), 4=HIPER(E)
         data.table.rows.forEach(row => {
             const c = row.c;
-            if(!c || !c[1]) return;
-            
-            const cnpjBruto = c[1].f ? String(c[1].f).trim() : (c[1].v !== null ? String(c[1].v).trim() : '');
-            const senhaBruta = c[2].f ? String(c[2].f).trim() : (c[2].v !== null ? String(c[2].v).trim() : '');
-            const clienteBruto = c[0].f ? String(c[0].f).trim() : (c[0].v !== null ? String(c[0].v).trim() : '');
-            const lojaBruta = c[3].f ? String(c[3].f).trim() : (c[3].v !== null ? String(c[3].v).trim() : 'LOJISTA PARCEIRO');
-            const hiperBruto = c[4].f ? String(c[4].f).trim() : (c[4].v !== null ? String(c[4].v).trim() : '');
-            
-            if (cnpjBruto === '') return;
+            if (!c || !c[0] || c[0].v === null) return;
 
-            clientesCadastrados.push({
-                cliente: clienteBruto,
-                cnpj: cnpjBruto.replace(/\D/g, ""), // Guarda o CNPJ limpo apenas com números
-                senha: senhaBruta,
-                loja: lojaBruta,
-                hiper: hiperBruto
-            });
+            const usuario = String(c[0].v).trim().toUpperCase();
+            const senha = c[1] && c[1].v !== null ? String(c[1].v).trim() : '';
+            const loja = c[2] && c[2].v !== null ? String(c[2].v).trim() : 'Cliente VIP';
+
+            clientesCadastrados.push({ usuario, senha, loja });
         });
-        console.log("CLIENTES CARREGADOS NA MEMÓRIA:", clientesCadastrados.length);
-    } catch (e) {
-        console.error("Erro ao carregar banco de clientes. Verifique se a aba está publicada.", e);
+    } catch (error) {
+        console.error("Erro ao carregar clientes:", error);
     }
 }
 
-function abrirModalLogin() {
-    document.getElementById("login-erro").style.display = "none";
-    document.getElementById("modalLogin").style.display = "flex";
-}
-
-function fecharModalLogin(e) {
-    if (e.target.id === "modalLogin") document.getElementById("modalLogin").style.display = "none";
-}
-
 function executarLogin() {
-    const valorDigitadoLimpo = document.getElementById("loginCnpj").value.replace(/\D/g, "");
-    const senhaDigitada = document.getElementById("loginSenha").value.trim();
+    const inputUsuario = document.getElementById("loginUsuario").value.trim().toUpperCase();
+    const inputSenha = document.getElementById("loginSenha").value.trim();
     const divErro = document.getElementById("login-erro");
-    
-    const clienteEncontrado = clientesCadastrados.find(c => {
-        // .padStart protege contra zeros que o Google Planilhas costuma engolir à esquerda
-        const cpfCnpjPlanilhaLimpo = String(c.cnpj).replace(/\D/g, "").padStart(valorDigitadoLimpo.length, "0");
-        const senhaPlanilhaLimpa = String(c.senha).trim();
-        
-        return cpfCnpjPlanilhaLimpo === valorDigitadoLimpo && senhaPlanilhaLimpa === senhaDigitada;
-    });
-    
+
+    if (!inputUsuario || !inputSenha) {
+        divErro.innerText = "❌ Preencha o Usuário e a Senha.";
+        divErro.style.display = "block";
+        return;
+    }
+
+    const clienteEncontrado = clientesCadastrados.find(c => c.usuario === inputUsuario && c.senha === inputSenha);
+
     if (clienteEncontrado) {
         lojistaLogado = clienteEncontrado;
-        localStorage.setItem("dnorte_session", JSON.stringify(clienteEncontrado));
+        divErro.style.display = "none";
         
-        document.getElementById("modalLogin").style.display = "none";
-        ajustarInterfaceModoLogado();
-        filtrarProdutosFinal(); 
+        localStorage.setItem("dnorte_lojista", JSON.stringify(lojistaLogado));
+        
+        alert(`Bem-vindo, ${clienteEncontrado.loja}! Preços liberados com sucesso.`);
+        location.reload(); 
     } else {
+        divErro.innerText = "❌ Usuário ou Senha incorretos. Tente novamente.";
         divErro.style.display = "block";
     }
 }
 
-function verificarSessaoSalva() {
-    const sessaoSalva = localStorage.getItem("dnorte_session");
-    if (sessaoSalva) {
-        lojistaLogado = JSON.parse(sessaoSalva);
-        ajustarInterfaceModoLogado();
-    }
-}
-
-function ajustarInterfaceModoLogado() {
-    if (lojistaLogado) {
-        const divAviso = document.getElementById("aviso-cliente-logado");
-        if(divAviso) divAviso.style.display = "block";
-        
-        const spanNome = document.getElementById("nome-loja-logada");
-        if(spanNome) spanNome.innerText = lojistaLogado.loja;
-        
-        const divCarrinho = document.getElementById("carrinho-lateral");
-        if(divCarrinho) divCarrinho.style.display = "block";
-        
-        const inpLoja = document.getElementById("inputLoja");
-        if(inpLoja) inpLoja.value = lojistaLogado.loja;
-        
-        const inpNome = document.getElementById("inputNome");
-        if(inpNome) inpNome.value = lojistaLogado.cliente || lojistaLogado.loja;
-    }
-}
-
-function fazerLogout() {
-    localStorage.removeItem("dnorte_session");
-    lojistaLogado = null;
-    
-    const divAviso = document.getElementById("aviso-cliente-logado");
-    if(divAviso) divAviso.style.display = "none";
-    
-    const divCarrinho = document.getElementById("carrinho-lateral");
-    if(divCarrinho) divCarrinho.style.display = "none";
-    
-    const btnZap = document.getElementById("btn-whatsapp");
-    if(btnZap) btnZap.style.display = "none";
-    
-    carrinho = [];
-    renderCarrinho();
-    filtrarProdutosFinal(); 
-}
-
 // =======================================================
-// MÁSCARA AUTOMÁTICA PARA CPF E CNPJ
-// =======================================================
-function mascaraCpfCnpj(input) {
-    let v = input.value.replace(/\D/g, ""); 
-    if (v.length <= 11) { 
-        v = v.replace(/(\d{3})(\d)/, "$1.$2");
-        v = v.replace(/(\d{3})(\d)/, "$1.$2");
-        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    } else { 
-        v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-        v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-        v = v.replace(/(\d{4})(\d)/, "$1-$2");
-    }
-    input.value = v;
-}
-
-// =======================================================
-// 3. BUSCA AUTOMÁTICA DE PRODUTOS (ATUALIZADA PARA HIPER)
+// 3. BUSCA AUTOMÁTICA DE PRODUTOS
 // =======================================================
 async function carregarProdutosDaPlanilha() {
     const divProdutos = document.getElementById("produtos");
-    
     try {
-        // Vai buscar à aba padrão (Produtos)
-        const url = `https://docs.google.com/spreadsheets/d/${ID_PLANILHA}/gviz/tq?tqx=out:json`;
+        // 👇 VERIFIQUE SE O NOME DA SUA ABA É ESTE MESMO!
+        const nomeDaAba = "Produtos"; 
+        
+        const url = `https://docs.google.com/spreadsheets/d/${ID_PLANILHA}/gviz/tq?sheet=${nomeDaAba}&tqx=out:json`;
         const response = await fetch(url);
         const text = await response.text();
+        
+        if (!text.includes("google.visualization.Query.setResponse")) {
+            console.error("Erro do Google:", text);
+            if(divProdutos) divProdutos.innerHTML = `<p style='text-align:center;color:red; font-weight:bold; font-size: 18px; padding: 40px;'>❌ O Google bloqueou a leitura.<br><br>Verifique se o nome da aba '${nomeDaAba}' está escrito corretamente no script e se a planilha possui erros como #N/D.</p>`;
+            return; 
+        }
+
         const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
         const data = JSON.parse(jsonString);
         
-        let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6, idxPreco = 7;
+        // MAPEAMENTO CORRIGIDO PARA A SUA PLANILHA REAL
+        let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6, idxPreco = 7; 
+        
         produtos = [];
         
         data.table.rows.forEach(row => {
@@ -195,7 +160,6 @@ async function carregarProdutosDaPlanilha() {
                 if (isNaN(preco)) preco = 0;
             }
             
-            // 🚀 MUDANÇA PRINCIPAL: Agora lê o link de internet diretamente da folha de cálculo!
             let imagem = "favicon.png";
             if (c[idxFoto] && c[idxFoto].v !== null && String(c[idxFoto].v).trim() !== "") {
                 imagem = String(c[idxFoto].v).trim(); 
@@ -208,13 +172,13 @@ async function carregarProdutosDaPlanilha() {
             construirFiltros();
             filtrarProdutosFinal();
         } else {
-            if(divProdutos) divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>⚠️ Nenhum produto encontrado.</p>";
+            if(divProdutos) divProdutos.innerHTML = "<p style='text-align:center;'>⚠️ Nenhum produto encontrado nesta aba.</p>";
         }
     } catch (error) {
-        console.error("Erro nos produtos:", error);
-        if(divProdutos) divProdutos.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:red;'>❌ Erro ao carregar base de dados. Verifique a folha de cálculo.</p>";
+        console.error("Erro:", error);
     }
 }
+
 // =======================================================
 // 4. MENU DINÂMICO DE FILTROS E BUSCA
 // =======================================================
@@ -256,7 +220,6 @@ function construirFiltros() {
         labelCat.style.marginBottom = "8px";
         wrapper.insertBefore(labelCat, document.getElementById("botoes-principais"));
     }
-
     renderizarDepartamentos();
 }
 
@@ -280,7 +243,6 @@ function renderizarDepartamentos() {
         btn.onclick = () => selecionarDepartamento(dep);
         container.appendChild(btn);
     });
-    
     renderizarCategorias();
 }
 
@@ -308,8 +270,8 @@ function renderizarCategorias() {
     btnTodas.onclick = () => selecionarCategoria("TODAS");
     containerPrincipal.appendChild(btnTodas);
     
-    const destaque = categorias.slice(0, 4); 
-    const resto = categorias.slice(4); 
+    const destaque = categorias.slice(0, 4);
+    const resto = categorias.slice(4);
     
     destaque.forEach(cat => {
         if(!cat || cat === "TODAS") return;
@@ -323,10 +285,8 @@ function renderizarCategorias() {
         btnVerMais.innerHTML = '<i class="fas fa-plus"></i> MAIS CATEGORIAS';
         btnVerMais.onclick = alternarMenuCategorias;
         containerPrincipal.appendChild(btnVerMais);
-
-        resto.forEach(cat => {
-            criarBotaoCategoria(cat, containerExtra);
-        });
+        
+        resto.forEach(cat => { criarBotaoCategoria(cat, containerExtra); });
     } else {
         const menu = document.getElementById("menu-extra");
         if(menu) menu.style.display = "none";
@@ -346,13 +306,14 @@ function criarBotaoCategoria(cat, local) {
 
 function selecionarCategoria(cat) {
     categoriaAtual = cat;
-    renderizarCategorias(); 
+    renderizarCategorias();
     filtrarProdutosFinal();
 }
 
-// =======================================================
-// 5. MÓDULO INTELIGENTE DE VITRINE E LOGIN
-// =======================================================
+function filtrarProdutos() {
+    filtrarProdutosFinal();
+}
+
 function filtrarProdutosFinal() {
     const inputBusca = document.getElementById('inputBusca');
     const termo = inputBusca ? inputBusca.value.toLowerCase() : "";
@@ -360,34 +321,43 @@ function filtrarProdutosFinal() {
     const listaFiltrada = produtos.filter(p => {
         const matchDepto = departamentoAtual === "TODOS" || p.departamento === departamentoAtual;
         const matchCat = categoriaAtual === "TODAS" || p.categoria === categoriaAtual;
-        const matchBusca = termo === "" || 
-                           p.nome.toLowerCase().includes(termo) || 
-                           String(p.sku).includes(termo) || 
-                           p.categoria.toLowerCase().includes(termo);
-        
+        const matchBusca = termo === "" || p.nome.toLowerCase().includes(termo) || String(p.sku).includes(termo) || p.categoria.toLowerCase().includes(termo);
         return matchDepto && matchCat && matchBusca;
     });
     
-    renderProdutos(listaFiltrada);
+    renderizarProdutos(listaFiltrada);
 }
 
-function filtrarProdutos() { filtrarProdutosFinal(); }
+// =======================================================
+// 5. RENDERIZAÇÃO DE PRODUTOS (LAYOUT CORRIGIDO)
+// =======================================================
+function renderizarProdutos(lista) {
+    const divProdutos = document.getElementById("produtos");
+    const carrinhoArea = document.getElementById("carrinho-lateral");
+    const btnMobile = document.getElementById("btn-whatsapp");
 
-function renderProdutos(lista) {
-    const div = document.getElementById("produtos");
-    if (!div) return;
+    if(!divProdutos) return;
 
     if (lista.length === 0) {
-        div.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">Nenhum item localizado.</div>`;
+        divProdutos.innerHTML = "<div style='grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;'>Nenhum item localizado.</div>";
         return;
     }
 
+    if (lojistaLogado) {
+        if(carrinhoArea) carrinhoArea.style.display = "block";
+        if(btnMobile) btnMobile.style.display = "block";
+    } else {
+        if(carrinhoArea) carrinhoArea.style.display = "none";
+        if(btnMobile) btnMobile.style.display = "none";
+    }
+
+    // AQUI O SEU DESIGN VOLTA AO NORMAL (GRELHA, CARTÕES, BOTÕES BONITOS)
     const htmlBuffer = lista.map(p => {
         let blocoPrecoEAcao = "";
         
         if (lojistaLogado) {
             blocoPrecoEAcao = `
-                <p class="preco-produto">R$ ${p.preco.toFixed(2)}</p>
+                <p class="preco-produto">R$ ${p.preco.toFixed(2).replace('.', ',')}</p>
                 <div class="qtd-selector">
                     <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
                     <span id="qtd-${p.sku}">1</span>
@@ -413,7 +383,7 @@ function renderProdutos(lista) {
         </div>`;
     }).join('');
 
-    div.innerHTML = htmlBuffer;
+    divProdutos.innerHTML = htmlBuffer;
 }
 
 function solicitarPrecoViaZap(sku, nomeProd) {
@@ -422,8 +392,38 @@ function solicitarPrecoViaZap(sku, nomeProd) {
 }
 
 // =======================================================
-// 6. GERENCIAMENTO DE PEDIDOS E MODAIS
+// 6. MODAL DO PRODUTO E GESTÃO DO CARRINHO
 // =======================================================
+function abrirModal(sku) {
+    const p = produtos.find(prod => String(prod.sku) === String(sku));
+    if(!p) return;
+    document.getElementById("modalImg").src = p.imagem;
+    document.getElementById("modalNome").innerText = p.nome;
+    
+    const pPreco = document.getElementById("modalPreco");
+    const pAcoes = document.getElementById("modalAcoes");
+    
+    if (lojistaLogado) {
+        pPreco.innerText = "R$ " + p.preco.toFixed(2).replace('.', ',');
+        pPreco.style.color = "#fb7815";
+        pAcoes.innerHTML = `<button class="btn-add" style="width:100%; padding:15px;" onclick="adicionarNoModal('${p.sku}')">ADICIONAR AO PEDIDO</button>`;
+    } else {
+        pPreco.innerHTML = `<i class="fas fa-lock"></i> Valores visíveis apenas para lojistas parceiros.`;
+        pPreco.style.color = "#888";
+        pAcoes.innerHTML = `<button class="btn-solicitar-preco" style="width:100%; padding:15px;" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar via WhatsApp <i class="fab fa-whatsapp"></i></button>`;
+    }
+    
+    document.getElementById("modalProduto").style.display = "flex";
+}
+
+function fecharModal(force = false, event = null) {
+    if (force || (event && event.target.id === "modalProduto")) {
+        document.getElementById("modalProduto").style.display = "none";
+    }
+}
+
+function adicionarNoModal(sku) { adicionar(sku); fecharModal(true); }
+
 function alterarQtd(sku, mudanca) {
     const span = document.getElementById(`qtd-${sku}`);
     if(span) {
@@ -490,7 +490,7 @@ function renderCarrinho() {
                 <span>x${i.qtd}</span>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                <span style="color:#fb7815; font-weight:bold;">R$ ${(i.preco * i.qtd).toFixed(2)}</span>
+                <span style="color:#fb7815; font-weight:bold;">R$ ${(i.preco * i.qtd).toFixed(2).replace('.', ',')}</span>
                 <div style="display:flex; gap:5px;">
                     <button onclick="ajustarQtdDiretoNoCarrinho('${i.sku}', -1)">-</button>
                     <button onclick="ajustarQtdDiretoNoCarrinho('${i.sku}', 1)">+</button>
@@ -499,7 +499,7 @@ function renderCarrinho() {
         </div>`;
     });
 
-    if(divTotal) divTotal.innerHTML = `<h3>Total: R$ ${total.toFixed(2)}</h3>`;
+    if(divTotal) divTotal.innerHTML = `<h3>Total: R$ ${total.toFixed(2).replace('.', ',')}</h3>`;
     
     if(btnMobile && lojistaLogado) {
         btnMobile.style.display = "block";
@@ -507,43 +507,15 @@ function renderCarrinho() {
     }
 }
 
-function abrirModal(sku) {
-    const p = produtos.find(prod => String(prod.sku) === String(sku));
-    if(!p) return;
-    document.getElementById("modalImg").src = p.imagem;
-    document.getElementById("modalNome").innerText = p.nome;
-    
-    const pPreco = document.getElementById("modalPreco");
-    const pAcoes = document.getElementById("modalAcoes");
-    
-    if (lojistaLogado) {
-        pPreco.innerText = `R$ ${p.preco.toFixed(2)}`;
-        pPreco.style.color = "#fb7815";
-        pAcoes.innerHTML = `<button class="btn-add" style="width:100%; padding:15px;" onclick="adicionarNoModal('${p.sku}')">ADICIONAR AO PEDIDO</button>`;
-    } else {
-        pPreco.innerHTML = `<i class="fas fa-lock"></i> Valores visíveis apenas para lojistas parceiros.`;
-        pPreco.style.color = "#888";
-        pAcoes.innerHTML = `<button class="btn-solicitar-preco" style="width:100%; padding:15px;" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar via WhatsApp <i class="fab fa-whatsapp"></i></button>`;
-    }
-    
-    document.getElementById("modalProduto").style.display = "flex";
-}
-
-function fecharModal(e) {
-    if (e === true || e.target.id === "modalProduto") document.getElementById("modalProduto").style.display = "none";
-}
-
-function adicionarNoModal(sku) { adicionar(sku); fecharModal(true); }
 function abrirModalMobile() { 
     const carrinhoArea = document.querySelector('.carrinho-area');
     if (carrinhoArea) {
-        // O toggle faz o botão funcionar como um interruptor: clica liga, clica desliga!
         carrinhoArea.classList.toggle('mostrar-mobile');
     }
 }
 
 // =======================================================
-// 7. FINALIZAÇÃO DO PEDIDO
+// 7. FINALIZAÇÃO DO PEDIDO (WHATSAPP)
 // =======================================================
 function finalizarPedido() {
     if (carrinho.length === 0) { alert("Carrinho vazio!"); return; }
@@ -561,21 +533,20 @@ function finalizarPedido() {
     msg += `*Cidade:* ${city}\n`;
     
     if (lojistaLogado) {
-        msg += `*CNPJ/CPF:* ${lojistaLogado.cnpj}\n`;
-        if(lojistaLogado.hiper) msg += `*Cód. Hiper:* ${lojistaLogado.hiper}\n`;
+        msg += `*Usuário:* ${lojistaLogado.usuario}\n`;
     }
     
     msg += `=============================\n\n`;
     msg += `*ITENS SOLICITADOS:*\n`;
     
     let totalZap = 0;
-    carrinho.forEach(i => { 
-        msg += `${i.qtd}x ${i.nome} (Cód: #${i.sku})\n`; 
-        totalZap += i.preco * i.qtd; 
+    carrinho.forEach(i => {
+        msg += `- ${i.qtd}x [${i.sku}] ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}\n`;
+        totalZap += (i.preco * i.qtd);
     });
     
-    msg += `\n-----------------------------\n`;
-    msg += `*TOTAL DO PEDIDO: R$ ${totalZap.toFixed(2)}*`;
-
-    window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, "_blank");
+    msg += `\n*TOTAL ESTIMADO:* R$ ${totalZap.toFixed(2)}\n`;
+    
+    const url = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
 }
