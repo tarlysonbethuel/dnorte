@@ -711,3 +711,28 @@ function finalizarPedido() {
     const url = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
 }
+// =======================================================
+// 8. BOTÃO FLUTUANTE: VOLTAR AOS FILTROS
+// =======================================================
+
+// Ouve o movimento de rolagem da página
+window.addEventListener('scroll', function() {
+    const btnTopo = document.getElementById('btn-voltar-topo');
+    if (btnTopo) {
+        // Se a página for rolada mais de 600 pixels para baixo, mostra o botão
+        if (window.scrollY > 600) {
+            btnTopo.style.display = 'block';
+        } else {
+            // Se estiver no topo, esconde o botão
+            btnTopo.style.display = 'none';
+        }
+    }
+});
+
+// Função para deslizar suavemente até às categorias
+function voltarAosFiltros() {
+    const ancora = document.getElementById('vitrine-ancora');
+    if (ancora) {
+        ancora.scrollIntoView({ behavior: 'smooth' });
+    }
+}

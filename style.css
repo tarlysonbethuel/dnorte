@@ -203,3 +203,26 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
         grid-template-columns: 1fr 350px;
     }
 }
+/* --- BOTÃO VOLTAR AOS FILTROS (FLUTUANTE) --- */
+.btn-voltar-topo {
+    display: none; /* Fica escondido até rolar a página */
+    position: fixed;
+    bottom: 20px;
+    left: 20px; /* Posicionado à esquerda para não chocar com o carrinho verde */
+    background-color: var(--dnorte-blue);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 998;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-voltar-topo:hover {
+    background-color: var(--dnorte-orange);
+    transform: translateY(-5px);
+}
