@@ -1,10 +1,6 @@
 /* =======================================================
    CATÁLOGO AUTOMÁTICO DNORTE 2.0 - SISTEMA MISTO
-<<<<<<< HEAD
    VITRINE + PREÇO DINÂMICO + LINKS DIRETOS PARA PRODUTOS
-=======
-   VITRINE + PREÇO DINÂMICO (VAREJO / ATACADO / OFERTA)
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
    ======================================================= */
 
 const WHATSAPP_LOJA = "5569999107161"; 
@@ -120,11 +116,7 @@ function executarLogin() {
 }
 
 // =======================================================
-<<<<<<< HEAD
 // 3. BUSCA AUTOMÁTICA DE PRODUTOS
-=======
-// 3. BUSCA AUTOMÁTICA DE PRODUTOS (COM VAREJO, ATACADO E OFERTA)
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
 // =======================================================
 async function carregarProdutosDaPlanilha() {
     const divProdutos = document.getElementById("produtos");
@@ -143,12 +135,7 @@ async function carregarProdutosDaPlanilha() {
         const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
         const data = JSON.parse(jsonString);
         
-<<<<<<< HEAD
         // MAPEAMENTO DAS COLUNAS: 7(Varejo) | 8(Atacado) | 9(QtdMínima) | 10(Oferta)
-=======
-        // MAPEAMENTO DAS COLUNAS: 
-        // 7(H)=Varejo | 8(I)=Atacado | 9(J)=Qtd Mínima | 10(K)=Oferta
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
         let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6;
         let idxPrecoVarejo = 7, idxPrecoAtacado = 8, idxQtdMinima = 9, idxPrecoOferta = 10; 
         
@@ -180,28 +167,17 @@ async function carregarProdutosDaPlanilha() {
                 if (!isNaN(valAtacado) && valAtacado > 0) precoAtacado = valAtacado;
             }
 
-<<<<<<< HEAD
             // 3. QUANTIDADE MÍNIMA
-=======
-            // 3. QUANTIDADE MÍNIMA (Coluna J)
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
             let qtdMinima = 1;
             if (c[idxQtdMinima] && c[idxQtdMinima].v !== null && c[idxQtdMinima].v !== "") {
                 qtdMinima = parseInt(c[idxQtdMinima].v);
                 if (isNaN(qtdMinima) || qtdMinima < 1) qtdMinima = 1;
             }
             if (precoAtacado < precoVarejo && qtdMinima === 1) {
-<<<<<<< HEAD
                 qtdMinima = 5; 
             }
 
             // 4. PREÇO OFERTA
-=======
-                qtdMinima = 5; // Padrão se o cliente esquecer de colocar
-            }
-
-            // 4. PREÇO OFERTA (Coluna K) -> NOVO!
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
             let precoOferta = 0;
             if (c[idxPrecoOferta] && c[idxPrecoOferta].v !== null) {
                 let valOferta = parseFloat(String(c[idxPrecoOferta].v).replace(',', '.'));
@@ -391,11 +367,7 @@ function filtrarProdutosFinal() {
 }
 
 // =======================================================
-<<<<<<< HEAD
 // 5. RENDERIZAÇÃO DE PRODUTOS
-=======
-// 5. RENDERIZAÇÃO DE PRODUTOS (OFERTA + ATACADO)
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
 // =======================================================
 function renderizarProdutos(lista) {
     const divProdutos = document.getElementById("produtos");
@@ -422,20 +394,11 @@ function renderizarProdutos(lista) {
         let seloAtacadoTopo = ""; 
         
         if (lojistaLogado) {
-<<<<<<< HEAD
-=======
-            
-            // 1. Verifica se tem OFERTA ATIVA (preço vermelho)
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
             let htmlPreco = `<p class="preco-produto">R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</p>`;
             let precoBaseAtual = p.precoVarejo;
 
             if (p.precoOferta > 0 && p.precoOferta < p.precoVarejo) {
-<<<<<<< HEAD
                 precoBaseAtual = p.precoOferta;
-=======
-                precoBaseAtual = p.precoOferta; // A oferta passa a ser o preço base
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
                 htmlPreco = `
                 <p class="preco-produto" style="line-height: 1.1;">
                     <span style="text-decoration: line-through; color: #94a3b8; font-size: 13px;">R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</span><br>
@@ -444,10 +407,6 @@ function renderizarProdutos(lista) {
                 </p>`;
             }
 
-<<<<<<< HEAD
-=======
-            // 2. Verifica se tem ETIQUETA DE ATACADO
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
             if (p.precoAtacado < precoBaseAtual && p.qtdMinima > 1) {
                 seloAtacadoTopo = `
                 <div style="background-color: #e6f4ea; border: 1px solid #28a745; color: #28a745; text-align: center; padding: 6px; font-size: 11px; font-weight: 800; border-radius: 8px; margin-bottom: 12px; width: 100%;">
@@ -510,19 +469,11 @@ function abrirModal(sku) {
         let precoBaseAtual = p.precoVarejo;
         let textoPreco = `Varejo: R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}`;
         
-<<<<<<< HEAD
-=======
-        // Se houver Oferta
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
         if (p.precoOferta > 0 && p.precoOferta < p.precoVarejo) {
             precoBaseAtual = p.precoOferta;
             textoPreco = `<span style="text-decoration:line-through; color:#94a3b8; font-size:14px;">Varejo: R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</span><br><span style="color:#e53e3e;">🔥 Oferta: R$ ${p.precoOferta.toFixed(2).replace('.', ',')}</span>`;
         }
 
-<<<<<<< HEAD
-=======
-        // Se houver Atacado (E se for mais barato que a Oferta/Varejo)
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
         if(p.precoAtacado < precoBaseAtual) {
             textoPreco += `<br><span style="color:#28a745; font-size:16px;">📦 Atacado (${p.qtdMinima}+ un): R$ ${p.precoAtacado.toFixed(2).replace('.', ',')}</span>`;
         }
@@ -614,10 +565,6 @@ function renderCarrinho() {
     }
 
     carrinho.forEach(i => {
-<<<<<<< HEAD
-=======
-        // LÓGICA DE PREÇOS NO CARRINHO
->>>>>>> ec8ce77249a310cf41c38a5709b5c43d8b3f306f
         let precoBase = (i.precoOferta > 0 && i.precoOferta < i.precoVarejo) ? i.precoOferta : i.precoVarejo;
         let precoAtivo = (i.qtd >= i.qtdMinima && i.precoAtacado < precoBase) ? i.precoAtacado : precoBase;
         
