@@ -1,6 +1,6 @@
 /* =======================================================
    CATÁLOGO AUTOMÁTICO DNORTE 2.0 - SISTEMA MISTO
-   VITRINE + PREÇO DINÂMICO + OFERTAS EM DESTAQUE
+   VITRINE + PREÇO DINÂMICO + LINKS DIRETOS E DE CATEGORIAS
    ======================================================= */
 
 const WHATSAPP_LOJA = "5569999107161"; 
@@ -217,7 +217,7 @@ async function carregarProdutosDaPlanilha() {
         if (produtos.length > 0) {
             construirFiltros();
             filtrarProdutosFinal();
-            verificarProdutoNaURL(); 
+            verificarFiltrosEProdutoNaURL(); // Chama a nova função super poderosa
         } else {
             if(divProdutos) divProdutos.innerHTML = "<p style='text-align:center;'>⚠️ Nenhum produto encontrado nesta aba.</p>";
         }
@@ -225,16 +225,31 @@ async function carregarProdutosDaPlanilha() {
 }
 
 // =======================================================
-// MÓDULO: DETECTAR LINK DIRETO
+// MÓDULO: DETECTAR LINKS DIRETOS (PRODUTO E CATEGORIAS)
 // =======================================================
-function verificarProdutoNaURL() {
+function verificarFiltrosEProdutoNaURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const skuNaUrl = urlParams.get('sku'); 
+    const depNaUrl = urlParams.get('dep'); 
+    const catNaUrl = urlParams.get('cat'); 
+    
+    // Se for link de Produto, abre a janela
     if (skuNaUrl) {
         setTimeout(() => {
             abrirModal(skuNaUrl);
             document.getElementById('vitrine-ancora').scrollIntoView({ behavior: 'smooth' });
         }, 500); 
+    } 
+    // Se for link de Categoria, aplica os filtros automaticamente
+    else if (depNaUrl || catNaUrl) {
+        if (depNaUrl) departamentoAtual = depNaUrl;
+        if (catNaUrl) categoriaAtual = catNaUrl;
+        
+        setTimeout(() => {
+            renderizarDepartamentos(); // Reconstroi os botões com a aba certa pintada
+            filtrarProdutosFinal(); // Filtra os produtos
+            document.getElementById('vitrine-ancora').scrollIntoView({ behavior: 'smooth' });
+        }, 500);
     }
 }
 
@@ -245,6 +260,31 @@ function copiarLinkProduto(sku) {
     }).catch(err => {
         mostrarAlerta("Oops!", "Ocorreu um erro ao copiar o link. O seu navegador pode ter bloqueado a ação.", "erro");
     });
+}
+
+function copiarLinkFiltroAtual() {
+    let url = `${window.location.origin}${window.location.pathname}`;
+    let params = [];
+    
+    if (departamentoAtual !== "TODOS") {
+        params.push(`dep=${encodeURIComponent(departamentoAtual)}`);
+    }
+    if (categoriaAtual !== "TODAS") {
+        params.push(`cat=${encodeURIComponent(categoriaAtual)}`);
+    }
+    
+    if (params.length > 0) {
+        url += "?" + params.join("&");
+        navigator.clipboard.writeText(url).then(() => {
+            mostrarAlerta("Link Copiado!", `O link direto para o departamento/categoria que você está a ver foi copiado. Envie para o seu cliente!`, "sucesso");
+        }).catch(err => {
+            mostrarAlerta("Oops!", "Erro ao copiar o link da categoria.", "erro");
+        });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            mostrarAlerta("Catálogo Copiado!", "Como você está na visão geral, copiamos o link do catálogo completo.", "sucesso");
+        });
+    }
 }
 
 // =======================================================
@@ -267,11 +307,39 @@ function construirFiltros() {
     const wrapper = document.querySelector(".menu-categorias-wrapper");
     if (!wrapper) return;
     let deptoContainer = document.getElementById("container-departamentos");
+    
     if (!deptoContainer) {
+        // --- CABEÇALHO COM TÍTULO E BOTÃO DE PARTILHAR ---
+        let headerDepartamentos = document.createElement("div");
+        headerDepartamentos.style.display = "flex";
+        headerDepartamentos.style.justifyContent = "space-between";
+        headerDepartamentos.style.alignItems = "center";
+        headerDepartamentos.style.marginBottom = "10px";
+        headerDepartamentos.style.flexWrap = "wrap";
+        headerDepartamentos.style.gap = "10px";
+
         let labelDepto = document.createElement("div");
         labelDepto.innerHTML = "<strong style='color:#03264c; font-size:15px;'><i class='fas fa-building'></i> 1. Filtre por Departamento:</strong>";
-        labelDepto.style.marginBottom = "8px";
-        wrapper.insertBefore(labelDepto, wrapper.firstChild);
+        
+        let btnShare = document.createElement("button");
+        btnShare.innerHTML = "<i class='fas fa-link'></i> Copiar Link desta Categoria";
+        btnShare.style.background = "var(--dnorte-orange)";
+        btnShare.style.color = "white";
+        btnShare.style.border = "none";
+        btnShare.style.padding = "8px 12px";
+        btnShare.style.borderRadius = "6px";
+        btnShare.style.cursor = "pointer";
+        btnShare.style.fontWeight = "bold";
+        btnShare.style.fontSize = "13px";
+        btnShare.style.transition = "0.3s";
+        btnShare.onmouseover = function() { this.style.background = "#e0680d"; }
+        btnShare.onmouseout = function() { this.style.background = "var(--dnorte-orange)"; }
+        btnShare.onclick = copiarLinkFiltroAtual; // Chama a nova função!
+
+        headerDepartamentos.appendChild(labelDepto);
+        headerDepartamentos.appendChild(btnShare);
+        
+        wrapper.insertBefore(headerDepartamentos, wrapper.firstChild);
         
         deptoContainer = document.createElement("div");
         deptoContainer.id = "container-departamentos";
@@ -279,7 +347,7 @@ function construirFiltros() {
         deptoContainer.style.marginBottom = "15px";
         deptoContainer.style.borderBottom = "2px solid #eee";
         deptoContainer.style.paddingBottom = "10px";
-        wrapper.insertBefore(deptoContainer, labelDepto.nextSibling);
+        wrapper.insertBefore(deptoContainer, headerDepartamentos.nextSibling);
         
         let labelCat = document.createElement("div");
         labelCat.innerHTML = "<strong style='color:#fb7815; font-size:15px;'><i class='fas fa-tags'></i> 2. Sub-Categoria:</strong>";
@@ -294,21 +362,18 @@ function renderizarDepartamentos() {
     if(!container) return;
     container.innerHTML = "";
 
-    // 1️⃣ ADIÇÃO DO BOTÃO SUPER OFERTAS
     const btnOfertas = document.createElement("button");
     btnOfertas.className = "btn-categoria btn-ofertas" + (departamentoAtual === "OFERTAS" ? " ativo" : "");
     btnOfertas.innerHTML = "<i class='fas fa-fire'></i> SUPER OFERTAS";
     btnOfertas.onclick = () => selecionarDepartamento("OFERTAS");
     container.appendChild(btnOfertas);
     
-    // 2️⃣ BOTÃO TODOS OS DEPARTAMENTOS
     const btnTodos = document.createElement("button");
     btnTodos.className = "btn-categoria" + (departamentoAtual === "TODOS" ? " ativo" : "");
     btnTodos.innerText = "TODOS";
     btnTodos.onclick = () => selecionarDepartamento("TODOS");
     container.appendChild(btnTodos);
     
-    // 3️⃣ LISTA DE DEPARTAMENTOS EXISTENTES
     const departamentos = [...new Set(produtos.map(p => p.departamento))].sort();
     departamentos.forEach(dep => {
         if (!dep || dep === "TODOS" || dep === "OFERTAS") return;
@@ -335,7 +400,6 @@ function renderizarCategorias() {
     containerPrincipal.innerHTML = "";
     containerExtra.innerHTML = "";
     
-    // Se estiver em "Ofertas", puxa as categorias apenas dos produtos em oferta
     let prodsDoDepto = produtos;
     if (departamentoAtual === "OFERTAS") {
         prodsDoDepto = produtos.filter(p => p.precoOferta > 0 && p.precoOferta < p.precoVarejo);
@@ -396,7 +460,6 @@ function filtrarProdutosFinal() {
     const termo = inputBusca ? inputBusca.value.toLowerCase() : "";
     
     const listaFiltrada = produtos.filter(p => {
-        // Lógica de Filtro Especial para a aba de Ofertas
         let matchDepto = false;
         if (departamentoAtual === "TODOS") {
             matchDepto = true;
@@ -414,7 +477,7 @@ function filtrarProdutosFinal() {
 }
 
 // =======================================================
-// 5. RENDERIZAÇÃO DE PRODUTOS (COM SELO DE %)
+// 5. RENDERIZAÇÃO DE PRODUTOS
 // =======================================================
 function renderizarProdutos(lista) {
     const divProdutos = document.getElementById("produtos");
@@ -439,17 +502,14 @@ function renderizarProdutos(lista) {
     const htmlBuffer = lista.map(p => {
         let blocoPrecoEAcao = "";
         let seloAtacadoTopo = ""; 
-        let seloDescontoHtml = ""; // Selo estilo Havan
+        let seloDescontoHtml = ""; 
         
         if (lojistaLogado) {
             let htmlPreco = `<p class="preco-produto">R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</p>`;
             let precoBaseAtual = p.precoVarejo;
 
-            // CÁLCULO E EXIBIÇÃO DO DESCONTO (%)
             if (p.precoOferta > 0 && p.precoOferta < p.precoVarejo) {
                 precoBaseAtual = p.precoOferta;
-                
-                // Exemplo: de 100 para 80 -> (100 - 80) / 100 = 0.20 -> 20%
                 let porcentagemDesconto = Math.round(((p.precoVarejo - p.precoOferta) / p.precoVarejo) * 100);
                 seloDescontoHtml = `<div class="selo-desconto">-${porcentagemDesconto}%</div>`;
 
