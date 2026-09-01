@@ -107,8 +107,25 @@ function executarLogin() {
         
         localStorage.setItem("dnorte_lojista", JSON.stringify(lojistaLogado));
         
-        alert(`Bem-vindo, ${clienteEncontrado.loja}! Preços liberados com sucesso.`);
-        location.reload(); 
+        // --- EFEITO VISUAL PROFISSIONAL DE SUCESSO ---
+        const loginBox = document.querySelector('.login-box');
+        loginBox.innerHTML = `
+            <div style="text-align: center; padding: 20px 10px;">
+                <i class="fas fa-check-circle" style="font-size: 65px; color: #25D366; margin-bottom: 20px;"></i>
+                <h3 style="color: var(--dnorte-blue); font-size: 26px; margin-bottom: 10px;">Acesso Liberado!</h3>
+                <p style="font-size: 18px; color: #333; font-weight: bold; margin-bottom: 5px;">Bem-vindo(a), ${clienteEncontrado.loja}</p>
+                <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">Os preços de atacado estão prontos para você.</p>
+                <p style="color: var(--dnorte-orange); font-size: 14px; font-weight: bold;">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando o seu catálogo...
+                </p>
+            </div>
+        `;
+        
+        // Aguarda 2 segundos para o cliente ler a mensagem e recarrega a página automaticamente
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+
     } else {
         divErro.innerText = "❌ Usuário ou Senha incorretos. Tente novamente.";
         divErro.style.display = "block";
