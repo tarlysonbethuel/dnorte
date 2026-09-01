@@ -24,6 +24,50 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =======================================================
+// 0. SISTEMA DE ALERTAS PREMIUM (SUBSTITUI O ALERT PADRÃO)
+// =======================================================
+function mostrarAlerta(titulo, mensagem, tipo = 'aviso') {
+    // Remove o alerta anterior se o usuário clicar várias vezes
+    const alertaAntigo = document.getElementById('modalAlertaSistema');
+    if (alertaAntigo) alertaAntigo.remove();
+
+    let cor = 'var(--dnorte-orange)';
+    let icone = 'fas fa-exclamation-triangle';
+
+    if (tipo === 'sucesso') {
+        cor = '#25D366'; // Verde WhatsApp
+        icone = 'fas fa-check-circle';
+    } else if (tipo === 'erro') {
+        cor = '#e53e3e'; // Vermelho
+        icone = 'fas fa-times-circle';
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'modalAlertaSistema';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(3, 38, 76, 0.8)';
+    modal.style.zIndex = '9999'; // Fica sempre por cima de tudo
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.backdropFilter = 'blur(5px)';
+
+    modal.innerHTML = `
+        <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+            <i class="${icone}" style="font-size: 55px; color: ${cor}; margin-bottom: 20px;"></i>
+            <h3 style="color: var(--dnorte-blue); font-size: 24px; margin-bottom: 10px;">${titulo}</h3>
+            <p style="color: #64748b; font-size: 16px; margin-bottom: 25px;">${mensagem}</p>
+            <button onclick="document.getElementById('modalAlertaSistema').remove()" style="background: ${cor}; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; transition: 0.3s;">Entendido</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// =======================================================
 // 1. VERIFICAÇÃO DE SESSÃO E LOGOUT
 // =======================================================
 function verificarSessaoSalva() {
@@ -48,7 +92,7 @@ function fazerLogout() {
 
 function abrirModalLogin() {
     if (lojistaLogado) {
-        alert("Você já está logado como: " + (lojistaLogado.loja || lojistaLogado.usuario));
+        mostrarAlerta("Acesso Confirmado!", `A sua sessão já está ativa como:<br><strong style="color: var(--dnorte-blue); font-size: 18px;">${lojistaLogado.loja || lojistaLogado.usuario}</strong>`, "sucesso");
         return;
     }
     const modal = document.getElementById('modalLogin');
@@ -107,24 +151,22 @@ function executarLogin() {
         
         localStorage.setItem("dnorte_lojista", JSON.stringify(lojistaLogado));
         
-        // --- EFEITO VISUAL PROFISSIONAL DE SUCESSO ---
+        // EFEITO VISUAL PROFISSIONAL DE SUCESSO DENTRO DO MODAL
         const loginBox = document.querySelector('.login-box');
         loginBox.innerHTML = `
             <div style="text-align: center; padding: 20px 10px;">
                 <i class="fas fa-check-circle" style="font-size: 65px; color: #25D366; margin-bottom: 20px;"></i>
                 <h3 style="color: var(--dnorte-blue); font-size: 26px; margin-bottom: 10px;">Acesso Liberado!</h3>
                 <p style="font-size: 18px; color: #333; font-weight: bold; margin-bottom: 5px;">Bem-vindo(a), ${clienteEncontrado.loja}</p>
-                <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">Os preços de atacado estão prontos para você.</p>
+                <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">Os preços estão prontos para você.</p>
                 <p style="color: var(--dnorte-orange); font-size: 14px; font-weight: bold;">
                     <i class="fas fa-spinner fa-spin"></i> Carregando o seu catálogo...
                 </p>
             </div>
         `;
         
-        // Aguarda 2 segundos para o cliente ler a mensagem e recarrega a página automaticamente
-        setTimeout(() => {
-            location.reload();
-        }, 2000);
+        // Aguarda 2 segundos e recarrega a página automaticamente
+        setTimeout(() => { location.reload(); }, 2000);
 
     } else {
         divErro.innerText = "❌ Usuário ou Senha incorretos. Tente novamente.";
@@ -152,7 +194,6 @@ async function carregarProdutosDaPlanilha() {
         const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
         const data = JSON.parse(jsonString);
         
-        // MAPEAMENTO DAS COLUNAS: 7(Varejo) | 8(Atacado) | 9(QtdMínima) | 10(Oferta)
         let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6;
         let idxPrecoVarejo = 7, idxPrecoAtacado = 8, idxQtdMinima = 9, idxPrecoOferta = 10; 
         
@@ -170,21 +211,18 @@ async function carregarProdutosDaPlanilha() {
             const departamento = c[idxDepartamento] && c[idxDepartamento].v !== null ? String(c[idxDepartamento].v).trim().toUpperCase() : 'GERAL';
             const categoria = c[idxCategoria] && c[idxCategoria].v !== null ? String(c[idxCategoria].v).trim().toUpperCase() : 'DIVERSOS';
             
-            // 1. PREÇO VAREJO
             let precoVarejo = 0;
             if (c[idxPrecoVarejo] && c[idxPrecoVarejo].v !== null) {
                 precoVarejo = parseFloat(String(c[idxPrecoVarejo].v).replace(',', '.'));
                 if (isNaN(precoVarejo)) precoVarejo = 0;
             }
 
-            // 2. PREÇO ATACADO
             let precoAtacado = precoVarejo; 
             if (c[idxPrecoAtacado] && c[idxPrecoAtacado].v !== null) {
                 let valAtacado = parseFloat(String(c[idxPrecoAtacado].v).replace(',', '.'));
                 if (!isNaN(valAtacado) && valAtacado > 0) precoAtacado = valAtacado;
             }
 
-            // 3. QUANTIDADE MÍNIMA
             let qtdMinima = 1;
             if (c[idxQtdMinima] && c[idxQtdMinima].v !== null && c[idxQtdMinima].v !== "") {
                 qtdMinima = parseInt(c[idxQtdMinima].v);
@@ -194,7 +232,6 @@ async function carregarProdutosDaPlanilha() {
                 qtdMinima = 5; 
             }
 
-            // 4. PREÇO OFERTA
             let precoOferta = 0;
             if (c[idxPrecoOferta] && c[idxPrecoOferta].v !== null) {
                 let valOferta = parseFloat(String(c[idxPrecoOferta].v).replace(',', '.'));
@@ -212,7 +249,7 @@ async function carregarProdutosDaPlanilha() {
         if (produtos.length > 0) {
             construirFiltros();
             filtrarProdutosFinal();
-            verificarProdutoNaURL(); // <--- NOVA FUNÇÃO ADICIONADA AQUI!
+            verificarProdutoNaURL(); 
         } else {
             if(divProdutos) divProdutos.innerHTML = "<p style='text-align:center;'>⚠️ Nenhum produto encontrado nesta aba.</p>";
         }
@@ -222,32 +259,28 @@ async function carregarProdutosDaPlanilha() {
 }
 
 // =======================================================
-// MÓDULO NOVO: DETECTAR LINK DIRETO DE PRODUTO
+// MÓDULO: DETECTAR LINK DIRETO DE PRODUTO
 // =======================================================
 function verificarProdutoNaURL() {
     const urlParams = new URLSearchParams(window.location.search);
-    const skuNaUrl = urlParams.get('sku'); // Procura por ?sku=XXXXX na URL
+    const skuNaUrl = urlParams.get('sku'); 
     
     if (skuNaUrl) {
-        // Se encontrar, abre o modal do produto automaticamente
         setTimeout(() => {
             abrirModal(skuNaUrl);
-            // Move a tela suavemente para a área de produtos para o cliente não ficar perdido no topo
             document.getElementById('vitrine-ancora').scrollIntoView({ behavior: 'smooth' });
         }, 500); 
     }
 }
 
 function copiarLinkProduto(sku) {
-    // Cria o link direto juntando o seu site atual com o código do produto
     const linkDireto = `${window.location.origin}${window.location.pathname}?sku=${sku}`;
     
-    // Copia para a área de transferência
     navigator.clipboard.writeText(linkDireto).then(() => {
-        alert("✅ Link do produto copiado com sucesso! Agora é só colar na conversa com o cliente.");
+        mostrarAlerta("Link Copiado!", "O link do produto foi copiado com sucesso. Agora é só colar na conversa com o cliente.", "sucesso");
     }).catch(err => {
         console.error('Erro ao copiar link', err);
-        alert("Ocorreu um erro ao copiar o link. O seu navegador pode ter bloqueado a ação.");
+        mostrarAlerta("Oops!", "Ocorreu um erro ao copiar o link. O seu navegador pode ter bloqueado a ação.", "erro");
     });
 }
 
@@ -479,7 +512,6 @@ function abrirModal(sku) {
     const pPreco = document.getElementById("modalPreco");
     const pAcoes = document.getElementById("modalAcoes");
     
-    // BOTÃO COMPARTILHAR ADICIONADO AO MODAL
     const btnCompartilharHTML = `<button onclick="copiarLinkProduto('${p.sku}')" style="width:100%; padding:12px; background:transparent; border:2px solid #03264c; color:#03264c; border-radius:8px; cursor:pointer; font-weight:bold; margin-top: 10px; transition: 0.3s;" onmouseover="this.style.background='#03264c'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#03264c';"><i class="fas fa-link"></i> Copiar Link do Produto</button>`;
     
     if (lojistaLogado) {
@@ -517,7 +549,6 @@ function fecharModal(force = false, event = null) {
     if (force || (event && event.target.id === "modalProduto")) {
         document.getElementById("modalProduto").style.display = "none";
         
-        // Limpa o link do navegador ao fechar o modal para ficar organizado
         const urlLimpa = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, urlLimpa);
     }
@@ -631,13 +662,19 @@ function abrirModalMobile() {
 // 7. FINALIZAÇÃO DO PEDIDO
 // =======================================================
 function finalizarPedido() {
-    if (carrinho.length === 0) { alert("Carrinho vazio!"); return; }
+    if (carrinho.length === 0) { 
+        mostrarAlerta("Carrinho Vazio", "Adicione pelo menos um produto ao seu pedido antes de finalizar.", "aviso");
+        return; 
+    }
     
     const nome = document.getElementById("inputNome").value.toUpperCase();
     const loja = document.getElementById("inputLoja").value.toUpperCase();
     const city = document.getElementById("inputCidade").value.toUpperCase();
     
-    if(!nome || !loja || !city) { alert("Por favor, preencha todos os campos do cabeçalho do pedido!"); return; }
+    if(!nome || !loja || !city) { 
+        mostrarAlerta("Atenção", "Por favor, preencha todos os campos do cabeçalho (Nome, Loja e Cidade) para enviar o pedido.", "aviso");
+        return; 
+    }
 
     let msg = `*NOVO PEDIDO DE COMPRA - DNORTE*\n`;
     msg += `=============================\n`;
