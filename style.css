@@ -226,3 +226,37 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
     background-color: var(--dnorte-orange);
     transform: translateY(-5px);
 }
+/* --- BOTÃO SUPER OFERTAS EM DESTAQUE --- */
+.btn-ofertas {
+    background: #e53e3e !important;
+    color: white !important;
+    border-color: #e53e3e !important;
+    animation: pulseOferta 2s infinite;
+}
+.btn-ofertas.ativo {
+    background: #c53030 !important;
+    transform: scale(1.05);
+}
+@keyframes pulseOferta {
+    0% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(229, 62, 62, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
+}
+
+/* --- SELO DE PORCENTAGEM DE DESCONTO (ESTILO HAVAN) --- */
+.img-prod-wrapper {
+    position: relative; /* Necessário para segurar o selo no lugar certo */
+}
+.selo-desconto {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: #e53e3e; /* Vermelho para chamar a atenção */
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 13px;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}

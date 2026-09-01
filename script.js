@@ -1,6 +1,6 @@
 /* =======================================================
    CATÁLOGO AUTOMÁTICO DNORTE 2.0 - SISTEMA MISTO
-   VITRINE + PREÇO DINÂMICO + LINKS DIRETOS PARA PRODUTOS
+   VITRINE + PREÇO DINÂMICO + OFERTAS EM DESTAQUE
    ======================================================= */
 
 const WHATSAPP_LOJA = "5569999107161"; 
@@ -24,23 +24,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =======================================================
-// 0. SISTEMA DE ALERTAS PREMIUM (SUBSTITUI O ALERT PADRÃO)
+// 0. SISTEMA DE ALERTAS PREMIUM
 // =======================================================
 function mostrarAlerta(titulo, mensagem, tipo = 'aviso') {
-    // Remove o alerta anterior se o usuário clicar várias vezes
     const alertaAntigo = document.getElementById('modalAlertaSistema');
     if (alertaAntigo) alertaAntigo.remove();
 
     let cor = 'var(--dnorte-orange)';
     let icone = 'fas fa-exclamation-triangle';
 
-    if (tipo === 'sucesso') {
-        cor = '#25D366'; // Verde WhatsApp
-        icone = 'fas fa-check-circle';
-    } else if (tipo === 'erro') {
-        cor = '#e53e3e'; // Vermelho
-        icone = 'fas fa-times-circle';
-    }
+    if (tipo === 'sucesso') { cor = '#25D366'; icone = 'fas fa-check-circle'; } 
+    else if (tipo === 'erro') { cor = '#e53e3e'; icone = 'fas fa-times-circle'; }
 
     const modal = document.createElement('div');
     modal.id = 'modalAlertaSistema';
@@ -50,7 +44,7 @@ function mostrarAlerta(titulo, mensagem, tipo = 'aviso') {
     modal.style.width = '100%';
     modal.style.height = '100%';
     modal.style.backgroundColor = 'rgba(3, 38, 76, 0.8)';
-    modal.style.zIndex = '9999'; // Fica sempre por cima de tudo
+    modal.style.zIndex = '9999';
     modal.style.display = 'flex';
     modal.style.justifyContent = 'center';
     modal.style.alignItems = 'center';
@@ -76,7 +70,6 @@ function verificarSessaoSalva() {
         lojistaLogado = JSON.parse(salvo);
         const aviso = document.getElementById("aviso-cliente-logado");
         const spanNome = document.getElementById("nome-loja-logada");
-        
         if (aviso && spanNome) {
             spanNome.innerText = lojistaLogado.loja || lojistaLogado.usuario;
             aviso.style.display = "block";
@@ -106,7 +99,7 @@ function fecharModalLogin(event) {
 }
 
 // =======================================================
-// 2. CONTROLE DE LOGIN (USUÁRIO E SENHA)
+// 2. CONTROLE DE LOGIN
 // =======================================================
 async function carregarClientesDoSheets() {
     try {
@@ -120,16 +113,12 @@ async function carregarClientesDoSheets() {
         data.table.rows.forEach(row => {
             const c = row.c;
             if (!c || !c[0] || c[0].v === null) return;
-
             const usuario = String(c[0].v).trim().toUpperCase();
             const senha = c[1] && c[1].v !== null ? String(c[1].v).trim() : '';
             const loja = c[2] && c[2].v !== null ? String(c[2].v).trim() : 'Cliente VIP';
-
             clientesCadastrados.push({ usuario, senha, loja });
         });
-    } catch (error) {
-        console.error("Erro ao carregar clientes:", error);
-    }
+    } catch (error) { console.error("Erro ao carregar clientes:", error); }
 }
 
 function executarLogin() {
@@ -139,8 +128,7 @@ function executarLogin() {
 
     if (!inputUsuario || !inputSenha) {
         divErro.innerText = "❌ Preencha o Usuário e a Senha.";
-        divErro.style.display = "block";
-        return;
+        divErro.style.display = "block"; return;
     }
 
     const clienteEncontrado = clientesCadastrados.find(c => c.usuario === inputUsuario && c.senha === inputSenha);
@@ -148,10 +136,8 @@ function executarLogin() {
     if (clienteEncontrado) {
         lojistaLogado = clienteEncontrado;
         divErro.style.display = "none";
-        
         localStorage.setItem("dnorte_lojista", JSON.stringify(lojistaLogado));
         
-        // EFEITO VISUAL PROFISSIONAL DE SUCESSO DENTRO DO MODAL
         const loginBox = document.querySelector('.login-box');
         loginBox.innerHTML = `
             <div style="text-align: center; padding: 20px 10px;">
@@ -159,15 +145,10 @@ function executarLogin() {
                 <h3 style="color: var(--dnorte-blue); font-size: 26px; margin-bottom: 10px;">Acesso Liberado!</h3>
                 <p style="font-size: 18px; color: #333; font-weight: bold; margin-bottom: 5px;">Bem-vindo(a), ${clienteEncontrado.loja}</p>
                 <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">Os preços estão prontos para você.</p>
-                <p style="color: var(--dnorte-orange); font-size: 14px; font-weight: bold;">
-                    <i class="fas fa-spinner fa-spin"></i> Carregando o seu catálogo...
-                </p>
+                <p style="color: var(--dnorte-orange); font-size: 14px; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Carregando o seu catálogo...</p>
             </div>
         `;
-        
-        // Aguarda 2 segundos e recarrega a página automaticamente
         setTimeout(() => { location.reload(); }, 2000);
-
     } else {
         divErro.innerText = "❌ Usuário ou Senha incorretos. Tente novamente.";
         divErro.style.display = "block";
@@ -186,7 +167,6 @@ async function carregarProdutosDaPlanilha() {
         const text = await response.text();
         
         if (!text.includes("google.visualization.Query.setResponse")) {
-            console.error("Erro do Google:", text);
             if(divProdutos) divProdutos.innerHTML = `<p style='text-align:center;color:red; font-weight:bold; font-size: 18px; padding: 40px;'>❌ O Google bloqueou a leitura.</p>`;
             return; 
         }
@@ -202,7 +182,6 @@ async function carregarProdutosDaPlanilha() {
         data.table.rows.forEach(row => {
             const c = row.c;
             if (!c || !c[idxProduto] || c[idxProduto].v === null) return; 
-            
             const situacao = c[idxSituacao] && c[idxSituacao].v ? String(c[idxSituacao].v).toUpperCase().trim() : 'ATIVO';
             if (situacao !== 'ATIVO') return; 
             
@@ -211,11 +190,8 @@ async function carregarProdutosDaPlanilha() {
             const departamento = c[idxDepartamento] && c[idxDepartamento].v !== null ? String(c[idxDepartamento].v).trim().toUpperCase() : 'GERAL';
             const categoria = c[idxCategoria] && c[idxCategoria].v !== null ? String(c[idxCategoria].v).trim().toUpperCase() : 'DIVERSOS';
             
-            let precoVarejo = 0;
-            if (c[idxPrecoVarejo] && c[idxPrecoVarejo].v !== null) {
-                precoVarejo = parseFloat(String(c[idxPrecoVarejo].v).replace(',', '.'));
-                if (isNaN(precoVarejo)) precoVarejo = 0;
-            }
+            let precoVarejo = c[idxPrecoVarejo] && c[idxPrecoVarejo].v !== null ? parseFloat(String(c[idxPrecoVarejo].v).replace(',', '.')) : 0;
+            if (isNaN(precoVarejo)) precoVarejo = 0;
 
             let precoAtacado = precoVarejo; 
             if (c[idxPrecoAtacado] && c[idxPrecoAtacado].v !== null) {
@@ -223,14 +199,9 @@ async function carregarProdutosDaPlanilha() {
                 if (!isNaN(valAtacado) && valAtacado > 0) precoAtacado = valAtacado;
             }
 
-            let qtdMinima = 1;
-            if (c[idxQtdMinima] && c[idxQtdMinima].v !== null && c[idxQtdMinima].v !== "") {
-                qtdMinima = parseInt(c[idxQtdMinima].v);
-                if (isNaN(qtdMinima) || qtdMinima < 1) qtdMinima = 1;
-            }
-            if (precoAtacado < precoVarejo && qtdMinima === 1) {
-                qtdMinima = 5; 
-            }
+            let qtdMinima = c[idxQtdMinima] && c[idxQtdMinima].v !== null && c[idxQtdMinima].v !== "" ? parseInt(c[idxQtdMinima].v) : 1;
+            if (isNaN(qtdMinima) || qtdMinima < 1) qtdMinima = 1;
+            if (precoAtacado < precoVarejo && qtdMinima === 1) qtdMinima = 5; 
 
             let precoOferta = 0;
             if (c[idxPrecoOferta] && c[idxPrecoOferta].v !== null) {
@@ -238,10 +209,7 @@ async function carregarProdutosDaPlanilha() {
                 if (!isNaN(valOferta) && valOferta > 0) precoOferta = valOferta;
             }
             
-            let imagem = "favicon.png";
-            if (c[idxFoto] && c[idxFoto].v !== null && String(c[idxFoto].v).trim() !== "") {
-                imagem = String(c[idxFoto].v).trim(); 
-            }
+            let imagem = c[idxFoto] && c[idxFoto].v !== null && String(c[idxFoto].v).trim() !== "" ? String(c[idxFoto].v).trim() : "favicon.png";
             
             produtos.push({ sku, nome, departamento, categoria, precoVarejo, precoAtacado, qtdMinima, precoOferta, imagem });
         });
@@ -253,18 +221,15 @@ async function carregarProdutosDaPlanilha() {
         } else {
             if(divProdutos) divProdutos.innerHTML = "<p style='text-align:center;'>⚠️ Nenhum produto encontrado nesta aba.</p>";
         }
-    } catch (error) {
-        console.error("Erro:", error);
-    }
+    } catch (error) { console.error("Erro:", error); }
 }
 
 // =======================================================
-// MÓDULO: DETECTAR LINK DIRETO DE PRODUTO
+// MÓDULO: DETECTAR LINK DIRETO
 // =======================================================
 function verificarProdutoNaURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const skuNaUrl = urlParams.get('sku'); 
-    
     if (skuNaUrl) {
         setTimeout(() => {
             abrirModal(skuNaUrl);
@@ -275,11 +240,9 @@ function verificarProdutoNaURL() {
 
 function copiarLinkProduto(sku) {
     const linkDireto = `${window.location.origin}${window.location.pathname}?sku=${sku}`;
-    
     navigator.clipboard.writeText(linkDireto).then(() => {
         mostrarAlerta("Link Copiado!", "O link do produto foi copiado com sucesso. Agora é só colar na conversa com o cliente.", "sucesso");
     }).catch(err => {
-        console.error('Erro ao copiar link', err);
         mostrarAlerta("Oops!", "Ocorreu um erro ao copiar o link. O seu navegador pode ter bloqueado a ação.", "erro");
     });
 }
@@ -309,6 +272,7 @@ function construirFiltros() {
         labelDepto.innerHTML = "<strong style='color:#03264c; font-size:15px;'><i class='fas fa-building'></i> 1. Filtre por Departamento:</strong>";
         labelDepto.style.marginBottom = "8px";
         wrapper.insertBefore(labelDepto, wrapper.firstChild);
+        
         deptoContainer = document.createElement("div");
         deptoContainer.id = "container-departamentos";
         deptoContainer.className = "botoes-principais";
@@ -316,6 +280,7 @@ function construirFiltros() {
         deptoContainer.style.borderBottom = "2px solid #eee";
         deptoContainer.style.paddingBottom = "10px";
         wrapper.insertBefore(deptoContainer, labelDepto.nextSibling);
+        
         let labelCat = document.createElement("div");
         labelCat.innerHTML = "<strong style='color:#fb7815; font-size:15px;'><i class='fas fa-tags'></i> 2. Sub-Categoria:</strong>";
         labelCat.style.marginBottom = "8px";
@@ -328,14 +293,25 @@ function renderizarDepartamentos() {
     const container = document.getElementById("container-departamentos");
     if(!container) return;
     container.innerHTML = "";
+
+    // 1️⃣ ADIÇÃO DO BOTÃO SUPER OFERTAS
+    const btnOfertas = document.createElement("button");
+    btnOfertas.className = "btn-categoria btn-ofertas" + (departamentoAtual === "OFERTAS" ? " ativo" : "");
+    btnOfertas.innerHTML = "<i class='fas fa-fire'></i> SUPER OFERTAS";
+    btnOfertas.onclick = () => selecionarDepartamento("OFERTAS");
+    container.appendChild(btnOfertas);
+    
+    // 2️⃣ BOTÃO TODOS OS DEPARTAMENTOS
     const btnTodos = document.createElement("button");
     btnTodos.className = "btn-categoria" + (departamentoAtual === "TODOS" ? " ativo" : "");
-    btnTodos.innerText = "TODOS OS DEPARTAMENTOS";
+    btnTodos.innerText = "TODOS";
     btnTodos.onclick = () => selecionarDepartamento("TODOS");
     container.appendChild(btnTodos);
+    
+    // 3️⃣ LISTA DE DEPARTAMENTOS EXISTENTES
     const departamentos = [...new Set(produtos.map(p => p.departamento))].sort();
     departamentos.forEach(dep => {
-        if (!dep || dep === "TODOS") return;
+        if (!dep || dep === "TODOS" || dep === "OFERTAS") return;
         const btn = document.createElement("button");
         btn.className = "btn-categoria" + (departamentoAtual === dep ? " ativo" : "");
         btn.innerText = dep;
@@ -358,15 +334,26 @@ function renderizarCategorias() {
     if(!containerPrincipal || !containerExtra) return;
     containerPrincipal.innerHTML = "";
     containerExtra.innerHTML = "";
-    const prodsDoDepto = departamentoAtual === "TODOS" ? produtos : produtos.filter(p => p.departamento === departamentoAtual);
+    
+    // Se estiver em "Ofertas", puxa as categorias apenas dos produtos em oferta
+    let prodsDoDepto = produtos;
+    if (departamentoAtual === "OFERTAS") {
+        prodsDoDepto = produtos.filter(p => p.precoOferta > 0 && p.precoOferta < p.precoVarejo);
+    } else if (departamentoAtual !== "TODOS") {
+        prodsDoDepto = produtos.filter(p => p.departamento === departamentoAtual);
+    }
+    
     const categorias = [...new Set(prodsDoDepto.map(p => p.categoria))].sort();
+    
     const btnTodas = document.createElement("button");
     btnTodas.className = "btn-categoria" + (categoriaAtual === "TODAS" ? " ativo" : "");
     btnTodas.innerText = "TODAS";
     btnTodas.onclick = () => selecionarCategoria("TODAS");
     containerPrincipal.appendChild(btnTodas);
+    
     const destaque = categorias.slice(0, 4);
     const resto = categorias.slice(4);
+    
     destaque.forEach(cat => {
         if(!cat || cat === "TODAS") return;
         criarBotaoCategoria(cat, containerPrincipal);
@@ -407,8 +394,18 @@ function filtrarProdutos() { filtrarProdutosFinal(); }
 function filtrarProdutosFinal() {
     const inputBusca = document.getElementById('inputBusca');
     const termo = inputBusca ? inputBusca.value.toLowerCase() : "";
+    
     const listaFiltrada = produtos.filter(p => {
-        const matchDepto = departamentoAtual === "TODOS" || p.departamento === departamentoAtual;
+        // Lógica de Filtro Especial para a aba de Ofertas
+        let matchDepto = false;
+        if (departamentoAtual === "TODOS") {
+            matchDepto = true;
+        } else if (departamentoAtual === "OFERTAS") {
+            matchDepto = (p.precoOferta > 0 && p.precoOferta < p.precoVarejo);
+        } else {
+            matchDepto = (p.departamento === departamentoAtual);
+        }
+        
         const matchCat = categoriaAtual === "TODAS" || p.categoria === categoriaAtual;
         const matchBusca = termo === "" || p.nome.toLowerCase().includes(termo) || String(p.sku).includes(termo) || p.categoria.toLowerCase().includes(termo);
         return matchDepto && matchCat && matchBusca;
@@ -417,7 +414,7 @@ function filtrarProdutosFinal() {
 }
 
 // =======================================================
-// 5. RENDERIZAÇÃO DE PRODUTOS
+// 5. RENDERIZAÇÃO DE PRODUTOS (COM SELO DE %)
 // =======================================================
 function renderizarProdutos(lista) {
     const divProdutos = document.getElementById("produtos");
@@ -442,18 +439,24 @@ function renderizarProdutos(lista) {
     const htmlBuffer = lista.map(p => {
         let blocoPrecoEAcao = "";
         let seloAtacadoTopo = ""; 
+        let seloDescontoHtml = ""; // Selo estilo Havan
         
         if (lojistaLogado) {
             let htmlPreco = `<p class="preco-produto">R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</p>`;
             let precoBaseAtual = p.precoVarejo;
 
+            // CÁLCULO E EXIBIÇÃO DO DESCONTO (%)
             if (p.precoOferta > 0 && p.precoOferta < p.precoVarejo) {
                 precoBaseAtual = p.precoOferta;
+                
+                // Exemplo: de 100 para 80 -> (100 - 80) / 100 = 0.20 -> 20%
+                let porcentagemDesconto = Math.round(((p.precoVarejo - p.precoOferta) / p.precoVarejo) * 100);
+                seloDescontoHtml = `<div class="selo-desconto">-${porcentagemDesconto}%</div>`;
+
                 htmlPreco = `
                 <p class="preco-produto" style="line-height: 1.1;">
                     <span style="text-decoration: line-through; color: #94a3b8; font-size: 13px;">R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</span><br>
-                    <span style="color: #e53e3e;">R$ ${p.precoOferta.toFixed(2).replace('.', ',')} 
-                    <span style="font-size:10px; background:#e53e3e; color:white; padding:2px 4px; border-radius:4px; vertical-align: middle;">OFERTA</span></span>
+                    <span style="color: #e53e3e;">R$ ${p.precoOferta.toFixed(2).replace('.', ',')}</span>
                 </p>`;
             }
 
@@ -484,6 +487,7 @@ function renderizarProdutos(lista) {
         <div class="produto">
             ${seloAtacadoTopo}
             <div class="img-prod-wrapper" onclick="abrirModal('${p.sku}')">
+                ${seloDescontoHtml} 
                 <img src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.src='favicon.png'; this.style.opacity='0.2'">
             </div>
             <h3 title="${p.nome}" onclick="abrirModal('${p.sku}')">${p.nome}</h3>
@@ -520,7 +524,10 @@ function abrirModal(sku) {
         
         if (p.precoOferta > 0 && p.precoOferta < p.precoVarejo) {
             precoBaseAtual = p.precoOferta;
-            textoPreco = `<span style="text-decoration:line-through; color:#94a3b8; font-size:14px;">Varejo: R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</span><br><span style="color:#e53e3e;">🔥 Oferta: R$ ${p.precoOferta.toFixed(2).replace('.', ',')}</span>`;
+            let porcentagemDesconto = Math.round(((p.precoVarejo - p.precoOferta) / p.precoVarejo) * 100);
+            
+            textoPreco = `<span style="text-decoration:line-through; color:#94a3b8; font-size:14px;">Varejo: R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</span><br>
+                          <span style="color:#e53e3e;">🔥 Oferta: R$ ${p.precoOferta.toFixed(2).replace('.', ',')} <span style="font-size: 14px;">(-${porcentagemDesconto}%)</span></span>`;
         }
 
         if(p.precoAtacado < precoBaseAtual) {
@@ -548,7 +555,6 @@ function abrirModal(sku) {
 function fecharModal(force = false, event = null) {
     if (force || (event && event.target.id === "modalProduto")) {
         document.getElementById("modalProduto").style.display = "none";
-        
         const urlLimpa = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, urlLimpa);
     }
@@ -681,11 +687,7 @@ function finalizarPedido() {
     msg += `*Lojista:* ${loja}\n`;
     msg += `*Comprador:* ${nome}\n`;
     msg += `*Cidade:* ${city}\n`;
-    
-    if (lojistaLogado) {
-        msg += `*Usuário:* ${lojistaLogado.usuario}\n`;
-    }
-    
+    if (lojistaLogado) msg += `*Usuário:* ${lojistaLogado.usuario}\n`;
     msg += `=============================\n\n`;
     msg += `*ITENS SOLICITADOS:*\n`;
     
@@ -696,43 +698,29 @@ function finalizarPedido() {
         const subtotal = precoAtivo * i.qtd;
 
         let infoPromocao = "";
-        if (i.qtd >= i.qtdMinima && i.precoAtacado < precoBase) {
-            infoPromocao = " *(Atacado)*";
-        } else if (i.precoOferta > 0 && i.precoOferta < i.precoVarejo) {
-            infoPromocao = " *(Oferta)*";
-        }
+        if (i.qtd >= i.qtdMinima && i.precoAtacado < precoBase) infoPromocao = " *(Atacado)*";
+        else if (i.precoOferta > 0 && i.precoOferta < i.precoVarejo) infoPromocao = " *(Oferta)*";
 
         msg += `- ${i.qtd}x [${i.sku}] ${i.nome} - R$ ${subtotal.toFixed(2)}${infoPromocao}\n`;
         totalZap += subtotal;
     });
     
     msg += `\n*TOTAL ESTIMADO:* R$ ${totalZap.toFixed(2)}\n`;
-    
-    const url = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
+    window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, '_blank');
 }
+
 // =======================================================
 // 8. BOTÃO FLUTUANTE: VOLTAR AOS FILTROS
 // =======================================================
-
-// Ouve o movimento de rolagem da página
 window.addEventListener('scroll', function() {
     const btnTopo = document.getElementById('btn-voltar-topo');
     if (btnTopo) {
-        // Se a página for rolada mais de 600 pixels para baixo, mostra o botão
-        if (window.scrollY > 600) {
-            btnTopo.style.display = 'block';
-        } else {
-            // Se estiver no topo, esconde o botão
-            btnTopo.style.display = 'none';
-        }
+        if (window.scrollY > 600) btnTopo.style.display = 'block';
+        else btnTopo.style.display = 'none';
     }
 });
 
-// Função para deslizar suavemente até às categorias
 function voltarAosFiltros() {
     const ancora = document.getElementById('vitrine-ancora');
-    if (ancora) {
-        ancora.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (ancora) ancora.scrollIntoView({ behavior: 'smooth' });
 }
