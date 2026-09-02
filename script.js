@@ -1,6 +1,6 @@
 /* =======================================================
    CATÁLOGO AUTOMÁTICO DNORTE 2.0 - SISTEMA MISTO
-   VITRINE + PREÇO DINÂMICO + LINKS + VENDA MÍNIMA OBRIGATÓRIA
+   VITRINE + LINKS + REGRAS: MÍNIMO NORMAL (L) E MÍNIMO OFERTA (M)
    ======================================================= */
 
 const WHATSAPP_LOJA = "5569999107161"; 
@@ -156,7 +156,7 @@ function executarLogin() {
 }
 
 // =======================================================
-// 3. BUSCA AUTOMÁTICA DE PRODUTOS
+// 3. BUSCA AUTOMÁTICA DE PRODUTOS E REGRAS DE MÍNIMO
 // =======================================================
 async function carregarProdutosDaPlanilha() {
     const divProdutos = document.getElementById("produtos");
@@ -174,8 +174,11 @@ async function carregarProdutosDaPlanilha() {
         const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
         const data = JSON.parse(jsonString);
         
+        // ÍNDICES DAS COLUNAS ATUALIZADOS
         let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6;
-        let idxPrecoVarejo = 7, idxPrecoAtacado = 8, idxQtdMinima = 9, idxPrecoOferta = 10; 
+        let idxPrecoVarejo = 7, idxPrecoAtacado = 8, idxQtdMinimaAtacado = 9, idxPrecoOferta = 10;
+        let idxQtdMinimaVenda = 11;  // <--- Coluna L (Mínimo Diário/Normal)
+        let idxQtdMinimaOferta = 12; // <--- Coluna M (Mínimo de Oferta)
         
         produtos = [];
         
@@ -190,6 +193,7 @@ async function carregarProdutosDaPlanilha() {
             const departamento = c[idxDepartamento] && c[idxDepartamento].v !== null ? String(c[idxDepartamento].v).trim().toUpperCase() : 'GERAL';
             const categoria = c[idxCategoria] && c[idxCategoria].v !== null ? String(c[idxCategoria].v).trim().toUpperCase() : 'DIVERSOS';
             
+            // --- PREÇOS ---
             let precoVarejo = c[idxPrecoVarejo] && c[idxPrecoVarejo].v !== null ? parseFloat(String(c[idxPrecoVarejo].v).replace(',', '.')) : 0;
             if (isNaN(precoVarejo)) precoVarejo = 0;
 
@@ -199,25 +203,51 @@ async function carregarProdutosDaPlanilha() {
                 if (!isNaN(valAtacado) && valAtacado > 0) precoAtacado = valAtacado;
             }
 
-            // --- LÓGICA DE VENDA MÍNIMA ATUALIZADA ---
-            let qtdMinima = c[idxQtdMinima] && c[idxQtdMinima].v !== null && c[idxQtdMinima].v !== "" ? parseInt(c[idxQtdMinima].v) : 1;
-            if (isNaN(qtdMinima) || qtdMinima < 1) qtdMinima = 1;
-            
-            // Variável separada para decidir quando ativa o preço de atacado
-            let qtdAtacado = qtdMinima;
-            if (precoAtacado < precoVarejo && qtdMinima === 1) {
-                qtdAtacado = 5; // Se for unitário e tiver atacado, o atacado liga com 5 unidades
-            }
-
             let precoOferta = 0;
             if (c[idxPrecoOferta] && c[idxPrecoOferta].v !== null) {
                 let valOferta = parseFloat(String(c[idxPrecoOferta].v).replace(',', '.'));
                 if (!isNaN(valOferta) && valOferta > 0) precoOferta = valOferta;
             }
+
+            // --- REGRAS DE QUANTIDADE ---
+            // 1. Coluna J: Qtd para ativar Atacado
+            let qtdAtacado = 1;
+            if (c[idxQtdMinimaAtacado] && c[idxQtdMinimaAtacado].v !== null && c[idxQtdMinimaAtacado].v !== "") {
+                qtdAtacado = parseInt(c[idxQtdMinimaAtacado].v);
+                if (isNaN(qtdAtacado) || qtdAtacado < 1) qtdAtacado = 1;
+            }
+            if (precoAtacado < precoVarejo && qtdAtacado === 1) qtdAtacado = 5; 
+
+            // 2. Coluna L: Venda Mínima Normal
+            let qtdMinimaNormal = 1;
+            if (c[idxQtdMinimaVenda] && c[idxQtdMinimaVenda].v !== null && c[idxQtdMinimaVenda].v !== "") {
+                qtdMinimaNormal = parseInt(c[idxQtdMinimaVenda].v);
+                if (isNaN(qtdMinimaNormal) || qtdMinimaNormal < 1) qtdMinimaNormal = 1;
+            }
+
+            // 3. Coluna M: Venda Mínima de Oferta
+            let qtdMinimaOferta = 1;
+            if (c[idxQtdMinimaOferta] && c[idxQtdMinimaOferta].v !== null && c[idxQtdMinimaOferta].v !== "") {
+                qtdMinimaOferta = parseInt(c[idxQtdMinimaOferta].v);
+                if (isNaN(qtdMinimaOferta) || qtdMinimaOferta < 1) qtdMinimaOferta = 1;
+            }
+
+            // --- LÓGICA MESTRA DE TRAVA DE QUANTIDADE ---
+            // A quantidade mínima exigida muda se o produto está ou não em oferta!
+            let qtdMinimaFinal = qtdMinimaNormal;
+            if (precoOferta > 0 && precoOferta < precoVarejo) {
+                // Se está em oferta, a regra da Coluna M assume o controle
+                qtdMinimaFinal = qtdMinimaOferta > 1 ? qtdMinimaOferta : qtdMinimaNormal;
+            }
             
             let imagem = c[idxFoto] && c[idxFoto].v !== null && String(c[idxFoto].v).trim() !== "" ? String(c[idxFoto].v).trim() : "favicon.png";
             
-            produtos.push({ sku, nome, departamento, categoria, precoVarejo, precoAtacado, qtdMinima, qtdAtacado, precoOferta, imagem });
+            produtos.push({ 
+                sku, nome, departamento, categoria, 
+                precoVarejo, precoAtacado, qtdAtacado, 
+                qtdMinima: qtdMinimaFinal, // A qtdMinima salva será a decidida pela nossa regra acima
+                precoOferta, imagem 
+            });
         });
         
         if (produtos.length > 0) {
@@ -480,7 +510,7 @@ function filtrarProdutosFinal() {
 }
 
 // =======================================================
-// 5. RENDERIZAÇÃO DE PRODUTOS (COM AVISO DE VENDA MÍNIMA)
+// 5. RENDERIZAÇÃO DE PRODUTOS
 // =======================================================
 function renderizarProdutos(lista) {
     const divProdutos = document.getElementById("produtos");
@@ -530,13 +560,11 @@ function renderizarProdutos(lista) {
                 </div>`;
             }
 
-            // --- AVISO VISUAL DA VENDA MÍNIMA ---
             let avisoQtdMinima = "";
             if (p.qtdMinima > 1) {
                 avisoQtdMinima = `<div style="font-size: 11px; color: #e53e3e; font-weight: bold; background: #fff5f5; border: 1px solid #fed7d7; padding: 4px; border-radius: 4px; margin-bottom: 8px;">⚠️ Venda Mínima: ${p.qtdMinima} un.</div>`;
             }
 
-            // O input de quantidade já inicia no número mínimo configurado na planilha (p.qtdMinima)
             blocoPrecoEAcao = `
                 ${htmlPreco}
                 ${avisoQtdMinima}
@@ -605,7 +633,6 @@ function abrirModal(sku) {
             textoPreco += `<br><span style="color:#28a745; font-size:16px;">📦 Atacado (${p.qtdAtacado}+ un): R$ ${p.precoAtacado.toFixed(2).replace('.', ',')}</span>`;
         }
         
-        // Exibe o aviso da venda mínima também dentro da tela do produto
         if (p.qtdMinima > 1) {
             textoPreco += `<br><span style="color:#e53e3e; font-size:14px; font-weight:bold; display:inline-block; margin-top:8px;">⚠️ Venda Mínima: ${p.qtdMinima} unidades</span>`;
         }
@@ -646,7 +673,7 @@ function alterarQtd(sku, mudanca) {
     if(span) {
         let novaQtd = parseInt(span.innerText) + mudanca;
         
-        // --- TRAVA DE SEGURANÇA: Não deixa baixar da quantidade mínima definida na planilha ---
+        // --- TRAVA DE SEGURANÇA: Não baixa da qtdMinima calculada ---
         if(novaQtd < p.qtdMinima) {
             novaQtd = p.qtdMinima;
         }
@@ -660,7 +687,6 @@ function adicionar(sku) {
     if (!p) return;
     
     const span = document.getElementById(`qtd-${sku}`);
-    // Pega a quantidade que está escrita, se não existir pega a mínima
     const qtd = span ? parseInt(span.innerText) : p.qtdMinima;
     
     const index = carrinho.findIndex(i => String(i.sku) === String(sku));
@@ -669,7 +695,6 @@ function adicionar(sku) {
     
     renderCarrinho();
     
-    // Reseta o botão para a quantidade mínima do produto novamente
     if(span) span.innerText = p.qtdMinima; 
     
     const btn = event.target;
@@ -685,7 +710,6 @@ function ajustarQtdDiretoNoCarrinho(sku, mudanca) {
         const item = carrinho[index];
         item.qtd += mudanca;
         
-        // Se clicar no "-" do carrinho e a quantidade ficar abaixo da Venda Mínima, o item é removido do carrinho.
         if (item.qtd < item.qtdMinima) {
             carrinho.splice(index, 1);
         }
