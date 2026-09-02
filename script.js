@@ -1,6 +1,6 @@
 /* =======================================================
    CATÁLOGO AUTOMÁTICO DNORTE 2.0 - SISTEMA MISTO
-   VITRINE + PREÇO DINÂMICO + LINKS DIRETOS E DE CATEGORIAS
+   VITRINE + PREÇO DINÂMICO + LINKS + VENDA MÍNIMA OBRIGATÓRIA
    ======================================================= */
 
 const WHATSAPP_LOJA = "5569999107161"; 
@@ -199,9 +199,15 @@ async function carregarProdutosDaPlanilha() {
                 if (!isNaN(valAtacado) && valAtacado > 0) precoAtacado = valAtacado;
             }
 
+            // --- LÓGICA DE VENDA MÍNIMA ATUALIZADA ---
             let qtdMinima = c[idxQtdMinima] && c[idxQtdMinima].v !== null && c[idxQtdMinima].v !== "" ? parseInt(c[idxQtdMinima].v) : 1;
             if (isNaN(qtdMinima) || qtdMinima < 1) qtdMinima = 1;
-            if (precoAtacado < precoVarejo && qtdMinima === 1) qtdMinima = 5; 
+            
+            // Variável separada para decidir quando ativa o preço de atacado
+            let qtdAtacado = qtdMinima;
+            if (precoAtacado < precoVarejo && qtdMinima === 1) {
+                qtdAtacado = 5; // Se for unitário e tiver atacado, o atacado liga com 5 unidades
+            }
 
             let precoOferta = 0;
             if (c[idxPrecoOferta] && c[idxPrecoOferta].v !== null) {
@@ -211,13 +217,13 @@ async function carregarProdutosDaPlanilha() {
             
             let imagem = c[idxFoto] && c[idxFoto].v !== null && String(c[idxFoto].v).trim() !== "" ? String(c[idxFoto].v).trim() : "favicon.png";
             
-            produtos.push({ sku, nome, departamento, categoria, precoVarejo, precoAtacado, qtdMinima, precoOferta, imagem });
+            produtos.push({ sku, nome, departamento, categoria, precoVarejo, precoAtacado, qtdMinima, qtdAtacado, precoOferta, imagem });
         });
         
         if (produtos.length > 0) {
             construirFiltros();
             filtrarProdutosFinal();
-            verificarFiltrosEProdutoNaURL(); // Chama a nova função super poderosa
+            verificarFiltrosEProdutoNaURL(); 
         } else {
             if(divProdutos) divProdutos.innerHTML = "<p style='text-align:center;'>⚠️ Nenhum produto encontrado nesta aba.</p>";
         }
@@ -233,21 +239,19 @@ function verificarFiltrosEProdutoNaURL() {
     const depNaUrl = urlParams.get('dep'); 
     const catNaUrl = urlParams.get('cat'); 
     
-    // Se for link de Produto, abre a janela
     if (skuNaUrl) {
         setTimeout(() => {
             abrirModal(skuNaUrl);
             document.getElementById('vitrine-ancora').scrollIntoView({ behavior: 'smooth' });
         }, 500); 
     } 
-    // Se for link de Categoria, aplica os filtros automaticamente
     else if (depNaUrl || catNaUrl) {
         if (depNaUrl) departamentoAtual = depNaUrl;
         if (catNaUrl) categoriaAtual = catNaUrl;
         
         setTimeout(() => {
-            renderizarDepartamentos(); // Reconstroi os botões com a aba certa pintada
-            filtrarProdutosFinal(); // Filtra os produtos
+            renderizarDepartamentos(); 
+            filtrarProdutosFinal(); 
             document.getElementById('vitrine-ancora').scrollIntoView({ behavior: 'smooth' });
         }, 500);
     }
@@ -309,7 +313,6 @@ function construirFiltros() {
     let deptoContainer = document.getElementById("container-departamentos");
     
     if (!deptoContainer) {
-        // --- CABEÇALHO COM TÍTULO E BOTÃO DE PARTILHAR ---
         let headerDepartamentos = document.createElement("div");
         headerDepartamentos.style.display = "flex";
         headerDepartamentos.style.justifyContent = "space-between";
@@ -334,7 +337,7 @@ function construirFiltros() {
         btnShare.style.transition = "0.3s";
         btnShare.onmouseover = function() { this.style.background = "#e0680d"; }
         btnShare.onmouseout = function() { this.style.background = "var(--dnorte-orange)"; }
-        btnShare.onclick = copiarLinkFiltroAtual; // Chama a nova função!
+        btnShare.onclick = copiarLinkFiltroAtual; 
 
         headerDepartamentos.appendChild(labelDepto);
         headerDepartamentos.appendChild(btnShare);
@@ -477,7 +480,7 @@ function filtrarProdutosFinal() {
 }
 
 // =======================================================
-// 5. RENDERIZAÇÃO DE PRODUTOS
+// 5. RENDERIZAÇÃO DE PRODUTOS (COM AVISO DE VENDA MÍNIMA)
 // =======================================================
 function renderizarProdutos(lista) {
     const divProdutos = document.getElementById("produtos");
@@ -520,18 +523,26 @@ function renderizarProdutos(lista) {
                 </p>`;
             }
 
-            if (p.precoAtacado < precoBaseAtual && p.qtdMinima > 1) {
+            if (p.precoAtacado < precoBaseAtual && p.qtdAtacado > 1) {
                 seloAtacadoTopo = `
                 <div style="background-color: #e6f4ea; border: 1px solid #28a745; color: #28a745; text-align: center; padding: 6px; font-size: 11px; font-weight: 800; border-radius: 8px; margin-bottom: 12px; width: 100%;">
-                    📦 ATACADO: R$ ${p.precoAtacado.toFixed(2).replace('.',',')} (${p.qtdMinima}+ un)
+                    📦 ATACADO: R$ ${p.precoAtacado.toFixed(2).replace('.',',')} (${p.qtdAtacado}+ un)
                 </div>`;
             }
 
+            // --- AVISO VISUAL DA VENDA MÍNIMA ---
+            let avisoQtdMinima = "";
+            if (p.qtdMinima > 1) {
+                avisoQtdMinima = `<div style="font-size: 11px; color: #e53e3e; font-weight: bold; background: #fff5f5; border: 1px solid #fed7d7; padding: 4px; border-radius: 4px; margin-bottom: 8px;">⚠️ Venda Mínima: ${p.qtdMinima} un.</div>`;
+            }
+
+            // O input de quantidade já inicia no número mínimo configurado na planilha (p.qtdMinima)
             blocoPrecoEAcao = `
                 ${htmlPreco}
+                ${avisoQtdMinima}
                 <div class="qtd-selector">
                     <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
-                    <span id="qtd-${p.sku}">1</span>
+                    <span id="qtd-${p.sku}">${p.qtdMinima}</span>
                     <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
                 </div>
                 <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar ao Pedido</button>
@@ -565,7 +576,7 @@ function solicitarPrecoViaZap(sku, nomeProd) {
 }
 
 // =======================================================
-// 6. MODAL DO PRODUTO E GESTÃO DO CARRINHO
+// 6. MODAL DO PRODUTO E GESTÃO DO CARRINHO (BLOQUEIOS)
 // =======================================================
 function abrirModal(sku) {
     const p = produtos.find(prod => String(prod.sku) === String(sku));
@@ -591,7 +602,12 @@ function abrirModal(sku) {
         }
 
         if(p.precoAtacado < precoBaseAtual) {
-            textoPreco += `<br><span style="color:#28a745; font-size:16px;">📦 Atacado (${p.qtdMinima}+ un): R$ ${p.precoAtacado.toFixed(2).replace('.', ',')}</span>`;
+            textoPreco += `<br><span style="color:#28a745; font-size:16px;">📦 Atacado (${p.qtdAtacado}+ un): R$ ${p.precoAtacado.toFixed(2).replace('.', ',')}</span>`;
+        }
+        
+        // Exibe o aviso da venda mínima também dentro da tela do produto
+        if (p.qtdMinima > 1) {
+            textoPreco += `<br><span style="color:#e53e3e; font-size:14px; font-weight:bold; display:inline-block; margin-top:8px;">⚠️ Venda Mínima: ${p.qtdMinima} unidades</span>`;
         }
 
         pPreco.innerHTML = textoPreco;
@@ -623,10 +639,18 @@ function fecharModal(force = false, event = null) {
 function adicionarNoModal(sku) { adicionar(sku); fecharModal(true); }
 
 function alterarQtd(sku, mudanca) {
+    const p = produtos.find(prod => String(prod.sku) === String(sku));
+    if (!p) return;
+    
     const span = document.getElementById(`qtd-${sku}`);
     if(span) {
         let novaQtd = parseInt(span.innerText) + mudanca;
-        if(novaQtd < 1) novaQtd = 1;
+        
+        // --- TRAVA DE SEGURANÇA: Não deixa baixar da quantidade mínima definida na planilha ---
+        if(novaQtd < p.qtdMinima) {
+            novaQtd = p.qtdMinima;
+        }
+        
         span.innerText = novaQtd;
     }
 }
@@ -636,14 +660,17 @@ function adicionar(sku) {
     if (!p) return;
     
     const span = document.getElementById(`qtd-${sku}`);
-    const qtd = span ? parseInt(span.innerText) : 1;
+    // Pega a quantidade que está escrita, se não existir pega a mínima
+    const qtd = span ? parseInt(span.innerText) : p.qtdMinima;
     
     const index = carrinho.findIndex(i => String(i.sku) === String(sku));
     if (index > -1) carrinho[index].qtd += qtd;
     else carrinho.push({ ...p, qtd: qtd });
     
     renderCarrinho();
-    if(span) span.innerText = "1"; 
+    
+    // Reseta o botão para a quantidade mínima do produto novamente
+    if(span) span.innerText = p.qtdMinima; 
     
     const btn = event.target;
     if(btn && btn.classList.contains('btn-add')) {
@@ -655,8 +682,13 @@ function adicionar(sku) {
 function ajustarQtdDiretoNoCarrinho(sku, mudanca) {
     const index = carrinho.findIndex(i => String(i.sku) === String(sku));
     if (index > -1) {
-        carrinho[index].qtd += mudanca;
-        if (carrinho[index].qtd < 1) carrinho.splice(index, 1);
+        const item = carrinho[index];
+        item.qtd += mudanca;
+        
+        // Se clicar no "-" do carrinho e a quantidade ficar abaixo da Venda Mínima, o item é removido do carrinho.
+        if (item.qtd < item.qtdMinima) {
+            carrinho.splice(index, 1);
+        }
         renderCarrinho();
     }
 }
@@ -680,14 +712,14 @@ function renderCarrinho() {
 
     carrinho.forEach(i => {
         let precoBase = (i.precoOferta > 0 && i.precoOferta < i.precoVarejo) ? i.precoOferta : i.precoVarejo;
-        let precoAtivo = (i.qtd >= i.qtdMinima && i.precoAtacado < precoBase) ? i.precoAtacado : precoBase;
+        let precoAtivo = (i.qtd >= i.qtdAtacado && i.precoAtacado < precoBase) ? i.precoAtacado : precoBase;
         
         const subtotal = precoAtivo * i.qtd;
         total += subtotal;
         totalItens += i.qtd;
 
         let badgePromocao = "";
-        if (i.qtd >= i.qtdMinima && i.precoAtacado < precoBase) {
+        if (i.qtd >= i.qtdAtacado && i.precoAtacado < precoBase) {
             badgePromocao = `<span style="color:#28a745; font-size:10px; margin-left:5px;">(Atacado)</span>`;
         } else if (i.precoOferta > 0 && i.precoOferta < i.precoVarejo) {
             badgePromocao = `<span style="color:#e53e3e; font-size:10px; margin-left:5px;">(Oferta)</span>`;
@@ -754,11 +786,11 @@ function finalizarPedido() {
     let totalZap = 0;
     carrinho.forEach(i => {
         let precoBase = (i.precoOferta > 0 && i.precoOferta < i.precoVarejo) ? i.precoOferta : i.precoVarejo;
-        let precoAtivo = (i.qtd >= i.qtdMinima && i.precoAtacado < precoBase) ? i.precoAtacado : precoBase;
+        let precoAtivo = (i.qtd >= i.qtdAtacado && i.precoAtacado < precoBase) ? i.precoAtacado : precoBase;
         const subtotal = precoAtivo * i.qtd;
 
         let infoPromocao = "";
-        if (i.qtd >= i.qtdMinima && i.precoAtacado < precoBase) infoPromocao = " *(Atacado)*";
+        if (i.qtd >= i.qtdAtacado && i.precoAtacado < precoBase) infoPromocao = " *(Atacado)*";
         else if (i.precoOferta > 0 && i.precoOferta < i.precoVarejo) infoPromocao = " *(Oferta)*";
 
         msg += `- ${i.qtd}x [${i.sku}] ${i.nome} - R$ ${subtotal.toFixed(2)}${infoPromocao}\n`;
