@@ -130,8 +130,7 @@
             <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Insira os seus dados cadastrados na DNorte para liberar os preços de atacado e o carrinho.</p>
             <p style="margin-top: 15px; text-align: center; font-size: 14px;"> Ainda não é parceiro? <br>
            <a href="#" onclick="event.preventDefault(); abrirModalCadastro()" style="color: var(--dnorte-orange); font-weight: bold; text-decoration: none;">Faça o seu Pré-Cadastro aqui</a>
-</p>
-            
+            </p>
             
             <div class="input-group">
                 <label>Usuário de Acesso:</label>
@@ -147,46 +146,48 @@
         </div>
     </div>
 
- <!-- Modal de Pré-Cadastro -->
-<div id="modalCadastro" class="modal" style="display: none; z-index: 3000;">
-    <div class="modal-content login-box" style="max-width: 450px;">
-        <span class="close-btn" onclick="fecharModalCadastro()">&times;</span>
-        <h2 style="color: var(--dnorte-blue); margin-bottom: 10px;">Pré-Cadastro Lojista</h2>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Preencha os dados abaixo. A nossa equipa analisará e enviará o seu acesso rapidamente.</p>
+    <!-- Modal de Pré-Cadastro -->
+    <div id="modalCadastro" class="modal" style="display: none; z-index: 3000;">
+        <div class="modal-content login-box" style="max-width: 450px;">
+            <span class="close-btn" onclick="fecharModalCadastro()">&times;</span>
+            <h2 style="color: var(--dnorte-blue); margin-bottom: 10px;">Pré-Cadastro Lojista</h2>
+            <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Preencha os dados abaixo. A nossa equipa analisará e enviará o seu acesso rapidamente.</p>
 
-        <!-- ATENÇÃO: Verifique se este é o seu e-mail correto -->
-        <form action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST">
-            
-            <input type="hidden" name="_subject" value="🚨 NOVO PRÉ-CADASTRO - DNORTE">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_next" value="https://dnorte.vercel.app/?cadastro=sucesso">
+            <!-- ATENÇÃO: Verifique se este é o seu e-mail correto -->
+            <form action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST">
+                
+                <input type="hidden" name="_subject" value="🚨 NOVO PRÉ-CADASTRO - DNORTE">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_next" value="https://dnorte.vercel.app/?cadastro=sucesso">
 
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="font-weight: bold; font-size: 13px; color: #333;">Nome Completo (Comprador):</label>
-                <input type="text" name="Nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: João Silva">
-            </div>
-            
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="font-weight: bold; font-size: 13px; color: #333;">Nome da Loja (Fantasia):</label>
-                <input type="text" name="Loja" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: MultShop Variedades">
-            </div>
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; font-size: 13px; color: #333;">Nome Completo (Comprador):</label>
+                    <input type="text" name="Nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: João Silva">
+                </div>
+                
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; font-size: 13px; color: #333;">Nome da Loja (Fantasia):</label>
+                    <input type="text" name="Loja" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: MultShop Variedades">
+                </div>
 
-            <!-- CAMPO CPF/CNPJ COM VALIDAÇÃO -->
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="font-weight: bold; font-size: 13px; color: #333;">CPF ou CNPJ:</label>
-                <input type="text" name="Documento" id="inputCpfCnpj" required maxlength="18" oninput="aplicarMascaraCpfCnpj(this)" onblur="validarCpfCnpjBlur(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px; outline: none; transition: 0.3s;" placeholder="Ex: 000.000.000-00 ou 00.000.000/0000-00">
-                <span id="erroCpfCnpj" style="color: red; font-size: 12px; display: none; margin-top: 5px; font-weight: bold;">❌ Documento inválido! Verifique a numeração.</span>
-            </div>
+                <!-- CAMPO CPF/CNPJ COM VALIDAÇÃO -->
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; font-size: 13px; color: #333;">CPF ou CNPJ:</label>
+                    <input type="text" name="Documento" id="inputCpfCnpj" required maxlength="18" oninput="aplicarMascaraCpfCnpj(this)" onblur="validarCpfCnpjBlur(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px; outline: none; transition: 0.3s;" placeholder="Ex: 000.000.000-00 ou 00.000.000/0000-00">
+                    <span id="erroCpfCnpj" style="color: red; font-size: 12px; display: none; margin-top: 5px; font-weight: bold;">❌ Documento inválido! Verifique a numeração.</span>
+                </div>
 
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="font-weight: bold; font-size: 13px; color: #333;">WhatsApp (com DDD):</label>
-                <input type="text" name="WhatsApp" required maxlength="15" oninput="aplicarMascaraTelefone(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: (69) 99999-9999">
-            </div>
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; font-size: 13px; color: #333;">WhatsApp (com DDD):</label>
+                    <input type="text" name="WhatsApp" required maxlength="15" oninput="aplicarMascaraTelefone(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: (69) 99999-9999">
+                </div>
 
-            <button type="submit" style="width: 100%; padding: 15px; background: var(--dnorte-orange); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;">Enviar Solicitação</button>
-        </form>
-</div>
+                <button type="submit" style="width: 100%; padding: 15px; background: var(--dnorte-orange); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;">Enviar Solicitação</button>
+            </form>
+        </div>
+    </div> <!-- Esta é a tag que estava faltando! -->
 
+    <!-- Modal de Produto -->
     <div id="modalProduto" class="modal" onclick="fecharModal(event)">
         <div class="modal-content">
             <span class="close-btn" onclick="fecharModal(true)">&times;</span>
@@ -204,10 +205,12 @@
             </div>
         </div>
     </div>
-<!-- Botão Voltar aos Filtros -->
+
+    <!-- Botão Voltar aos Filtros -->
     <button id="btn-voltar-topo" class="btn-voltar-topo" onclick="voltarAosFiltros()" title="Voltar ao Topo">
         <i class="fas fa-arrow-up"></i>
     </button>
+
     <script src="script.js"></script>
 </body>
 </html>
