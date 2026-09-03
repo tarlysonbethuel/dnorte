@@ -1,10 +1,12 @@
 /* =======================================================
    CATÁLOGO AUTOMÁTICO DNORTE 2.0 - SISTEMA MISTO
-   VITRINE + LINKS + REGRAS: MÍNIMO NORMAL (L) E MÍNIMO OFERTA (M)
+   VITRINE + REGRAS DE MÍNIMO + AUTO-PREENCHIMENTO + EMAIL INVISÍVEL
    ======================================================= */
 
 const WHATSAPP_LOJA = "5569999107161"; 
 const ID_PLANILHA = "1oneVF4MfT-sQJx-Sa7wfr0AjnHQpZ6zgGZuSaelER7c"; 
+// Insira o e-mail que vai receber os pedidos abaixo:
+const EMAIL_PEDIDOS = "dnortedistribuidora.ro@gmail.com"; 
 
 let carrinho = [];
 let produtos = []; 
@@ -63,7 +65,7 @@ function mostrarAlerta(titulo, mensagem, tipo = 'aviso') {
 }
 
 // =======================================================
-// 1. VERIFICAÇÃO DE SESSÃO E LOGOUT
+// 1. VERIFICAÇÃO DE SESSÃO E LOGOUT (+ AUTO PREENCHIMENTO)
 // =======================================================
 function verificarSessaoSalva() {
     const salvo = localStorage.getItem("dnorte_lojista");
@@ -72,9 +74,20 @@ function verificarSessaoSalva() {
         const aviso = document.getElementById("aviso-cliente-logado");
         const spanNome = document.getElementById("nome-loja-logada");
         if (aviso && spanNome) {
-            spanNome.innerText = lojistaLogado.loja || lojistaLogado.usuario;
+            spanNome.innerText = lojistaLogado.nomeCliente || lojistaLogado.loja || lojistaLogado.usuario;
             aviso.style.display = "block";
         }
+        
+        // NOVO: Preenche os dados do carrinho automaticamente, se existirem
+        setTimeout(() => {
+            const inputNome = document.getElementById("inputNome");
+            const inputLoja = document.getElementById("inputLoja");
+            const inputCidade = document.getElementById("inputCidade");
+            
+            if (inputNome && lojistaLogado.nomeCliente) inputNome.value = lojistaLogado.nomeCliente;
+            if (inputLoja && lojistaLogado.loja) inputLoja.value = lojistaLogado.loja;
+            if (inputCidade && lojistaLogado.cidadeCliente) inputCidade.value = lojistaLogado.cidadeCliente;
+        }, 500);
     }
 }
 
@@ -86,7 +99,7 @@ function fazerLogout() {
 
 function abrirModalLogin() {
     if (lojistaLogado) {
-        mostrarAlerta("Acesso Confirmado!", `A sua sessão já está ativa como:<br><strong style="color: var(--dnorte-blue); font-size: 18px;">${lojistaLogado.loja || lojistaLogado.usuario}</strong>`, "sucesso");
+        mostrarAlerta("Acesso Confirmado!", `A sua sessão já está ativa como:<br><strong style="color: var(--dnorte-blue); font-size: 18px;">${lojistaLogado.nomeCliente || lojistaLogado.loja || lojistaLogado.usuario}</strong>`, "sucesso");
         return;
     }
     const modal = document.getElementById('modalLogin');
@@ -100,7 +113,7 @@ function fecharModalLogin(event) {
 }
 
 // =======================================================
-// 2. CONTROLE DE LOGIN
+// 2. CONTROLE DE LOGIN (AGORA LÊ COLUNAS D e E)
 // =======================================================
 async function carregarClientesDoSheets() {
     try {
@@ -116,8 +129,11 @@ async function carregarClientesDoSheets() {
             if (!c || !c[0] || c[0].v === null) return;
             const usuario = String(c[0].v).trim().toUpperCase();
             const senha = c[1] && c[1].v !== null ? String(c[1].v).trim() : '';
-            const loja = c[2] && c[2].v !== null ? String(c[2].v).trim() : 'Cliente VIP';
-            clientesCadastrados.push({ usuario, senha, loja });
+            const loja = c[2] && c[2].v !== null ? String(c[2].v).trim() : '';
+            const nomeCliente = c[3] && c[3].v !== null ? String(c[3].v).trim() : ''; // COLUNA D
+            const cidadeCliente = c[4] && c[4].v !== null ? String(c[4].v).trim() : ''; // COLUNA E
+            
+            clientesCadastrados.push({ usuario, senha, loja, nomeCliente, cidadeCliente });
         });
     } catch (error) { console.error("Erro ao carregar clientes:", error); }
 }
@@ -144,7 +160,7 @@ function executarLogin() {
             <div style="text-align: center; padding: 20px 10px;">
                 <i class="fas fa-check-circle" style="font-size: 65px; color: #25D366; margin-bottom: 20px;"></i>
                 <h3 style="color: var(--dnorte-blue); font-size: 26px; margin-bottom: 10px;">Acesso Liberado!</h3>
-                <p style="font-size: 18px; color: #333; font-weight: bold; margin-bottom: 5px;">Bem-vindo(a), ${clienteEncontrado.loja}</p>
+                <p style="font-size: 18px; color: #333; font-weight: bold; margin-bottom: 5px;">Bem-vindo(a), ${clienteEncontrado.nomeCliente || clienteEncontrado.loja}</p>
                 <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">Os preços estão prontos para você.</p>
                 <p style="color: var(--dnorte-orange); font-size: 14px; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Carregando o seu catálogo...</p>
             </div>
@@ -175,11 +191,10 @@ async function carregarProdutosDaPlanilha() {
         const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
         const data = JSON.parse(jsonString);
         
-        // ÍNDICES DAS COLUNAS ATUALIZADOS
         let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6;
         let idxPrecoVarejo = 7, idxPrecoAtacado = 8, idxQtdMinimaAtacado = 9, idxPrecoOferta = 10;
-        let idxQtdMinimaVenda = 11;  // <--- Coluna L (Mínimo Diário/Normal)
-        let idxQtdMinimaOferta = 12; // <--- Coluna M (Mínimo de Oferta)
+        let idxQtdMinimaVenda = 11;  // Coluna L
+        let idxQtdMinimaOferta = 12; // Coluna M
         
         produtos = [];
         
@@ -194,7 +209,6 @@ async function carregarProdutosDaPlanilha() {
             const departamento = c[idxDepartamento] && c[idxDepartamento].v !== null ? String(c[idxDepartamento].v).trim().toUpperCase() : 'GERAL';
             const categoria = c[idxCategoria] && c[idxCategoria].v !== null ? String(c[idxCategoria].v).trim().toUpperCase() : 'DIVERSOS';
             
-            // --- PREÇOS ---
             let precoVarejo = c[idxPrecoVarejo] && c[idxPrecoVarejo].v !== null ? parseFloat(String(c[idxPrecoVarejo].v).replace(',', '.')) : 0;
             if (isNaN(precoVarejo)) precoVarejo = 0;
 
@@ -210,8 +224,6 @@ async function carregarProdutosDaPlanilha() {
                 if (!isNaN(valOferta) && valOferta > 0) precoOferta = valOferta;
             }
 
-            // --- REGRAS DE QUANTIDADE ---
-            // 1. Coluna J: Qtd para ativar Atacado
             let qtdAtacado = 1;
             if (c[idxQtdMinimaAtacado] && c[idxQtdMinimaAtacado].v !== null && c[idxQtdMinimaAtacado].v !== "") {
                 qtdAtacado = parseInt(c[idxQtdMinimaAtacado].v);
@@ -219,25 +231,20 @@ async function carregarProdutosDaPlanilha() {
             }
             if (precoAtacado < precoVarejo && qtdAtacado === 1) qtdAtacado = 5; 
 
-            // 2. Coluna L: Venda Mínima Normal
             let qtdMinimaNormal = 1;
             if (c[idxQtdMinimaVenda] && c[idxQtdMinimaVenda].v !== null && c[idxQtdMinimaVenda].v !== "") {
                 qtdMinimaNormal = parseInt(c[idxQtdMinimaVenda].v);
                 if (isNaN(qtdMinimaNormal) || qtdMinimaNormal < 1) qtdMinimaNormal = 1;
             }
 
-            // 3. Coluna M: Venda Mínima de Oferta
             let qtdMinimaOferta = 1;
             if (c[idxQtdMinimaOferta] && c[idxQtdMinimaOferta].v !== null && c[idxQtdMinimaOferta].v !== "") {
                 qtdMinimaOferta = parseInt(c[idxQtdMinimaOferta].v);
                 if (isNaN(qtdMinimaOferta) || qtdMinimaOferta < 1) qtdMinimaOferta = 1;
             }
 
-            // --- LÓGICA MESTRA DE TRAVA DE QUANTIDADE ---
-            // A quantidade mínima exigida muda se o produto está ou não em oferta!
             let qtdMinimaFinal = qtdMinimaNormal;
             if (precoOferta > 0 && precoOferta < precoVarejo) {
-                // Se está em oferta, a regra da Coluna M assume o controle
                 qtdMinimaFinal = qtdMinimaOferta > 1 ? qtdMinimaOferta : qtdMinimaNormal;
             }
             
@@ -246,7 +253,7 @@ async function carregarProdutosDaPlanilha() {
             produtos.push({ 
                 sku, nome, departamento, categoria, 
                 precoVarejo, precoAtacado, qtdAtacado, 
-                qtdMinima: qtdMinimaFinal, // A qtdMinima salva será a decidida pela nossa regra acima
+                qtdMinima: qtdMinimaFinal,
                 precoOferta, imagem 
             });
         });
@@ -262,7 +269,7 @@ async function carregarProdutosDaPlanilha() {
 }
 
 // =======================================================
-// MÓDULO: DETECTAR LINKS DIRETOS (PRODUTO E CATEGORIAS)
+// MÓDULO: DETECTAR LINKS DIRETOS E FILTROS
 // =======================================================
 function verificarFiltrosEProdutoNaURL() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -293,7 +300,7 @@ function copiarLinkProduto(sku) {
     navigator.clipboard.writeText(linkDireto).then(() => {
         mostrarAlerta("Link Copiado!", "O link do produto foi copiado com sucesso. Agora é só colar na conversa com o cliente.", "sucesso");
     }).catch(err => {
-        mostrarAlerta("Oops!", "Ocorreu um erro ao copiar o link. O seu navegador pode ter bloqueado a ação.", "erro");
+        mostrarAlerta("Oops!", "Ocorreu um erro ao copiar o link.", "erro");
     });
 }
 
@@ -301,23 +308,19 @@ function copiarLinkFiltroAtual() {
     let url = `${window.location.origin}${window.location.pathname}`;
     let params = [];
     
-    if (departamentoAtual !== "TODOS") {
-        params.push(`dep=${encodeURIComponent(departamentoAtual)}`);
-    }
-    if (categoriaAtual !== "TODAS") {
-        params.push(`cat=${encodeURIComponent(categoriaAtual)}`);
-    }
+    if (departamentoAtual !== "TODOS") params.push(`dep=${encodeURIComponent(departamentoAtual)}`);
+    if (categoriaAtual !== "TODAS") params.push(`cat=${encodeURIComponent(categoriaAtual)}`);
     
     if (params.length > 0) {
         url += "?" + params.join("&");
         navigator.clipboard.writeText(url).then(() => {
-            mostrarAlerta("Link Copiado!", `O link direto para o departamento/categoria que você está a ver foi copiado. Envie para o seu cliente!`, "sucesso");
+            mostrarAlerta("Link Copiado!", `O link da categoria foi copiado!`, "sucesso");
         }).catch(err => {
-            mostrarAlerta("Oops!", "Erro ao copiar o link da categoria.", "erro");
+            mostrarAlerta("Oops!", "Erro ao copiar o link.", "erro");
         });
     } else {
         navigator.clipboard.writeText(url).then(() => {
-            mostrarAlerta("Catálogo Copiado!", "Como você está na visão geral, copiamos o link do catálogo completo.", "sucesso");
+            mostrarAlerta("Catálogo Copiado!", "Link do catálogo completo copiado.", "sucesso");
         });
     }
 }
@@ -674,11 +677,7 @@ function alterarQtd(sku, mudanca) {
     if(span) {
         let novaQtd = parseInt(span.innerText) + mudanca;
         
-        // --- TRAVA DE SEGURANÇA: Não baixa da qtdMinima calculada ---
-        if(novaQtd < p.qtdMinima) {
-            novaQtd = p.qtdMinima;
-        }
-        
+        if(novaQtd < p.qtdMinima) novaQtd = p.qtdMinima;
         span.innerText = novaQtd;
     }
 }
@@ -711,9 +710,7 @@ function ajustarQtdDiretoNoCarrinho(sku, mudanca) {
         const item = carrinho[index];
         item.qtd += mudanca;
         
-        if (item.qtd < item.qtdMinima) {
-            carrinho.splice(index, 1);
-        }
+        if (item.qtd < item.qtdMinima) carrinho.splice(index, 1);
         renderCarrinho();
     }
 }
@@ -776,34 +773,39 @@ function renderCarrinho() {
 
 function abrirModalMobile() { 
     const carrinhoArea = document.querySelector('.carrinho-area');
-    if (carrinhoArea) {
-        carrinhoArea.classList.toggle('mostrar-mobile');
-    }
+    if (carrinhoArea) carrinhoArea.classList.toggle('mostrar-mobile');
 }
 
 // =======================================================
-// 7. FINALIZAÇÃO DO PEDIDO
+// 7. FINALIZAÇÃO DO PEDIDO (ENVIAR PARA EMAIL E WHATSAPP)
 // =======================================================
-function finalizarPedido() {
+async function finalizarPedido() {
     if (carrinho.length === 0) { 
-        mostrarAlerta("Carrinho Vazio", "Adicione pelo menos um produto ao seu pedido antes de finalizar.", "aviso");
+        mostrarAlerta("Carrinho Vazio", "Adicione pelo menos um produto ao pedido.", "aviso");
         return; 
     }
     
-    const nome = document.getElementById("inputNome").value.toUpperCase();
-    const loja = document.getElementById("inputLoja").value.toUpperCase();
-    const city = document.getElementById("inputCidade").value.toUpperCase();
+    const inputNome = document.getElementById("inputNome").value.toUpperCase();
+    const inputLoja = document.getElementById("inputLoja").value.toUpperCase();
+    const inputCidade = document.getElementById("inputCidade").value.toUpperCase();
     
-    if(!nome || !loja || !city) { 
-        mostrarAlerta("Atenção", "Por favor, preencha todos os campos do cabeçalho (Nome, Loja e Cidade) para enviar o pedido.", "aviso");
+    if(!inputNome || !inputLoja || !inputCidade) { 
+        mostrarAlerta("Atenção", "Preencha o Nome, Loja e Cidade para enviar o pedido.", "aviso");
         return; 
     }
 
+    // Muda o botão para mostrar que está a processar
+    const btnFinalizar = document.querySelector('.btn-finalizar');
+    const textoOriginal = btnFinalizar.innerHTML;
+    btnFinalizar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando Pedido...';
+    btnFinalizar.disabled = true;
+
+    // 1. Monta a Mensagem do WhatsApp e Email
     let msg = `*NOVO PEDIDO DE COMPRA - DNORTE*\n`;
     msg += `=============================\n`;
-    msg += `*Lojista:* ${loja}\n`;
-    msg += `*Comprador:* ${nome}\n`;
-    msg += `*Cidade:* ${city}\n`;
+    msg += `*Lojista:* ${inputLoja}\n`;
+    msg += `*Comprador:* ${inputNome}\n`;
+    msg += `*Cidade:* ${inputCidade}\n`;
     if (lojistaLogado) msg += `*Usuário:* ${lojistaLogado.usuario}\n`;
     msg += `=============================\n\n`;
     msg += `*ITENS SOLICITADOS:*\n`;
@@ -823,6 +825,30 @@ function finalizarPedido() {
     });
     
     msg += `\n*TOTAL ESTIMADO:* R$ ${totalZap.toFixed(2)}\n`;
+
+    // 2. Prepara os dados para enviar para o seu E-mail silenciosamente
+    const formData = new FormData();
+    formData.append("Lojista", inputLoja);
+    formData.append("Comprador", inputNome);
+    formData.append("Cidade", inputCidade);
+    formData.append("Valor_Total", `R$ ${totalZap.toFixed(2)}`);
+    formData.append("Pedido_Detalhado", msg);
+    formData.append("_subject", `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`);
+    formData.append("_captcha", "false");
+
+    // 3. Dispara o E-mail usando o FormSubmit (Modo AJAX Invisível)
+    try {
+        await fetch(`https://formsubmit.co/ajax/${EMAIL_PEDIDOS}`, {
+            method: "POST",
+            body: formData
+        });
+    } catch (error) {
+        console.error("Erro ao enviar cópia por email", error);
+    }
+
+    // 4. Restaura o botão e abre o WhatsApp para o cliente
+    btnFinalizar.innerHTML = textoOriginal;
+    btnFinalizar.disabled = false;
     window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
@@ -846,10 +872,8 @@ function voltarAosFiltros() {
 // 9. GESTÃO DO PRÉ-CADASTRO (MODAL E SUCESSO)
 // =======================================================
 function abrirModalCadastro() {
-    // Esconde o modal de login e mostra o de cadastro
     const modalLog = document.getElementById('modalLogin');
     if(modalLog) modalLog.style.display = 'none';
-
     const modalCad = document.getElementById('modalCadastro');
     if(modalCad) modalCad.style.display = 'flex';
 }
@@ -859,30 +883,22 @@ function fecharModalCadastro() {
     if(modalCad) modalCad.style.display = 'none';
 }
 
-// Verifica se o cliente acabou de ser redirecionado após preencher o formulário
 function verificarSucessoCadastro() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('cadastro') === 'sucesso') {
         setTimeout(() => {
             mostrarAlerta("Recebemos os seus dados!", "O seu pré-cadastro foi enviado com sucesso. A nossa equipa entrará em contato em breve com o seu login e senha.", "sucesso");
-            
-            // Limpa o link para tirar o "?cadastro=sucesso" da barra de endereços
             window.history.replaceState({}, document.title, window.location.pathname);
         }, 800);
     }
 }
 
-// Função para criar a máscara automática do WhatsApp: (XX) XXXXX-XXXX
 function aplicarMascaraTelefone(input) {
-    // Remove tudo o que não for número
     let valor = input.value.replace(/\D/g, "");
-    
     if (valor.length === 0) {
         input.value = "";
         return;
     }
-    
-    // Aplica a formatação passo a passo enquanto a pessoa digita
     if (valor.length <= 2) {
         input.value = "(" + valor;
     } else if (valor.length <= 7) {
@@ -890,4 +906,87 @@ function aplicarMascaraTelefone(input) {
     } else {
         input.value = "(" + valor.substring(0, 2) + ") " + valor.substring(2, 7) + "-" + valor.substring(7, 11);
     }
+}
+
+// =======================================================
+// 10. MÁSCARA E VALIDAÇÃO DE CPF / CNPJ
+// =======================================================
+function aplicarMascaraCpfCnpj(input) {
+    let v = input.value.replace(/\D/g, "");
+    if (v.length <= 11) { 
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else { 
+        v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+        v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+        v = v.replace(/(\d{4})(\d)/, "$1-$2");
+    }
+    input.value = v;
+}
+
+function validarCpfCnpjBlur(input) {
+    const erroSpan = document.getElementById("erroCpfCnpj");
+    const valorLimpo = input.value.replace(/\D/g, "");
+    
+    if (valorLimpo.length === 0) {
+        input.setCustomValidity("");
+        if(erroSpan) erroSpan.style.display = "none";
+        input.style.borderColor = "#ccc";
+        return;
+    }
+
+    let valido = false;
+    if (valorLimpo.length === 11) valido = validarCPF(valorLimpo);
+    else if (valorLimpo.length === 14) valido = validarCNPJ(valorLimpo);
+
+    if (!valido) {
+        input.setCustomValidity("Documento inválido"); // Trava o envio do formulário
+        input.style.borderColor = "red";
+        if(erroSpan) erroSpan.style.display = "block";
+    } else {
+        input.setCustomValidity(""); // Libera o envio
+        input.style.borderColor = "#25D366"; 
+        if(erroSpan) erroSpan.style.display = "none";
+    }
+}
+
+function validarCPF(cpf) {
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
+    let soma = 0, resto;
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+    return true;
+}
+
+function validarCNPJ(cnpj) {
+    if (/^(\d)\1{13}$/.test(cnpj)) return false;
+    let tamanho = cnpj.length - 2;
+    let numeros = cnpj.substring(0, tamanho);
+    let digitos = cnpj.substring(tamanho);
+    let soma = 0, pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(0)) return false;
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0, tamanho);
+    soma = 0; pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(1)) return false;
+    return true;
 }
