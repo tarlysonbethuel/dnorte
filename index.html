@@ -162,13 +162,20 @@
             <input type="hidden" name="_next" value="https://dnorte.vercel.app/?cadastro=sucesso">
 
             <div style="margin-bottom: 15px; text-align: left;">
-                <label style="font-weight: bold; font-size: 13px; color: #333;">Nome Completo:</label>
+                <label style="font-weight: bold; font-size: 13px; color: #333;">Nome Completo (Comprador):</label>
                 <input type="text" name="Nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: João Silva">
             </div>
             
             <div style="margin-bottom: 15px; text-align: left;">
                 <label style="font-weight: bold; font-size: 13px; color: #333;">Nome da Loja (Fantasia):</label>
                 <input type="text" name="Loja" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: MultShop Variedades">
+            </div>
+
+            <!-- CAMPO CPF/CNPJ COM VALIDAÇÃO -->
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-weight: bold; font-size: 13px; color: #333;">CPF ou CNPJ:</label>
+                <input type="text" name="Documento" id="inputCpfCnpj" required maxlength="18" oninput="aplicarMascaraCpfCnpj(this)" onblur="validarCpfCnpjBlur(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px; outline: none; transition: 0.3s;" placeholder="Ex: 000.000.000-00 ou 00.000.000/0000-00">
+                <span id="erroCpfCnpj" style="color: red; font-size: 12px; display: none; margin-top: 5px; font-weight: bold;">❌ Documento inválido! Verifique a numeração.</span>
             </div>
 
             <div style="margin-bottom: 15px; text-align: left;">
@@ -178,7 +185,6 @@
 
             <button type="submit" style="width: 100%; padding: 15px; background: var(--dnorte-orange); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;">Enviar Solicitação</button>
         </form>
-    </div>
 </div>
 
     <div id="modalProduto" class="modal" onclick="fecharModal(event)">
