@@ -173,7 +173,7 @@
 
             <div style="margin-bottom: 15px; text-align: left;">
                 <label style="font-weight: bold; font-size: 13px; color: #333;">WhatsApp (com DDD):</label>
-                <input type="text" name="WhatsApp" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: 69 99999-9999">
+                <input type="text" name="WhatsApp" required maxlength="15" oninput="aplicarMascaraTelefone(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: (69) 99999-9999">
             </div>
 
             <button type="submit" style="width: 100%; padding: 15px; background: var(--dnorte-orange); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;">Enviar Solicitação</button>

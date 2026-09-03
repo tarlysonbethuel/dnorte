@@ -864,10 +864,30 @@ function verificarSucessoCadastro() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('cadastro') === 'sucesso') {
         setTimeout(() => {
-            mostrarAlerta("Recebemos os seus dados!", "O seu pré-cadastro foi enviado com sucesso. A nossa equipa entrará em contacto em breve com o seu login e senha.", "sucesso");
+            mostrarAlerta("Recebemos os seus dados!", "O seu pré-cadastro foi enviado com sucesso. A nossa equipa entrará em contato em breve com o seu login e senha.", "sucesso");
             
             // Limpa o link para tirar o "?cadastro=sucesso" da barra de endereços
             window.history.replaceState({}, document.title, window.location.pathname);
         }, 800);
+    }
+}
+
+// Função para criar a máscara automática do WhatsApp: (XX) XXXXX-XXXX
+function aplicarMascaraTelefone(input) {
+    // Remove tudo o que não for número
+    let valor = input.value.replace(/\D/g, "");
+    
+    if (valor.length === 0) {
+        input.value = "";
+        return;
+    }
+    
+    // Aplica a formatação passo a passo enquanto a pessoa digita
+    if (valor.length <= 2) {
+        input.value = "(" + valor;
+    } else if (valor.length <= 7) {
+        input.value = "(" + valor.substring(0, 2) + ") " + valor.substring(2);
+    } else {
+        input.value = "(" + valor.substring(0, 2) + ") " + valor.substring(2, 7) + "-" + valor.substring(7, 11);
     }
 }
