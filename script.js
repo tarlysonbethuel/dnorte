@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     verificarSessaoSalva();
     carregarClientesDoSheets();
     carregarProdutosDaPlanilha();
+    verificarSucessoCadastro();
 });
 
 // =======================================================
@@ -839,4 +840,34 @@ window.addEventListener('scroll', function() {
 function voltarAosFiltros() {
     const ancora = document.getElementById('vitrine-ancora');
     if (ancora) ancora.scrollIntoView({ behavior: 'smooth' });
+}
+
+// =======================================================
+// 9. GESTÃO DO PRÉ-CADASTRO (MODAL E SUCESSO)
+// =======================================================
+function abrirModalCadastro() {
+    // Esconde o modal de login e mostra o de cadastro
+    const modalLog = document.getElementById('modalLogin');
+    if(modalLog) modalLog.style.display = 'none';
+
+    const modalCad = document.getElementById('modalCadastro');
+    if(modalCad) modalCad.style.display = 'flex';
+}
+
+function fecharModalCadastro() {
+    const modalCad = document.getElementById('modalCadastro');
+    if(modalCad) modalCad.style.display = 'none';
+}
+
+// Verifica se o cliente acabou de ser redirecionado após preencher o formulário
+function verificarSucessoCadastro() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('cadastro') === 'sucesso') {
+        setTimeout(() => {
+            mostrarAlerta("Recebemos os seus dados!", "O seu pré-cadastro foi enviado com sucesso. A nossa equipa entrará em contacto em breve com o seu login e senha.", "sucesso");
+            
+            // Limpa o link para tirar o "?cadastro=sucesso" da barra de endereços
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 800);
+    }
 }

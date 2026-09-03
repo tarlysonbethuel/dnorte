@@ -128,6 +128,10 @@
             <span class="close-btn" onclick="document.getElementById('modalLogin').style.display='none'">&times;</span>
             <h3><i class="fas fa-lock"></i> Autenticação do Lojista</h3>
             <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Insira os seus dados cadastrados na DNorte para liberar os preços de atacado e o carrinho.</p>
+            <p style="margin-top: 15px; text-align: center; font-size: 14px;"> Ainda não é parceiro? <br>
+           <a href="#" onclick="event.preventDefault(); abrirModalCadastro()" style="color: var(--dnorte-orange); font-weight: bold; text-decoration: none;">Faça o seu Pré-Cadastro aqui</a>
+</p>
+            
             
             <div class="input-group">
                 <label>Usuário de Acesso:</label>
@@ -142,6 +146,40 @@
             <button class="btn-efetuar-login" onclick="executarLogin()">Liberar Preços <i class="fas fa-unlock"></i></button>
         </div>
     </div>
+
+ <!-- Modal de Pré-Cadastro -->
+<div id="modalCadastro" class="modal" style="display: none; z-index: 3000;">
+    <div class="modal-content login-box" style="max-width: 450px;">
+        <span class="close-btn" onclick="fecharModalCadastro()">&times;</span>
+        <h2 style="color: var(--dnorte-blue); margin-bottom: 10px;">Pré-Cadastro Lojista</h2>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Preencha os dados abaixo. A nossa equipa analisará e enviará o seu acesso rapidamente.</p>
+
+        <!-- ATENÇÃO: Verifique se este é o seu e-mail correto -->
+        <form action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST">
+            
+            <input type="hidden" name="_subject" value="🚨 NOVO PRÉ-CADASTRO - DNORTE">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_next" value="https://dnorte.vercel.app/?cadastro=sucesso">
+
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-weight: bold; font-size: 13px; color: #333;">Nome Completo:</label>
+                <input type="text" name="Nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: João Silva">
+            </div>
+            
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-weight: bold; font-size: 13px; color: #333;">Nome da Loja (Fantasia):</label>
+                <input type="text" name="Loja" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: MultShop Variedades">
+            </div>
+
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-weight: bold; font-size: 13px; color: #333;">WhatsApp (com DDD):</label>
+                <input type="text" name="WhatsApp" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: 69 99999-9999">
+            </div>
+
+            <button type="submit" style="width: 100%; padding: 15px; background: var(--dnorte-orange); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;">Enviar Solicitação</button>
+        </form>
+    </div>
+</div>
 
     <div id="modalProduto" class="modal" onclick="fecharModal(event)">
         <div class="modal-content">
