@@ -75,10 +75,21 @@
     <span id="vitrine-ancora"></span>
     <main class="catalogo-container">
         
-        <section class="busca-area">
+       <section class="busca-area">
             <div class="busca-wrapper">
-                <i class="fas fa-search icon-busca"></i>
-                <input type="text" id="inputBusca" oninput="filtrarProdutos()" placeholder="Procure por código, produto ou marca...">
+                <div class="input-busca-container">
+                    <i class="fas fa-search icon-busca"></i>
+                    <input type="text" id="inputBusca" oninput="filtrarProdutos()" placeholder="Procure por código, produto ou marca...">
+                </div>
+                
+                <!-- NOVO FILTRO DE ORDENAÇÃO -->
+                <select id="selectOrdenacao" class="select-ordenacao" onchange="filtrarProdutos()">
+                    <option value="a-z">🔤 Ordem: A - Z (Padrão)</option>
+                    <option value="z-a">🔤 Ordem: Z - A</option>
+                    <option value="menor-preco">💲 Preço: Menor para Maior</option>
+                    <option value="maior-preco">💲 Preço: Maior para Menor</option>
+                    <option value="codigo">🔢 Código do Sistema</option>
+                </select>
             </div>
         </section>
 

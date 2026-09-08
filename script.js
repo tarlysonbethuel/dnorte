@@ -494,9 +494,11 @@ function filtrarProdutos() { filtrarProdutosFinal(); }
 
 function filtrarProdutosFinal() {
     const inputBusca = document.getElementById('inputBusca');
+    const selectOrdenacao = document.getElementById('selectOrdenacao'); 
     const termo = inputBusca ? inputBusca.value.toLowerCase() : "";
+    const ordenacao = selectOrdenacao ? selectOrdenacao.value : "a-z"; // Padrão A-Z ativado
     
-    const listaFiltrada = produtos.filter(p => {
+    let listaFiltrada = produtos.filter(p => {
         let matchDepto = false;
         if (departamentoAtual === "TODOS") {
             matchDepto = true;
@@ -510,6 +512,28 @@ function filtrarProdutosFinal() {
         const matchBusca = termo === "" || p.nome.toLowerCase().includes(termo) || String(p.sku).includes(termo) || p.categoria.toLowerCase().includes(termo);
         return matchDepto && matchCat && matchBusca;
     });
+
+    // --- NOVA INTELIGÊNCIA DE ORDENAÇÃO ---
+    listaFiltrada.sort((a, b) => {
+        // Descobre o preço real de cada um (Oferta ou Varejo) para ordenar corretamente
+        let precoA = (a.precoOferta > 0 && a.precoOferta < a.precoVarejo) ? a.precoOferta : a.precoVarejo;
+        let precoB = (b.precoOferta > 0 && b.precoOferta < b.precoVarejo) ? b.precoOferta : b.precoVarejo;
+
+        if (ordenacao === "a-z") {
+            return a.nome.localeCompare(b.nome); // Ordem Alfabética (Crescente)
+        } else if (ordenacao === "z-a") {
+            return b.nome.localeCompare(a.nome); // Ordem Alfabética (Decrescente)
+        } else if (ordenacao === "menor-preco") {
+            return precoA - precoB; // Preço mais barato primeiro
+        } else if (ordenacao === "maior-preco") {
+            return precoB - precoA; // Preço mais caro primeiro
+        } else if (ordenacao === "codigo") {
+            // Ordena pelo SKU de forma inteligente (considerando 2, 10, 20 corretamente)
+            return String(a.sku).localeCompare(String(b.sku), undefined, {numeric: true});
+        }
+        return 0;
+    });
+
     renderizarProdutos(listaFiltrada);
 }
 

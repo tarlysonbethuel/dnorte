@@ -36,7 +36,6 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
 .aviso-logado a { color: white; font-weight: bold; margin-left: 10px; }
 
 /* --- HERO SECTION (BANNER PRINCIPAL) --- */
-/* --- HERO SECTION (BANNER PRINCIPAL) --- */
 .hero-section { 
     background: linear-gradient(rgba(3, 38, 76, 0.85), rgba(3, 38, 76, 0.95)), url('prateleira_dnorte1.png'); /* <-- AQUI: .png minúsculo! */
     background-position: center;
@@ -68,10 +67,17 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
 /* --- ÁREA DO CATÁLOGO E VITRINE --- */
 .catalogo-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
 .busca-area { margin-bottom: 30px; }
-.busca-wrapper { position: relative; max-width: 600px; margin: 0 auto; }
-.busca-wrapper input { width: 100%; padding: 15px 20px 15px 45px; border-radius: 30px; border: 2px solid #e2e8f0; font-size: 16px; outline: none; transition: 0.3s;}
-.busca-wrapper input:focus { border-color: var(--dnorte-orange); }
-.busca-wrapper .icon-busca { position: absolute; left: 18px; top: 18px; color: #94a3b8; }
+
+/* Novo Layout com Flexbox para Busca + Filtro */
+.busca-wrapper { display: flex; gap: 15px; max-width: 850px; margin: 0 auto; justify-content: center; flex-wrap: wrap; align-items: center; }
+.input-busca-container { position: relative; flex: 1; min-width: 280px; }
+.input-busca-container input { width: 100%; padding: 15px 20px 15px 45px; border-radius: 30px; border: 2px solid #e2e8f0; font-size: 16px; outline: none; transition: 0.3s; font-family: inherit;}
+.input-busca-container input:focus { border-color: var(--dnorte-orange); }
+.input-busca-container .icon-busca { position: absolute; left: 18px; top: 18px; color: #94a3b8; }
+
+/* Design do novo botão de ordenação */
+.select-ordenacao { padding: 15px 20px; border-radius: 30px; border: 2px solid #e2e8f0; font-size: 15px; outline: none; background: white; color: var(--dnorte-blue); font-weight: bold; cursor: pointer; transition: 0.3s; min-width: 220px; font-family: inherit; }
+.select-ordenacao:focus { border-color: var(--dnorte-orange); }
 
 /* Botões de Categoria (Resolvido o problema do texto vazando) */
 .botoes-principais, #lista-botoes-extra { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
