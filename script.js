@@ -193,16 +193,18 @@ async function carregarProdutosDaPlanilha() {
         
         let idxCodigo = 0, idxProduto = 1, idxCategoria = 2, idxDepartamento = 3, idxFoto = 5, idxSituacao = 6;
         let idxPrecoVarejo = 7, idxPrecoAtacado = 8, idxQtdMinimaAtacado = 9, idxPrecoOferta = 10;
-        let idxQtdMinimaVenda = 11;  // Coluna L
-        let idxQtdMinimaOferta = 12; // Coluna M
+        let idxQtdMinimaVenda = 11;  
+        let idxQtdMinimaOferta = 12; 
         
         produtos = [];
         
         data.table.rows.forEach(row => {
             const c = row.c;
             if (!c || !c[idxProduto] || c[idxProduto].v === null) return; 
+            
             const situacao = c[idxSituacao] && c[idxSituacao].v ? String(c[idxSituacao].v).toUpperCase().trim() : 'ATIVO';
-            if (situacao !== 'ATIVO') return; 
+            // AGORA O SISTEMA ACEITA PRODUTOS ATIVOS E ESGOTADOS
+            if (situacao !== 'ATIVO' && situacao !== 'ESGOTADO') return; 
             
             const sku = c[idxCodigo] && c[idxCodigo].v !== null ? String(c[idxCodigo].v).split('.')[0] : '';
             const nome = c[idxProduto].v;
@@ -254,7 +256,7 @@ async function carregarProdutosDaPlanilha() {
                 sku, nome, departamento, categoria, 
                 precoVarejo, precoAtacado, qtdAtacado, 
                 qtdMinima: qtdMinimaFinal,
-                precoOferta, imagem 
+                precoOferta, imagem, situacao // GRAVANDO A SITUAÇÃO AQUI
             });
         });
         
@@ -496,7 +498,7 @@ function filtrarProdutosFinal() {
     const inputBusca = document.getElementById('inputBusca');
     const selectOrdenacao = document.getElementById('selectOrdenacao'); 
     const termo = inputBusca ? inputBusca.value.toLowerCase() : "";
-    const ordenacao = selectOrdenacao ? selectOrdenacao.value : "a-z"; // Padrão A-Z ativado
+    const ordenacao = selectOrdenacao ? selectOrdenacao.value : "a-z"; 
     
     let listaFiltrada = produtos.filter(p => {
         let matchDepto = false;
@@ -513,6 +515,25 @@ function filtrarProdutosFinal() {
         return matchDepto && matchCat && matchBusca;
     });
 
+    listaFiltrada.sort((a, b) => {
+        // BÓNUS: Empurra os produtos esgotados para o final da lista sempre!
+        if (a.situacao === 'ESGOTADO' && b.situacao !== 'ESGOTADO') return 1;
+        if (b.situacao === 'ESGOTADO' && a.situacao !== 'ESGOTADO') return -1;
+
+        let precoA = (a.precoOferta > 0 && a.precoOferta < a.precoVarejo) ? a.precoOferta : a.precoVarejo;
+        let precoB = (b.precoOferta > 0 && b.precoOferta < b.precoVarejo) ? b.precoOferta : b.precoVarejo;
+
+        if (ordenacao === "a-z") return a.nome.localeCompare(b.nome);
+        else if (ordenacao === "z-a") return b.nome.localeCompare(a.nome);
+        else if (ordenacao === "menor-preco") return precoA - precoB;
+        else if (ordenacao === "maior-preco") return precoB - precoA;
+        else if (ordenacao === "codigo") return String(a.sku).localeCompare(String(b.sku), undefined, {numeric: true});
+        
+        return 0;
+    });
+
+    renderizarProdutos(listaFiltrada);
+}
     // --- NOVA INTELIGÊNCIA DE ORDENAÇÃO ---
     listaFiltrada.sort((a, b) => {
         // Descobre o preço real de cada um (Oferta ou Varejo) para ordenar corretamente
@@ -535,7 +556,6 @@ function filtrarProdutosFinal() {
     });
 
     renderizarProdutos(listaFiltrada);
-}
 
 // =======================================================
 // 5. RENDERIZAÇÃO DE PRODUTOS
@@ -593,21 +613,35 @@ function renderizarProdutos(lista) {
                 avisoQtdMinima = `<div style="font-size: 11px; color: #e53e3e; font-weight: bold; background: #fff5f5; border: 1px solid #fed7d7; padding: 4px; border-radius: 4px; margin-bottom: 8px;">⚠️ Venda Mínima: ${p.qtdMinima} un.</div>`;
             }
 
-            blocoPrecoEAcao = `
-                ${htmlPreco}
-                ${avisoQtdMinima}
-                <div class="qtd-selector">
-                    <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
-                    <span id="qtd-${p.sku}">${p.qtdMinima}</span>
-                    <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
-                </div>
-                <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar ao Pedido</button>
-            `;
+            if (p.situacao === 'ESGOTADO') {
+                blocoPrecoEAcao = `
+                    <p class="preco-produto" style="color: #e53e3e; font-size: 24px; font-weight: 900; margin-bottom: 15px;">ESGOTADO</p>
+                    <button type="button" class="btn-add" style="background: #94a3b8; cursor: not-allowed;" disabled>Sem estoque</button>
+                `;
+            } else {
+                blocoPrecoEAcao = `
+                    ${htmlPreco}
+                    ${avisoQtdMinima}
+                    <div class="qtd-selector">
+                        <button type="button" onclick="alterarQtd('${p.sku}', -1)">-</button>
+                        <span id="qtd-${p.sku}">${p.qtdMinima}</span>
+                        <button type="button" onclick="alterarQtd('${p.sku}', 1)">+</button>
+                    </div>
+                    <button type="button" class="btn-add" onclick="adicionar('${p.sku}')">Adicionar ao Pedido</button>
+                `;
+            }
         } else {
-            blocoPrecoEAcao = `
-                <p class="aviso-preco-vitrine"><i class="fas fa-lock"></i> Preço restrito a lojistas</p>
-                <button type="button" class="btn-solicitar-preco" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar Atacado <i class="fab fa-whatsapp"></i></button>
-            `;
+            if (p.situacao === 'ESGOTADO') {
+                blocoPrecoEAcao = `
+                    <p class="aviso-preco-vitrine" style="background: #fff5f5; color: #e53e3e; font-weight: bold;"><i class="fas fa-times-circle"></i> ESGOTADO</p>
+                    <button type="button" class="btn-solicitar-preco" style="border-color: #94a3b8; color: #94a3b8; cursor: not-allowed;" disabled>Indisponível</button>
+                `;
+            } else {
+                blocoPrecoEAcao = `
+                    <p class="aviso-preco-vitrine"><i class="fas fa-lock"></i> Preço restrito a lojistas</p>
+                    <button type="button" class="btn-solicitar-preco" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar Atacado <i class="fab fa-whatsapp"></i></button>
+                `;
+            }
         }
 
         return `
@@ -637,7 +671,11 @@ function solicitarPrecoViaZap(sku, nomeProd) {
 function abrirModal(sku) {
     const p = produtos.find(prod => String(prod.sku) === String(sku));
     if(!p) return;
-    document.getElementById("modalImg").src = p.imagem;
+    
+    const imgModal = document.getElementById("modalImg");
+    imgModal.src = p.imagem;
+    imgModal.style.filter = "none"; 
+    
     document.getElementById("modalNome").innerText = p.nome;
     
     const pPreco = document.getElementById("modalPreco");
@@ -652,9 +690,7 @@ function abrirModal(sku) {
         if (p.precoOferta > 0 && p.precoOferta < p.precoVarejo) {
             precoBaseAtual = p.precoOferta;
             let porcentagemDesconto = Math.round(((p.precoVarejo - p.precoOferta) / p.precoVarejo) * 100);
-            
-            textoPreco = `<span style="text-decoration:line-through; color:#94a3b8; font-size:14px;">Varejo: R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</span><br>
-                          <span style="color:#e53e3e;">🔥 Oferta: R$ ${p.precoOferta.toFixed(2).replace('.', ',')} <span style="font-size: 14px;">(-${porcentagemDesconto}%)</span></span>`;
+            textoPreco = `<span style="text-decoration:line-through; color:#94a3b8; font-size:14px;">Varejo: R$ ${p.precoVarejo.toFixed(2).replace('.', ',')}</span><br><span style="color:#e53e3e;">🔥 Oferta: R$ ${p.precoOferta.toFixed(2).replace('.', ',')} <span style="font-size: 14px;">(-${porcentagemDesconto}%)</span></span>`;
         }
 
         if(p.precoAtacado < precoBaseAtual) {
@@ -665,19 +701,37 @@ function abrirModal(sku) {
             textoPreco += `<br><span style="color:#e53e3e; font-size:14px; font-weight:bold; display:inline-block; margin-top:8px;">⚠️ Venda Mínima: ${p.qtdMinima} unidades</span>`;
         }
 
-        pPreco.innerHTML = textoPreco;
-        pPreco.style.color = "#fb7815";
-        pAcoes.innerHTML = `
-            <button class="btn-add" style="width:100%; padding:15px;" onclick="adicionarNoModal('${p.sku}')">ADICIONAR AO PEDIDO</button>
-            ${btnCompartilharHTML}
-        `;
+        if (p.situacao === 'ESGOTADO') {
+             pPreco.innerHTML = `<span style="color:#e53e3e; font-weight:900; font-size: 26px;">ESGOTADO</span>`;
+             pAcoes.innerHTML = `
+                <button class="btn-add" style="width:100%; padding:15px; background: #94a3b8; cursor: not-allowed;" disabled>❌ SEM ESTOQUE</button>
+                ${btnCompartilharHTML}
+            `;
+        } else {
+            pPreco.innerHTML = textoPreco;
+            pPreco.style.color = "#fb7815";
+            pAcoes.innerHTML = `
+                <button class="btn-add" style="width:100%; padding:15px;" onclick="adicionarNoModal('${p.sku}')">ADICIONAR AO PEDIDO</button>
+                ${btnCompartilharHTML}
+            `;
+        }
     } else {
-        pPreco.innerHTML = `<i class="fas fa-lock"></i> Valores visíveis apenas para lojistas parceiros.`;
-        pPreco.style.color = "#888";
-        pAcoes.innerHTML = `
-            <button class="btn-solicitar-preco" style="width:100%; padding:15px;" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar via WhatsApp <i class="fab fa-whatsapp"></i></button>
-            ${btnCompartilharHTML}
-        `;
+        if (p.situacao === 'ESGOTADO') {
+            pPreco.innerHTML = `<i class="fas fa-times-circle"></i> ESGOTADO`;
+            pPreco.style.color = "#e53e3e";
+            pPreco.style.fontWeight = "bold";
+            pAcoes.innerHTML = `
+                <button class="btn-solicitar-preco" style="width:100%; padding:15px; border-color: #94a3b8; color: #94a3b8; cursor: not-allowed;" disabled>Indisponível</button>
+                ${btnCompartilharHTML}
+            `;
+        } else {
+            pPreco.innerHTML = `<i class="fas fa-lock"></i> Valores visíveis apenas para lojistas parceiros.`;
+            pPreco.style.color = "#888";
+            pAcoes.innerHTML = `
+                <button class="btn-solicitar-preco" style="width:100%; padding:15px;" onclick="solicitarPrecoViaZap('${p.sku}', '${p.nome}')">Consultar via WhatsApp <i class="fab fa-whatsapp"></i></button>
+                ${btnCompartilharHTML}
+            `;
+        }
     }
     
     document.getElementById("modalProduto").style.display = "flex";
