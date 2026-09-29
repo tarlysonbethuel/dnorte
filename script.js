@@ -5,7 +5,6 @@
 
 const WHATSAPP_LOJA = "5569999107161"; 
 const ID_PLANILHA = "1oneVF4MfT-sQJx-Sa7wfr0AjnHQpZ6zgGZuSaelER7c"; 
-// Insira o e-mail que vai receber os pedidos abaixo:
 const EMAIL_PEDIDOS = "dnortedistribuidora.ro@gmail.com"; 
 
 let carrinho = [];
@@ -26,9 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
     verificarSucessoCadastro();
 });
 
-// =======================================================
-// 0. SISTEMA DE ALERTAS PREMIUM
-// =======================================================
 function mostrarAlerta(titulo, mensagem, tipo = 'aviso') {
     const alertaAntigo = document.getElementById('modalAlertaSistema');
     if (alertaAntigo) alertaAntigo.remove();
@@ -64,9 +60,6 @@ function mostrarAlerta(titulo, mensagem, tipo = 'aviso') {
     document.body.appendChild(modal);
 }
 
-// =======================================================
-// 1. VERIFICAÇÃO DE SESSÃO E LOGOUT (+ AUTO PREENCHIMENTO)
-// =======================================================
 function verificarSessaoSalva() {
     const salvo = localStorage.getItem("dnorte_lojista");
     if (salvo) {
@@ -78,7 +71,6 @@ function verificarSessaoSalva() {
             aviso.style.display = "block";
         }
         
-        // NOVO: Preenche os dados do carrinho automaticamente, se existirem
         setTimeout(() => {
             const inputNome = document.getElementById("inputNome");
             const inputLoja = document.getElementById("inputLoja");
@@ -112,9 +104,6 @@ function fecharModalLogin(event) {
     }
 }
 
-// =======================================================
-// 2. CONTROLE DE LOGIN (AGORA LÊ COLUNAS D e E)
-// =======================================================
 async function carregarClientesDoSheets() {
     try {
         const urlClientes = `https://docs.google.com/spreadsheets/d/${ID_PLANILHA}/gviz/tq?sheet=CLIENTES&tqx=out:json`;
@@ -130,8 +119,8 @@ async function carregarClientesDoSheets() {
             const usuario = String(c[0].v).trim().toUpperCase();
             const senha = c[1] && c[1].v !== null ? String(c[1].v).trim() : '';
             const loja = c[2] && c[2].v !== null ? String(c[2].v).trim() : '';
-            const nomeCliente = c[3] && c[3].v !== null ? String(c[3].v).trim() : ''; // COLUNA D
-            const cidadeCliente = c[4] && c[4].v !== null ? String(c[4].v).trim() : ''; // COLUNA E
+            const nomeCliente = c[3] && c[3].v !== null ? String(c[3].v).trim() : ''; 
+            const cidadeCliente = c[4] && c[4].v !== null ? String(c[4].v).trim() : ''; 
             
             clientesCadastrados.push({ usuario, senha, loja, nomeCliente, cidadeCliente });
         });
@@ -172,9 +161,6 @@ function executarLogin() {
     }
 }
 
-// =======================================================
-// 3. BUSCA AUTOMÁTICA DE PRODUTOS E REGRAS DE MÍNIMO
-// =======================================================
 async function carregarProdutosDaPlanilha() {
     const divProdutos = document.getElementById("produtos");
     try {
@@ -203,7 +189,6 @@ async function carregarProdutosDaPlanilha() {
             if (!c || !c[idxProduto] || c[idxProduto].v === null) return; 
             
             const situacao = c[idxSituacao] && c[idxSituacao].v ? String(c[idxSituacao].v).toUpperCase().trim() : 'ATIVO';
-            // AGORA O SISTEMA ACEITA PRODUTOS ATIVOS E ESGOTADOS
             if (situacao !== 'ATIVO' && situacao !== 'ESGOTADO') return; 
             
             const sku = c[idxCodigo] && c[idxCodigo].v !== null ? String(c[idxCodigo].v).split('.')[0] : '';
@@ -256,7 +241,7 @@ async function carregarProdutosDaPlanilha() {
                 sku, nome, departamento, categoria, 
                 precoVarejo, precoAtacado, qtdAtacado, 
                 qtdMinima: qtdMinimaFinal,
-                precoOferta, imagem, situacao // GRAVANDO A SITUAÇÃO AQUI
+                precoOferta, imagem, situacao 
             });
         });
         
@@ -270,9 +255,6 @@ async function carregarProdutosDaPlanilha() {
     } catch (error) { console.error("Erro:", error); }
 }
 
-// =======================================================
-// MÓDULO: DETECTAR LINKS DIRETOS E FILTROS
-// =======================================================
 function verificarFiltrosEProdutoNaURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const skuNaUrl = urlParams.get('sku'); 
@@ -327,9 +309,6 @@ function copiarLinkFiltroAtual() {
     }
 }
 
-// =======================================================
-// 4. MENU DINÂMICO DE FILTROS E BUSCA
-// =======================================================
 function alternarMenuCategorias() { 
     const menu = document.getElementById("menu-extra");
     const btnVerMais = document.getElementById("btn-ver-mais-cat");
@@ -494,6 +473,7 @@ function selecionarCategoria(cat) {
 
 function filtrarProdutos() { filtrarProdutosFinal(); }
 
+// O ERRO DE DUPLICAÇÃO FOI CORRIGIDO AQUI!
 function filtrarProdutosFinal() {
     const inputBusca = document.getElementById('inputBusca');
     const selectOrdenacao = document.getElementById('selectOrdenacao'); 
@@ -516,7 +496,7 @@ function filtrarProdutosFinal() {
     });
 
     listaFiltrada.sort((a, b) => {
-        // BÓNUS: Empurra os produtos esgotados para o final da lista sempre!
+        // Empurra os produtos esgotados para o final da lista sempre!
         if (a.situacao === 'ESGOTADO' && b.situacao !== 'ESGOTADO') return 1;
         if (b.situacao === 'ESGOTADO' && a.situacao !== 'ESGOTADO') return -1;
 
@@ -534,32 +514,7 @@ function filtrarProdutosFinal() {
 
     renderizarProdutos(listaFiltrada);
 }
-    // --- NOVA INTELIGÊNCIA DE ORDENAÇÃO ---
-    listaFiltrada.sort((a, b) => {
-        // Descobre o preço real de cada um (Oferta ou Varejo) para ordenar corretamente
-        let precoA = (a.precoOferta > 0 && a.precoOferta < a.precoVarejo) ? a.precoOferta : a.precoVarejo;
-        let precoB = (b.precoOferta > 0 && b.precoOferta < b.precoVarejo) ? b.precoOferta : b.precoVarejo;
 
-        if (ordenacao === "a-z") {
-            return a.nome.localeCompare(b.nome); // Ordem Alfabética (Crescente)
-        } else if (ordenacao === "z-a") {
-            return b.nome.localeCompare(a.nome); // Ordem Alfabética (Decrescente)
-        } else if (ordenacao === "menor-preco") {
-            return precoA - precoB; // Preço mais barato primeiro
-        } else if (ordenacao === "maior-preco") {
-            return precoB - precoA; // Preço mais caro primeiro
-        } else if (ordenacao === "codigo") {
-            // Ordena pelo SKU de forma inteligente (considerando 2, 10, 20 corretamente)
-            return String(a.sku).localeCompare(String(b.sku), undefined, {numeric: true});
-        }
-        return 0;
-    });
-
-    renderizarProdutos(listaFiltrada);
-
-// =======================================================
-// 5. RENDERIZAÇÃO DE PRODUTOS
-// =======================================================
 function renderizarProdutos(lista) {
     const divProdutos = document.getElementById("produtos");
     const carrinhoArea = document.getElementById("carrinho-lateral");
@@ -573,7 +528,7 @@ function renderizarProdutos(lista) {
     }
 
     if (lojistaLogado) {
-        if(carrinhoArea) carrinhoArea.style.display = "block";
+        if(carrinhoArea) carrinhoArea.style.display = "flex"; // Ajustado de block para flex
         if(btnMobile) btnMobile.style.display = "block";
     } else {
         if(carrinhoArea) carrinhoArea.style.display = "none";
@@ -665,9 +620,6 @@ function solicitarPrecoViaZap(sku, nomeProd) {
     window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
-// =======================================================
-// 6. MODAL DO PRODUTO E GESTÃO DO CARRINHO (BLOQUEIOS)
-// =======================================================
 function abrirModal(sku) {
     const p = produtos.find(prod => String(prod.sku) === String(sku));
     if(!p) return;
@@ -854,9 +806,6 @@ function abrirModalMobile() {
     if (carrinhoArea) carrinhoArea.classList.toggle('mostrar-mobile');
 }
 
-// =======================================================
-// 7. FINALIZAÇÃO DO PEDIDO (ENVIAR PARA EMAIL E WHATSAPP)
-// =======================================================
 function finalizarPedido() {
     if (carrinho.length === 0) { 
         mostrarAlerta("Carrinho Vazio", "Adicione pelo menos um produto ao pedido.", "aviso");
@@ -877,7 +826,6 @@ function finalizarPedido() {
     btnFinalizar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
     btnFinalizar.disabled = true;
 
-    // 1. Monta a Mensagem do WhatsApp e Email
     let msg = `*NOVO PEDIDO DE COMPRA - DNORTE*\n`;
     msg += `=============================\n`;
     msg += `*Lojista:* ${inputLoja}\n`;
@@ -903,7 +851,6 @@ function finalizarPedido() {
     
     msg += `\n*TOTAL ESTIMADO:* R$ ${totalZap.toFixed(2)}\n`;
 
-    // 2. PREENCHE E DISPARA O FORMULÁRIO FANTASMA (MÉTODO 100% GARANTIDO)
     document.getElementById("subjectInvisivel").value = `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`;
     document.getElementById("lojistaInvisivel").value = inputLoja;
     document.getElementById("compradorInvisivel").value = inputNome;
@@ -913,19 +860,14 @@ function finalizarPedido() {
     
     document.getElementById("formPedidoInvisivel").submit();
 
-    // 3. ABRE O WHATSAPP IMEDIATAMENTE (Sem travar o site)
     window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, '_blank');
 
-    // 4. RESTAURA O BOTÃO AO NORMAL
     setTimeout(() => {
         btnFinalizar.innerHTML = textoOriginal;
         btnFinalizar.disabled = false;
     }, 1000);
 }
 
-// =======================================================
-// 8. BOTÃO FLUTUANTE: VOLTAR AOS FILTROS
-// =======================================================
 window.addEventListener('scroll', function() {
     const btnTopo = document.getElementById('btn-voltar-topo');
     if (btnTopo) {
@@ -939,9 +881,6 @@ function voltarAosFiltros() {
     if (ancora) ancora.scrollIntoView({ behavior: 'smooth' });
 }
 
-// =======================================================
-// 9. GESTÃO DO PRÉ-CADASTRO (MODAL E SUCESSO)
-// =======================================================
 function abrirModalCadastro() {
     const modalLog = document.getElementById('modalLogin');
     if(modalLog) modalLog.style.display = 'none';
@@ -979,9 +918,6 @@ function aplicarMascaraTelefone(input) {
     }
 }
 
-// =======================================================
-// 10. MÁSCARA E VALIDAÇÃO DE CPF / CNPJ
-// =======================================================
 function aplicarMascaraCpfCnpj(input) {
     let v = input.value.replace(/\D/g, "");
     if (v.length <= 11) { 
@@ -1013,11 +949,11 @@ function validarCpfCnpjBlur(input) {
     else if (valorLimpo.length === 14) valido = validarCNPJ(valorLimpo);
 
     if (!valido) {
-        input.setCustomValidity("Documento inválido"); // Trava o envio do formulário
+        input.setCustomValidity("Documento inválido"); 
         input.style.borderColor = "red";
         if(erroSpan) erroSpan.style.display = "block";
     } else {
-        input.setCustomValidity(""); // Libera o envio
+        input.setCustomValidity(""); 
         input.style.borderColor = "#25D366"; 
         if(erroSpan) erroSpan.style.display = "none";
     }
