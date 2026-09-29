@@ -857,7 +857,7 @@ function abrirModalMobile() {
 // =======================================================
 // 7. FINALIZAÇÃO DO PEDIDO (ENVIAR PARA EMAIL E WHATSAPP)
 // =======================================================
-async function finalizarPedido() {
+function finalizarPedido() {
     if (carrinho.length === 0) { 
         mostrarAlerta("Carrinho Vazio", "Adicione pelo menos um produto ao pedido.", "aviso");
         return; 
@@ -872,10 +872,9 @@ async function finalizarPedido() {
         return; 
     }
 
-    // Muda o botão para mostrar que está a processar
     const btnFinalizar = document.querySelector('.btn-finalizar');
     const textoOriginal = btnFinalizar.innerHTML;
-    btnFinalizar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando Pedido...';
+    btnFinalizar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
     btnFinalizar.disabled = true;
 
     // 1. Monta a Mensagem do WhatsApp e Email
@@ -904,33 +903,36 @@ async function finalizarPedido() {
     
     msg += `\n*TOTAL ESTIMADO:* R$ ${totalZap.toFixed(2)}\n`;
 
-    // 2. Dispara o E-mail usando o FormSubmit (Modo AJAX JSON Autorizado)
-    try {
-        await fetch(`https://formsubmit.co/ajax/${EMAIL_PEDIDOS}`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                _subject: `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`,
-                _template: "box", // Formata o email numa caixa mais bonita
-                _captcha: "false",
-                Lojista: inputLoja,
-                Comprador: inputNome,
-                Cidade: inputCidade,
-                Valor_Total: `R$ ${totalZap.toFixed(2)}`,
-                Pedido_Detalhado: msg
-            })
-        });
-    } catch (error) {
-        console.error("Erro ao enviar cópia por email", error);
-    }
-
-    // 3. Restaura o botão e abre o WhatsApp para o cliente
-    btnFinalizar.innerHTML = textoOriginal;
-    btnFinalizar.disabled = false;
+    // 2. ABRE O WHATSAPP IMEDIATAMENTE (Isto evita o bloqueio do navegador)
     window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, '_blank');
+
+    // 3. ENVIA O E-MAIL EM SEGUNDO PLANO (Não trava mais o site)
+    fetch(`https://formsubmit.co/ajax/${EMAIL_PEDIDOS}`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            _subject: `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`,
+            _template: "box",
+            _captcha: "false",
+            Lojista: inputLoja,
+            Comprador: inputNome,
+            Cidade: inputCidade,
+            Valor_Total: `R$ ${totalZap.toFixed(2)}`,
+            Pedido_Detalhado: msg
+        })
+    })
+    .then(response => response.json())
+    .then(data => console.log("E-mail enviado com sucesso em segundo plano."))
+    .catch(error => console.error("Erro ao enviar e-mail:", error));
+
+    // 4. RESTAURA O BOTÃO AO NORMAL APÓS 1 SEGUNDO
+    setTimeout(() => {
+        btnFinalizar.innerHTML = textoOriginal;
+        btnFinalizar.disabled = false;
+    }, 1000);
 }
 
 // =======================================================
