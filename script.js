@@ -904,27 +904,30 @@ async function finalizarPedido() {
     
     msg += `\n*TOTAL ESTIMADO:* R$ ${totalZap.toFixed(2)}\n`;
 
-    // 2. Prepara os dados para enviar para o seu E-mail silenciosamente
-    const formData = new FormData();
-    formData.append("Lojista", inputLoja);
-    formData.append("Comprador", inputNome);
-    formData.append("Cidade", inputCidade);
-    formData.append("Valor_Total", `R$ ${totalZap.toFixed(2)}`);
-    formData.append("Pedido_Detalhado", msg);
-    formData.append("_subject", `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`);
-    formData.append("_captcha", "false");
-
-    // 3. Dispara o E-mail usando o FormSubmit (Modo AJAX Invisível)
+    // 2. Dispara o E-mail usando o FormSubmit (Modo AJAX JSON Autorizado)
     try {
         await fetch(`https://formsubmit.co/ajax/${EMAIL_PEDIDOS}`, {
             method: "POST",
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                _subject: `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`,
+                _template: "box", // Formata o email numa caixa mais bonita
+                _captcha: "false",
+                Lojista: inputLoja,
+                Comprador: inputNome,
+                Cidade: inputCidade,
+                Valor_Total: `R$ ${totalZap.toFixed(2)}`,
+                Pedido_Detalhado: msg
+            })
         });
     } catch (error) {
         console.error("Erro ao enviar cópia por email", error);
     }
 
-    // 4. Restaura o botão e abre o WhatsApp para o cliente
+    // 3. Restaura o botão e abre o WhatsApp para o cliente
     btnFinalizar.innerHTML = textoOriginal;
     btnFinalizar.disabled = false;
     window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, '_blank');
