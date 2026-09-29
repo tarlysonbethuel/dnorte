@@ -903,32 +903,20 @@ function finalizarPedido() {
     
     msg += `\n*TOTAL ESTIMADO:* R$ ${totalZap.toFixed(2)}\n`;
 
-    // 2. ABRE O WHATSAPP IMEDIATAMENTE (Isto evita o bloqueio do navegador)
+    // 2. PREENCHE E DISPARA O FORMULÁRIO FANTASMA (MÉTODO 100% GARANTIDO)
+    document.getElementById("subjectInvisivel").value = `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`;
+    document.getElementById("lojistaInvisivel").value = inputLoja;
+    document.getElementById("compradorInvisivel").value = inputNome;
+    document.getElementById("cidadeInvisivel").value = inputCidade;
+    document.getElementById("totalInvisivel").value = `R$ ${totalZap.toFixed(2)}`;
+    document.getElementById("detalhesInvisivel").value = msg;
+    
+    document.getElementById("formPedidoInvisivel").submit();
+
+    // 3. ABRE O WHATSAPP IMEDIATAMENTE (Sem travar o site)
     window.open(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(msg)}`, '_blank');
 
-    // 3. ENVIA O E-MAIL EM SEGUNDO PLANO (Não trava mais o site)
-    fetch(`https://formsubmit.co/ajax/${EMAIL_PEDIDOS}`, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            _subject: `🛒 NOVO PEDIDO RECEBIDO - ${inputLoja}`,
-            _template: "box",
-            _captcha: "false",
-            Lojista: inputLoja,
-            Comprador: inputNome,
-            Cidade: inputCidade,
-            Valor_Total: `R$ ${totalZap.toFixed(2)}`,
-            Pedido_Detalhado: msg
-        })
-    })
-    .then(response => response.json())
-    .then(data => console.log("E-mail enviado com sucesso em segundo plano."))
-    .catch(error => console.error("Erro ao enviar e-mail:", error));
-
-    // 4. RESTAURA O BOTÃO AO NORMAL APÓS 1 SEGUNDO
+    // 4. RESTAURA O BOTÃO AO NORMAL
     setTimeout(() => {
         btnFinalizar.innerHTML = textoOriginal;
         btnFinalizar.disabled = false;

@@ -221,7 +221,17 @@
     <button id="btn-voltar-topo" class="btn-voltar-topo" onclick="voltarAosFiltros()" title="Voltar ao Topo">
         <i class="fas fa-arrow-up"></i>
     </button>
-
+<!-- ========================================== -->
+    <iframe name="iframeFantasma" style="display:none;"></iframe>
+    <form id="formPedidoInvisivel" action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST" target="iframeFantasma" style="display:none;">
+        <input type="hidden" name="_subject" id="subjectInvisivel">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="Lojista" id="lojistaInvisivel">
+        <input type="hidden" name="Comprador" id="compradorInvisivel">
+        <input type="hidden" name="Cidade" id="cidadeInvisivel">
+        <input type="hidden" name="Valor_Total" id="totalInvisivel">
+        <textarea name="Pedido_Detalhado" id="detalhesInvisivel"></textarea>
+    </form>
     <script src="script.js"></script>
 </body>
 </html>
