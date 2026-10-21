@@ -1,237 +1,130 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DNorte Distribuidora - Catálogo & Vitrine</title>
-    
-    <link rel="icon" type="image/png" href="favicon.png">
-    
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#03264c">
+  <meta name="description" content="DNorte Distribuidora — atacado de variedades, catálogo B2B e showroom em Jaru/RO.">
+  <title>DNorte Distribuidora | Atacado para Lojistas</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=3.5">
 </head>
-<body>
-
+<body class="home-page">
+  <header class="site-header" id="inicio">
     <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                 <img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora" class="img-logo">
-             </div>
-            <ul class="nav-links">
-                <li><a href="#inicio">Início</a></li>
-                <li><a href="#quem-somos">Quem Somos</a></li>
-                <li><a href="#como-trabalhamos">Diferenciais</a></li>
-                <li><a href="#vitrine-ancora" id="lnk-vitrine">Vitrine Pública</a></li>
-                <li><button class="btn-login-nav" onclick="abrirModalLogin()"><i class="fas fa-lock"></i> Área do Lojista</button></li>
-            </ul>
+      <a class="brand" href="#inicio" aria-label="DNorte Distribuidora - Início"><img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora"></a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+      <div class="nav-links" id="navLinks">
+        <a href="/catalogo">Catálogo</a>
+        <a href="#diferenciais">Diferenciais</a>
+        <a href="#showroom">Showroom</a>
+        <a href="#quem-somos">Quem Somos</a>
+        <div class="account-area" id="accountArea">
+          <button class="btn-login-nav" id="btnContaHeader" type="button" onclick="acaoContaHeader(event)" aria-expanded="false" aria-controls="accountMenu">
+            <span class="account-dot" id="accountDot" hidden></span><i class="fas fa-lock" id="iconeConta"></i><span id="textoBtnLogin">Área do Lojista</span><i class="fas fa-chevron-down account-chevron" id="accountChevron" hidden></i>
+          </button>
+          <div class="account-menu" id="accountMenu" hidden>
+            <div class="account-menu-header"><span class="account-menu-label">CONTA DO LOJISTA</span><strong id="accountLoja">Loja</strong><span id="accountPessoa">Comprador</span></div>
+            <div class="account-access-status"><span></span><div><strong>Acesso liberado</strong><small>Preços disponíveis no catálogo</small></div></div>
+            <button class="account-menu-action" type="button" onclick="irParaCatalogo()"><i class="fas fa-box-open"></i> Abrir catálogo</button>
+            <a class="account-menu-action" href="/carrinho"><i class="fas fa-basket-shopping"></i> Meu pedido</a>
+            <button class="account-menu-action account-logout" type="button" onclick="fazerLogout(this)"><i class="fas fa-arrow-right-from-bracket"></i> Sair da conta</button>
+          </div>
         </div>
+      </div>
     </nav>
+  </header>
 
-    <div id="aviso-cliente-logado" class="aviso-logado" style="display: none;">
-        <p><i class="fas fa-unlock"></i> Modo: <strong>Catálogo com Preço Ativado</strong> | Bem-vindo, <span id="nome-loja-logada">Lojista</span>! <a href="#" onclick="fazerLogout()">[Sair / Bloquear Preços]</a></p>
-    </div>
-
-    <header id="inicio" class="hero-section">
-        <div class="hero-content">
-            <h1>A força que abastece o seu negócio.</h1>
-            <p>Logística inteligente, catálogo completo e parceria de verdade para lojistas exigentes. Conheça a nossa vitrine e descubra como podemos acelerar as suas vendas.</p>
-            <a href="#vitrine-ancora" class="btn-hero">Ver Produtos</a>
+  <main>
+    <section class="hero-section">
+      <div class="hero-overlay"></div>
+      <div class="hero-content container">
+        <h1>A força que abastece o seu negócio.</h1>
+        <p>Tudo o que seu negócio precisa, com atendimento próximo e mais praticidade na reposição.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/catalogo"><i class="fas fa-box-open"></i> Acessar catálogo</a>
+          <button class="btn btn-secondary" type="button" onclick="abrirModalLogin()"><i class="fas fa-unlock"></i> Entrar como lojista</button>
         </div>
-    </header>
-
-    <section id="quem-somos" class="section-historia">
-        <div class="container">
-            <h2>Tradição que evolui com você.</h2>
-            <div class="historia-grid">
-                <p>Com raízes firmes em Jaru, Rondônia, a DNorte Distribuidora carrega a experiência de quem entende o ritmo do varejo. Nascemos da base sólida e do trabalho duro de anos sob a marca Distribuidora Maré Mansa. Hoje, com uma identidade renovada e processos tecnológicos avançados, damos um passo à frente.</p>
-                <p>Mais do que entregar caixas, nós entregamos soluções. Nosso estoque é gerenciado de forma rigorosa para garantir que a sua loja nunca fique sem os produtos que seus clientes mais procuram. Estamos no centro do estado para levar agilidade, precisão e confiança diretamente para a sua prateleira.</p>
-            </div>
-        </div>
+        <div class="hero-trust"><span><i class="fas fa-store"></i> Showroom em Jaru</span><span><i class="fab fa-whatsapp"></i> Atendimento rápido</span><span><i class="fas fa-boxes-stacked"></i> Mix para revenda</span></div>
+      </div>
     </section>
 
-    <section id="como-trabalhamos" class="section-diferenciais">
-        <div class="container">
-            <h2>Como Trabalhamos</h2>
-            <div class="diferenciais-grid">
-                <div class="card-diferencial">
-                    <div class="icon-box"><i class="fas fa-truck-fast"></i></div>
-                    <h3>Agilidade e Logística</h3>
-                    <p>Localização estratégica em Jaru para despachar mercadorias com a velocidade que o seu estoque exige.</p>
-                </div>
-                <div class="card-diferencial">
-                    <div class="icon-box"><i class="fas fa-boxes-stacked"></i></div>
-                    <h3>Mix de Produtos</h3>
-                    <p>Catálogo diversificado e catalogado nos mínimos detalhes para facilitar a sua escolha.</p>
-                </div>
-                <div class="card-diferencial">
-                    <div class="icon-box"><i class="fas fa-comments"></i></div>
-                    <h3>Atendimento Focado</h3>
-                    <p>Suporte humano e rápido pelo WhatsApp para tirar dúvidas, fechar pedidos e garantir o seu pós-venda.</p>
-                </div>
-            </div>
-        </div>
+    <section class="quick-section">
+      <div class="container quick-grid">
+        <a href="/catalogo?dep=OFERTAS" class="quick-card"><i class="fas fa-fire"></i><span><strong>Ofertas</strong><small>Vá direto às oportunidades</small></span></a>
+        <a href="#showroom" class="quick-card"><i class="fas fa-location-dot"></i><span><strong>Showroom</strong><small>Endereço e horários</small></span></a>
+        <button class="quick-card quick-button" type="button" onclick="abrirModalCadastro()"><i class="fas fa-user-plus"></i><span><strong>Quero comprar</strong><small>Faça seu pré-cadastro</small></span></button>
+      </div>
     </section>
 
-    <span id="vitrine-ancora"></span>
-    <main class="catalogo-container">
-        
-       <section class="busca-area">
-            <div class="busca-wrapper">
-                <div class="input-busca-container">
-                    <i class="fas fa-search icon-busca"></i>
-                    <input type="text" id="inputBusca" oninput="filtrarProdutos()" placeholder="Procure por código, produto ou marca...">
-                </div>
-                
-                <!-- NOVO FILTRO DE ORDENAÇÃO -->
-                <select id="selectOrdenacao" class="select-ordenacao" onchange="filtrarProdutos()">
-                    <option value="a-z">🔤 Ordem: A - Z (Padrão)</option>
-                    <option value="z-a">🔤 Ordem: Z - A</option>
-                    <option value="menor-preco">💲 Preço: Menor para Maior</option>
-                    <option value="maior-preco">💲 Preço: Maior para Menor</option>
-                    <option value="codigo">🔢 Código do Sistema</option>
-                </select>
-            </div>
-        </section>
-
-        <section class="menu-categorias-wrapper">
-            <div id="botoes-principais" class="botoes-principais"></div>
-            <div id="menu-extra" class="menu-extra" style="display: none;">
-                <div id="lista-botoes-extra" class="lista-botoes-extra"></div>
-            </div>
-        </section>
-
-        <div class="conteudo-principal">
-            <section id="produtos" class="produtos-grid"></section>
-
-            <aside id="carrinho-lateral" class="carrinho-area" style="display: none;">
-                <h2><i class="fas fa-shopping-cart"></i> Seu Pedido</h2>
-                <div class="Form-cliente">
-                    <input type="text" id="inputNome" placeholder="Seu Nome completo">
-                    <input type="text" id="inputLoja" placeholder="Nome da Loja">
-                    <input type="text" id="inputCidade" placeholder="Sua Cidade / UF">
-                </div>
-                <div id="itensCarrinho" class="itens-carrinho"></div>
-                <div id="total" class="total-carrinho"></div>
-                <button class="btn-finalizar" onclick="finalizarPedido()">Enviar Pedido via WhatsApp <i class="fab fa-whatsapp"></i></button>
-            </aside>
+    <section class="home-catalog-section" id="produtos">
+      <div class="container">
+        <div class="section-heading home-catalog-heading">
+          <div><span class="eyebrow dark">CATÁLOGO DNORTE</span><h2>Encontre o que sua loja precisa.</h2><p>O catálogo agora tem uma página própria, pensada para pesquisar, comparar e montar pedidos com mais rapidez.</p></div>
+          <a class="btn btn-primary" href="/catalogo">Ver catálogo completo <i class="fas fa-arrow-right"></i></a>
         </div>
-    </main>
-
-    <section class="section-cta">
-        <div class="cta-content">
-            <h2>Pronto para ter a DNorte na sua loja?</h2>
-            <p>Acesse nossa vitrine online para conhecer nossa linha de produtos. Se você já é lojista, chame nossa equipe no WhatsApp para ter acesso à tabela de preços exclusiva e condições de atacado.</p>
-            <div class="cta-buttons">
-                <a href="#vitrine-ancora" class="btn-cta-vitrine">Acessar Vitrine Online</a>
-                <a href="https://wa.me/5569999107161?text=Olá,%20gostaria%20de%20me%20cadastrar%20como%20lojista%20na%20DNorte." target="_blank" class="btn-cta-zap">Falar com um Consultor <i class="fab fa-whatsapp"></i></a>
-            </div>
+        <div class="category-showcase">
+          <a href="/catalogo?dep=1%20-%20ACESS%C3%93RIOS%20DE%20CELULAR%20E%20%C3%81UDIO" class="category-showcase-card"><i class="fas fa-mobile-screen-button"></i><strong>Celular & Áudio</strong><span>Cabos, carregadores, fones e suportes</span></a>
+          <a href="/catalogo?dep=2%20-%20ENERGIA" class="category-showcase-card"><i class="fas fa-battery-full"></i><strong>Energia</strong><span>Pilhas, baterias e fontes</span></a>
+          <a href="/catalogo?dep=3%20-%20INFORM%C3%81TICA%20E%20ELETR%C3%94NICOS" class="category-showcase-card"><i class="fas fa-computer"></i><strong>Informática & Eletrônicos</strong><span>Acessórios e eletrônicos para revenda</span></a>
+          <a href="/catalogo?dep=4%20-%20UTILIDADES%2C%20MODA%20E%20USO%20PESSOAL" class="category-showcase-card"><i class="fas fa-bag-shopping"></i><strong>Utilidades</strong><span>Moda, casa e uso pessoal</span></a>
+          <a href="/catalogo?dep=5%20-%20CONTROLES%20REMOTOS" class="category-showcase-card"><i class="fas fa-tv"></i><strong>Controles Remotos</strong><span>TV, ar-condicionado, receptor e mais</span></a>
+          <a href="/catalogo?dep=6%20-%20LAZER" class="category-showcase-card"><i class="fas fa-gamepad"></i><strong>Lazer</strong><span>Brinquedos e itens para diferentes públicos</span></a>
         </div>
+        <div class="catalog-callout">
+          <div><span class="callout-icon"><i class="fas fa-lock"></i></span><div><strong>Cliente DNorte?</strong><p>Entre na Área do Lojista e veja preços, ofertas e condições de quantidade no catálogo.</p></div></div>
+          <button class="btn btn-secondary catalog-login-cta" type="button" onclick="abrirModalLogin()">Entrar agora</button>
+        </div>
+      </div>
     </section>
 
-    <footer class="footer-site">
-        <p>&copy; 2026 DNorte Distribuidora. Todos os direitos reservados. Jaru - RO.</p>
-    </footer>
-
-    <button id="btn-whatsapp" class="btn-carrinho-mobile" onclick="abrirModalMobile()" style="display: none;"></button>
-
-    <div id="modalLogin" class="modal" onclick="fecharModalLogin(event)">
-        <div class="modal-content login-box">
-            <span class="close-btn" onclick="document.getElementById('modalLogin').style.display='none'">&times;</span>
-            <h3><i class="fas fa-lock"></i> Autenticação do Lojista</h3>
-            <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Insira os seus dados cadastrados na DNorte para liberar os preços de atacado e o carrinho.</p>
-            <p style="margin-top: 15px; text-align: center; font-size: 14px;"> Ainda não é parceiro? <br>
-           <a href="#" onclick="event.preventDefault(); abrirModalCadastro()" style="color: var(--dnorte-orange); font-weight: bold; text-decoration: none;">Faça o seu Pré-Cadastro aqui</a>
-            </p>
-            
-            <div class="input-group">
-                <label>Usuário de Acesso:</label>
-                <input type="text" id="loginUsuario" placeholder="Ex: Betuel007">
-            </div>
-            <div class="input-group">
-                <label>Senha de Acesso:</label>
-                <input type="password" id="loginSenha" placeholder="Digite sua senha">
-            </div>
-            
-            <div id="login-erro" style="color: red; font-size: 13px; margin-bottom: 15px; display: none; font-weight: bold;">❌ Usuário ou Senha incorretos.</div>
-            <button class="btn-efetuar-login" onclick="executarLogin()">Liberar Preços <i class="fas fa-unlock"></i></button>
+    <section class="why-section" id="diferenciais">
+      <div class="container">
+        <div class="section-heading centered"><span class="eyebrow dark">POR QUE DNORTE</span><h2>Feito para facilitar a rotina do lojista</h2></div>
+        <div class="why-grid">
+          <article class="why-card"><div class="icon"><i class="fas fa-truck-fast"></i></div><h3>Agilidade e logística</h3><p>Atendimento organizado para ajudar sua loja a repor produtos com rapidez.</p></article>
+          <article class="why-card"><div class="icon"><i class="fas fa-boxes-stacked"></i></div><h3>Mix de produtos</h3><p>Variedades para diferentes perfis de loja, reunidas em um catálogo fácil de pesquisar.</p></article>
+          <article class="why-card"><div class="icon"><i class="fas fa-comments"></i></div><h3>Atendimento próximo</h3><p>Fale com a equipe pelo WhatsApp e conclua seu pedido com suporte humano.</p></article>
         </div>
-    </div>
+      </div>
+    </section>
 
-    <!-- Modal de Pré-Cadastro -->
-    <div id="modalCadastro" class="modal" style="display: none; z-index: 3000;">
-        <div class="modal-content login-box" style="max-width: 450px;">
-            <span class="close-btn" onclick="fecharModalCadastro()">&times;</span>
-            <h2 style="color: var(--dnorte-blue); margin-bottom: 10px;">Pré-Cadastro Lojista</h2>
-            <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Preencha os dados abaixo. A nossa equipa analisará e enviará o seu acesso rapidamente.</p>
-
-            <!-- ATENÇÃO: Verifique se este é o seu e-mail correto -->
-            <form action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST">
-                
-                <input type="hidden" name="_subject" value="🚨 NOVO PRÉ-CADASTRO - DNORTE">
-                <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_next" value="https://dnorte.vercel.app/?cadastro=sucesso">
-
-                <div style="margin-bottom: 15px; text-align: left;">
-                    <label style="font-weight: bold; font-size: 13px; color: #333;">Nome Completo (Comprador):</label>
-                    <input type="text" name="Nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: João Silva">
-                </div>
-                
-                <div style="margin-bottom: 15px; text-align: left;">
-                    <label style="font-weight: bold; font-size: 13px; color: #333;">Nome da Loja (Fantasia):</label>
-                    <input type="text" name="Loja" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: MultShop Variedades">
-                </div>
-
-                <!-- CAMPO CPF/CNPJ COM VALIDAÇÃO -->
-                <div style="margin-bottom: 15px; text-align: left;">
-                    <label style="font-weight: bold; font-size: 13px; color: #333;">CPF ou CNPJ:</label>
-                    <input type="text" name="Documento" id="inputCpfCnpj" required maxlength="18" oninput="aplicarMascaraCpfCnpj(this)" onblur="validarCpfCnpjBlur(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px; outline: none; transition: 0.3s;" placeholder="Ex: 000.000.000-00 ou 00.000.000/0000-00">
-                    <span id="erroCpfCnpj" style="color: red; font-size: 12px; display: none; margin-top: 5px; font-weight: bold;">❌ Documento inválido! Verifique a numeração.</span>
-                </div>
-
-                <div style="margin-bottom: 15px; text-align: left;">
-                    <label style="font-weight: bold; font-size: 13px; color: #333;">WhatsApp (com DDD):</label>
-                    <input type="text" name="WhatsApp" required maxlength="15" oninput="aplicarMascaraTelefone(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;" placeholder="Ex: (69) 99999-9999">
-                </div>
-
-                <button type="submit" style="width: 100%; padding: 15px; background: var(--dnorte-orange); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;">Enviar Solicitação</button>
-            </form>
+    <section class="showroom-section" id="showroom">
+      <div class="container showroom-grid">
+        <div class="showroom-copy">
+          <span class="eyebrow">VISITE NOSSO SHOWROOM</span><h2>Conheça a DNorte de perto.</h2><p>Venha conhecer nossa variedade de produtos e conversar com a equipe presencialmente.</p>
+          <div class="contact-list">
+            <div><i class="fas fa-location-dot"></i><span><strong>Endereço</strong>Rua Rio Grande do Norte, 2534B — Setor 05<br>Jaru/RO</span></div>
+            <div><i class="fas fa-clock"></i><span><strong>Segunda a sexta</strong>08h às 11h30 e 13h30 às 17h30</span></div>
+            <div><i class="fas fa-calendar-day"></i><span><strong>Sábado</strong>08h às 12h</span></div>
+            <div><i class="fab fa-whatsapp"></i><span><strong>WhatsApp</strong>(69) 99910-7161</span></div>
+          </div>
+          <div class="showroom-actions"><a class="btn btn-primary" href="https://maps.app.goo.gl/KntN8Kqw2BVXiBy7A" target="_blank" rel="noopener"><i class="fas fa-route"></i> Como chegar</a><a class="btn btn-outline-light" href="https://wa.me/5569999107161?text=Olá!%20Gostaria%20de%20mais%20informações%20sobre%20o%20showroom%20da%20DNorte." target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Falar com a equipe</a></div>
         </div>
-    </div> <!-- Esta é a tag que estava faltando! -->
+        <div class="showroom-visual"><img src="prateleira_dnorte1.jpg" alt="Estoque e produtos da DNorte Distribuidora"><div class="showroom-badge"><i class="fas fa-store"></i><span><strong>Atendimento presencial</strong>Jaru • Rondônia</span></div></div>
+      </div>
+    </section>
 
-    <!-- Modal de Produto -->
-    <div id="modalProduto" class="modal" onclick="fecharModal(event)">
-        <div class="modal-content">
-            <span class="close-btn" onclick="fecharModal(true)">&times;</span>
-            <div class="modal-body">
-                <div class="modal-img-container">
-                    <img id="modalImg" src="" alt="Produto">
-                </div>
-                <div class="modal-info">
-                    <h2 id="modalNome"></h2>
-                    <div id="modalPrecoContainer">
-                        <p id="modalPreco" class="modal-preco"></p>
-                    </div>
-                    <div id="modalAcoes"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <section class="about-section" id="quem-somos">
+      <div class="container about-grid"><div><span class="eyebrow dark">QUEM SOMOS</span><h2>Tradição que evolui com você.</h2></div><div class="about-copy"><p>Com raízes firmes em Jaru, Rondônia, a DNorte Distribuidora carrega a experiência de quem entende o ritmo do varejo. A marca nasceu da trajetória construída anteriormente como Distribuidora Maré Mansa e hoje avança com uma identidade renovada.</p><p>Nosso objetivo é simplificar a reposição do lojista: catálogo organizado, variedade de produtos e atendimento próximo para transformar consulta em pedido com menos atrito.</p></div></div>
+    </section>
 
-    <!-- Botão Voltar aos Filtros -->
-    <button id="btn-voltar-topo" class="btn-voltar-topo" onclick="voltarAosFiltros()" title="Voltar ao Topo">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-<!-- ========================================== -->
-    <iframe name="iframeFantasma" style="display:none;"></iframe>
-    <form id="formPedidoInvisivel" action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST" target="iframeFantasma" style="display:none;">
-        <input type="hidden" name="_subject" id="subjectInvisivel">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="Lojista" id="lojistaInvisivel">
-        <input type="hidden" name="Comprador" id="compradorInvisivel">
-        <input type="hidden" name="Cidade" id="cidadeInvisivel">
-        <input type="hidden" name="Valor_Total" id="totalInvisivel">
-        <textarea name="Pedido_Detalhado" id="detalhesInvisivel"></textarea>
-    </form>
-    <script src="script.js"></script>
+    <section class="cta-section"><div class="container cta-box"><div><span class="eyebrow">SEJA CLIENTE DNORTE</span><h2>Quer ter acesso aos preços de atacado?</h2><p>Faça seu pré-cadastro. Nossa equipe analisará os dados e enviará o acesso ao catálogo.</p></div><button class="btn btn-light" type="button" onclick="abrirModalCadastro()"><i class="fas fa-user-plus"></i> Fazer pré-cadastro</button></div></section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora"><p>Atacado de variedades para lojistas.</p></div><div><h4>DNorte Distribuidora</h4><p><strong>CNPJ:</strong> 02.327.399/0001-45</p><p>Rua Rio Grande do Norte, 2534B — Setor 05<br>Jaru/RO</p></div><div><h4>Atendimento</h4><p>Seg–Sex: 08h–11h30 / 13h30–17h30</p><p>Sábado: 08h–12h</p><p><a href="https://wa.me/5569999107161" target="_blank" rel="noopener">(69) 99910-7161</a></p></div><div><h4>Acesso rápido</h4><a href="/catalogo">Catálogo</a><a href="#showroom">Showroom</a><button type="button" onclick="abrirModalLogin()">Área do Lojista</button></div></div><div class="container footer-bottom">© 2026 DNorte Distribuidora. Todos os direitos reservados.</div></footer>
+
+  <button class="back-top" id="btnTopo" type="button" onclick="document.getElementById('inicio').scrollIntoView({behavior:'smooth'})" aria-label="Voltar ao topo"><i class="fas fa-arrow-up"></i></button>
+
+  <div class="modal" id="modalLogin" aria-hidden="true"><div class="modal-card modal-sm"><button class="modal-close" type="button" onclick="fecharModal('modalLogin')"><i class="fas fa-xmark"></i></button><div class="modal-icon"><i class="fas fa-lock"></i></div><h3>Área do Lojista</h3><p>Entre com seus dados cadastrados para liberar preços e o carrinho de pedidos.</p><label class="field"><span>Usuário</span><input id="loginUsuario" type="text" autocomplete="username" placeholder="Seu usuário"></label><label class="field"><span>Senha</span><input id="loginSenha" type="password" autocomplete="current-password" placeholder="Sua senha"></label><label class="remember-option"><input id="loginRemember" type="checkbox"><span><strong>Manter acesso neste dispositivo</strong><small>Se marcado, sua conta permanece conectada por até 7 dias.</small></span></label><div class="form-error" id="loginErro" hidden></div><button class="btn btn-primary btn-full" id="btnLogin" type="button" onclick="executarLogin()">Entrar no catálogo <i class="fas fa-arrow-right-to-bracket"></i></button><p class="login-privacy"><i class="fas fa-shield-halved"></i> Seus preços só são liberados após a autenticação.</p><div class="modal-help">Ainda não é parceiro? <button type="button" onclick="abrirModalCadastro()">Faça seu pré-cadastro</button></div></div></div>
+
+  <div class="modal" id="modalCadastro" aria-hidden="true"><div class="modal-card modal-sm"><button class="modal-close" type="button" onclick="fecharModal('modalCadastro')"><i class="fas fa-xmark"></i></button><span class="eyebrow dark">PRÉ-CADASTRO</span><h3>Quero ser cliente DNorte</h3><p>Preencha os dados. Nossa equipe analisará o cadastro e entrará em contato.</p><form action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST"><input type="hidden" name="_subject" value="🚨 NOVO PRÉ-CADASTRO - DNORTE"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_next" value="https://dnorte.vercel.app/?cadastro=sucesso"><label class="field"><span>Nome completo</span><input type="text" name="Nome" required></label><label class="field"><span>Nome da loja</span><input type="text" name="Loja" required></label><label class="field"><span>CPF ou CNPJ</span><input id="inputCpfCnpj" type="text" name="Documento" maxlength="18" required></label><div class="form-error" id="erroCpfCnpj" hidden>Documento inválido. Verifique a numeração.</div><label class="field"><span>WhatsApp com DDD</span><input id="inputTelefone" type="text" name="WhatsApp" maxlength="15" required></label><button class="btn btn-primary btn-full" type="submit">Enviar solicitação</button></form></div></div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="home.js?v=3.5"></script>
 </body>
 </html>

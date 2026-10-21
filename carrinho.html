@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#03264c">
+  <meta name="description" content="Revise e envie seu pedido na DNorte Distribuidora.">
+  <title>Meu Pedido | DNorte Distribuidora</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=3.5">
+</head>
+<body class="cart-page">
+  <header class="site-header" id="inicio">
+    <nav class="navbar">
+      <a class="brand" href="/" aria-label="DNorte Distribuidora - Início"><img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora"></a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+      <div class="nav-links" id="navLinks">
+        <a href="/catalogo">Catálogo</a>
+        <a href="/catalogo?dep=OFERTAS">Ofertas</a>
+        <a href="/#showroom">Showroom</a>
+        <a class="nav-current" href="/carrinho">Meu Pedido</a>
+        <div class="account-area" id="accountArea">
+          <button class="btn-login-nav" id="btnContaHeader" type="button" onclick="acaoContaHeader(event)" aria-expanded="false" aria-controls="accountMenu"><span class="account-dot" id="accountDot" hidden></span><i class="fas fa-lock" id="iconeConta"></i><span id="textoBtnLogin">Área do Lojista</span><i class="fas fa-chevron-down account-chevron" id="accountChevron" hidden></i></button>
+          <div class="account-menu" id="accountMenu" hidden>
+            <div class="account-menu-header"><span class="account-menu-label">CONTA DO LOJISTA</span><strong id="accountLoja">Loja</strong><span id="accountPessoa">Comprador</span></div>
+            <div class="account-access-status"><span></span><div><strong>Acesso liberado</strong><small>Preços e pedido disponíveis</small></div></div>
+            <a class="account-menu-action" href="/catalogo"><i class="fas fa-box-open"></i> Continuar comprando</a>
+            <a class="account-menu-action account-home-link" href="/"><i class="fas fa-house"></i> Página inicial</a>
+            <button class="account-menu-action account-logout" type="button" onclick="fazerLogout(this)"><i class="fas fa-arrow-right-from-bracket"></i> Sair da conta</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="cart-page-hero">
+      <div class="container cart-page-hero-inner">
+        <div>
+          <a class="btn btn-catalog-back" href="/catalogo"><i class="fas fa-arrow-left"></i> Continuar comprando</a>
+          <h1>Revise seu pedido</h1>
+          <p>Confira produtos, quantidades e valores antes de enviar para nossa equipe.</p>
+        </div>
+        <div class="cart-hero-badge"><i class="fas fa-shield-halved"></i><span><strong>Pedido salvo</strong><small>Este carrinho fica disponível neste dispositivo por até 7 dias.</small></span></div>
+      </div>
+    </section>
+
+    <section class="cart-page-section">
+      <div class="container">
+        <div class="cart-auth-gate" id="cartAuthGate" hidden>
+          <div class="cart-auth-icon"><i class="fas fa-lock"></i></div>
+          <h2>Entre para acessar seu pedido</h2>
+          <p>O carrinho é vinculado à sua conta de lojista para manter preços e condições sempre atualizados.</p>
+          <button class="btn btn-primary" type="button" onclick="abrirModalLogin()"><i class="fas fa-unlock"></i> Entrar como lojista</button>
+          <a class="btn btn-secondary" href="/catalogo">Voltar ao catálogo</a>
+        </div>
+
+        <div class="cart-page-grid" id="cartPageGrid" hidden>
+          <section class="cart-items-card">
+            <div class="cart-page-card-head">
+              <div><span class="eyebrow dark">SEU PEDIDO</span><h2>Produtos selecionados</h2><p id="cartItemsSummary">Carregando...</p></div>
+              <button class="cart-clear-btn" id="btnLimparCarrinho" type="button" onclick="limparCarrinho()"><i class="fas fa-trash-can"></i> Limpar pedido</button>
+            </div>
+            <div class="cart-page-items" id="cartPageItems"></div>
+            <div class="cart-empty-state" id="cartEmptyState" hidden>
+              <i class="fas fa-basket-shopping"></i>
+              <h3>Seu pedido está vazio</h3>
+              <p>Volte ao catálogo e adicione os produtos que sua loja precisa.</p>
+              <a class="btn btn-primary" href="/catalogo"><i class="fas fa-box-open"></i> Ir para o catálogo</a>
+            </div>
+          </section>
+
+          <aside class="cart-summary-card">
+            <span class="eyebrow dark">FINALIZAR</span>
+            <h2>Resumo do pedido</h2>
+            <div class="cart-customer-form">
+              <label><span>Comprador</span><input id="inputNome" type="text" placeholder="Nome do comprador"></label>
+              <label><span>Loja</span><input id="inputLoja" type="text" placeholder="Nome da loja"></label>
+              <label><span>Cidade / UF</span><input id="inputCidade" type="text" placeholder="Cidade / UF"></label>
+            </div>
+            <div class="cart-summary-lines">
+              <div><span>Itens</span><strong id="summaryItems">0</strong></div>
+              <div><span>Produtos diferentes</span><strong id="summaryProducts">0</strong></div>
+              <div class="cart-summary-total"><span>Total estimado</span><strong id="summaryTotal">R$ 0,00</strong></div>
+            </div>
+            <p class="cart-summary-note"><i class="fas fa-circle-info"></i> Valores e disponibilidade serão confirmados pela equipe no atendimento.</p>
+            <button class="btn btn-whatsapp btn-full" id="btnEnviarPedido" type="button" onclick="finalizarPedido()"><i class="fab fa-whatsapp"></i> Enviar pedido no WhatsApp</button>
+            <a class="btn btn-secondary btn-full" href="/catalogo"><i class="fas fa-plus"></i> Continuar comprando</a>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="catalog-footer"><div class="container catalog-footer-inner"><a href="/"><img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora"></a><div><strong>Precisa de ajuda?</strong><span>Fale com a equipe: (69) 99910-7161</span></div><a class="btn btn-outline-light" href="https://wa.me/5569999107161" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a></div></footer>
+
+  <div class="modal" id="modalLogin" aria-hidden="true"><div class="modal-card modal-sm"><button class="modal-close" type="button" onclick="fecharModal('modalLogin')"><i class="fas fa-xmark"></i></button><div class="modal-icon"><i class="fas fa-lock"></i></div><h3>Área do Lojista</h3><p>Entre com seus dados cadastrados para acessar preços e seu pedido.</p><label class="field"><span>Usuário</span><input id="loginUsuario" type="text" autocomplete="username" placeholder="Seu usuário"></label><label class="field"><span>Senha</span><input id="loginSenha" type="password" autocomplete="current-password" placeholder="Sua senha"></label><label class="remember-option"><input id="loginRemember" type="checkbox"><span><strong>Manter acesso neste dispositivo</strong><small>Se marcado, sua conta permanece conectada por até 7 dias.</small></span></label><div class="form-error" id="loginErro" hidden></div><button class="btn btn-primary btn-full" id="btnLogin" type="button" onclick="executarLogin()">Entrar <i class="fas fa-arrow-right-to-bracket"></i></button><p class="login-privacy"><i class="fas fa-shield-halved"></i> Seus preços só são liberados após a autenticação.</p></div></div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <iframe name="iframeFantasma" hidden></iframe>
+  <form id="formPedidoInvisivel" action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST" target="iframeFantasma" hidden>
+    <input type="hidden" name="_subject" id="subjectInvisivel"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="Lojista" id="lojistaInvisivel"><input type="hidden" name="Comprador" id="compradorInvisivel"><input type="hidden" name="Cidade" id="cidadeInvisivel"><input type="hidden" name="Valor_Total" id="totalInvisivel"><textarea name="Pedido_Detalhado" id="detalhesInvisivel"></textarea>
+  </form>
+  <script src="carrinho.js?v=3.5"></script>
+</body>
+</html>

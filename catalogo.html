@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#03264c">
+  <meta name="description" content="Catálogo B2B DNorte Distribuidora — produtos, ofertas e pedidos para lojistas.">
+  <title>Catálogo DNorte | Produtos para Lojistas</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=3.5">
+</head>
+<body class="catalog-page">
+  <header class="site-header">
+    <nav class="navbar">
+      <a class="brand" href="/" aria-label="Voltar para a página inicial da DNorte"><img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora"></a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+      <div class="nav-links" id="navLinks">
+        <a class="nav-current" href="/catalogo">Catálogo</a>
+        <a href="/catalogo?dep=OFERTAS">Ofertas</a>
+        <a href="/#showroom">Showroom</a>
+        <a href="/#quem-somos">Quem Somos</a>
+        <div class="account-area" id="accountArea">
+          <button class="btn-login-nav" id="btnContaHeader" type="button" onclick="acaoContaHeader(event)" aria-expanded="false" aria-controls="accountMenu"><span class="account-dot" id="accountDot" hidden></span><i class="fas fa-lock" id="iconeConta"></i><span id="textoBtnLogin">Área do Lojista</span><i class="fas fa-chevron-down account-chevron" id="accountChevron" hidden></i></button>
+          <div class="account-menu" id="accountMenu" hidden><div class="account-menu-header"><span class="account-menu-label">CONTA DO LOJISTA</span><strong id="accountLoja">Loja</strong><span id="accountPessoa">Comprador</span></div><div class="account-access-status"><span></span><div><strong>Acesso liberado</strong><small>Preços e carrinho disponíveis</small></div></div><button class="account-menu-action" type="button" onclick="irParaCatalogo()"><i class="fas fa-box-open"></i> Voltar ao início do catálogo</button><a class="account-menu-action" href="/carrinho"><i class="fas fa-basket-shopping"></i> Meu pedido</a><a class="account-menu-action account-home-link" href="/"><i class="fas fa-house"></i> Página inicial</a><button class="account-menu-action account-logout" type="button" onclick="fazerLogout(this)"><i class="fas fa-arrow-right-from-bracket"></i> Sair da conta</button></div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="catalog-page-hero" id="catalogoTopo">
+      <div class="container catalog-page-hero-inner">
+        <div><a class="btn btn-catalog-back" href="/"><i class="fas fa-arrow-left"></i> Voltar ao site</a><h1 id="tituloCatalogo">Encontre o que sua loja precisa</h1><p id="subtituloCatalogo">Pesquise produtos e disponibilidade. Preços são exclusivos para lojistas autenticados.</p></div>
+        <div class="catalog-hero-actions"><button class="btn btn-catalog-share" type="button" onclick="copiarLinkFiltroAtual()"><i class="fas fa-link"></i> Compartilhar seleção</button><button class="btn btn-secondary catalog-login-shortcut" id="catalogLoginShortcut" type="button" onclick="abrirModalLogin()"><i class="fas fa-lock"></i> Entrar como lojista</button></div>
+      </div>
+    </section>
+
+    <section class="catalog-section catalog-page-section" id="catalogo">
+      <div class="container">
+        <div class="toolbar-sentinel" id="toolbarSentinel" aria-hidden="true"></div>
+        <div class="catalog-toolbar catalog-toolbar-sticky">
+          <label class="search-box"><i class="fas fa-search"></i><input id="inputBusca" type="search" placeholder="Procure por código, produto ou categoria..." autocomplete="off"></label>
+          <select id="selectOrdenacao" aria-label="Ordenar produtos"><option value="a-z">A–Z</option><option value="z-a">Z–A</option><option value="menor-preco">Menor preço</option><option value="maior-preco">Maior preço</option><option value="codigo">Código</option></select>
+        </div>
+        <div class="filter-panel">
+          <div class="mobile-filter-selects">
+            <label class="mobile-filter-field"><span><b>1</b> Departamento</span><select id="selectDepartamentoMobile" aria-label="Selecionar departamento"></select></label>
+            <label class="mobile-filter-field"><span class="orange"><b>2</b> Categoria</span><select id="selectCategoriaMobile" aria-label="Selecionar categoria"></select></label>
+          </div>
+          <div class="desktop-filter-groups">
+            <div class="filter-group"><div class="filter-label"><span>1</span> Departamento</div><div class="filter-scroll" id="departamentos"></div></div>
+            <div class="filter-group"><div class="filter-label orange"><span>2</span> Categoria</div><div class="filter-scroll" id="categorias"></div></div>
+          </div>
+        </div>
+        <div class="catalog-status" id="catalogStatus">Carregando catálogo...</div>
+        <div class="catalog-layout"><div class="produtos-grid" id="produtos"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="catalog-footer"><div class="container catalog-footer-inner"><a href="/"><img src="Logo-DNorte_Distribuidora.png" alt="DNorte Distribuidora"></a><div><strong>Precisa de ajuda?</strong><span>Fale com a equipe: (69) 99910-7161</span></div><a class="btn btn-outline-light" href="https://wa.me/5569999107161" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a></div></footer>
+
+  <a class="floating-cart" id="btnCarrinhoMobile" href="/carrinho" hidden><i class="fas fa-basket-shopping"></i><span id="floatingCartText">Pedido</span></a>
+  <button class="back-top" id="btnTopo" type="button" onclick="document.getElementById('catalogoTopo').scrollIntoView({behavior:'smooth'})" aria-label="Voltar ao topo do catálogo"><i class="fas fa-arrow-up"></i></button>
+
+  <div class="modal" id="modalLogin" aria-hidden="true"><div class="modal-card modal-sm"><button class="modal-close" type="button" onclick="fecharModal('modalLogin')"><i class="fas fa-xmark"></i></button><div class="modal-icon"><i class="fas fa-lock"></i></div><h3>Área do Lojista</h3><p>Entre com seus dados cadastrados para liberar preços e o carrinho de pedidos.</p><label class="field"><span>Usuário</span><input id="loginUsuario" type="text" autocomplete="username" placeholder="Seu usuário"></label><label class="field"><span>Senha</span><input id="loginSenha" type="password" autocomplete="current-password" placeholder="Sua senha"></label><label class="remember-option"><input id="loginRemember" type="checkbox"><span><strong>Manter acesso neste dispositivo</strong><small>Se marcado, sua conta permanece conectada por até 7 dias.</small></span></label><div class="form-error" id="loginErro" hidden></div><button class="btn btn-primary btn-full" id="btnLogin" type="button" onclick="executarLogin()">Entrar no catálogo <i class="fas fa-arrow-right-to-bracket"></i></button><p class="login-privacy"><i class="fas fa-shield-halved"></i> Seus preços só são liberados após a autenticação.</p><div class="modal-help">Ainda não é parceiro? <button type="button" onclick="abrirModalCadastro()">Faça seu pré-cadastro</button></div></div></div>
+
+  <div class="modal" id="modalCadastro" aria-hidden="true"><div class="modal-card modal-sm"><button class="modal-close" type="button" onclick="fecharModal('modalCadastro')"><i class="fas fa-xmark"></i></button><span class="eyebrow dark">PRÉ-CADASTRO</span><h3>Quero ser cliente DNorte</h3><p>Preencha os dados. Nossa equipe analisará o cadastro e entrará em contato.</p><form action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST"><input type="hidden" name="_subject" value="🚨 NOVO PRÉ-CADASTRO - DNORTE"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_next" value="https://dnorte.vercel.app/catalogo"><label class="field"><span>Nome completo</span><input type="text" name="Nome" required></label><label class="field"><span>Nome da loja</span><input type="text" name="Loja" required></label><label class="field"><span>CPF ou CNPJ</span><input id="inputCpfCnpj" type="text" name="Documento" maxlength="18" required></label><div class="form-error" id="erroCpfCnpj" hidden>Documento inválido. Verifique a numeração.</div><label class="field"><span>WhatsApp com DDD</span><input id="inputTelefone" type="text" name="WhatsApp" maxlength="15" required></label><button class="btn btn-primary btn-full" type="submit">Enviar solicitação</button></form></div></div>
+
+  <div class="modal" id="modalProduto" aria-hidden="true"><div class="modal-card modal-product"><button class="modal-close" type="button" onclick="fecharModalProduto()"><i class="fas fa-xmark"></i></button><div class="modal-product-image"><img id="modalImg" src="" alt="Produto"></div><div class="modal-product-info"><span class="product-code" id="modalCodigo"></span><h3 id="modalNome"></h3><div id="modalPreco"></div><div id="modalAcoes"></div></div></div></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <iframe name="iframeFantasma" hidden></iframe><form id="formPedidoInvisivel" action="https://formsubmit.co/dnortedistribuidora.ro@gmail.com" method="POST" target="iframeFantasma" hidden><input type="hidden" name="_subject" id="subjectInvisivel"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="Lojista" id="lojistaInvisivel"><input type="hidden" name="Comprador" id="compradorInvisivel"><input type="hidden" name="Cidade" id="cidadeInvisivel"><input type="hidden" name="Valor_Total" id="totalInvisivel"><textarea name="Pedido_Detalhado" id="detalhesInvisivel"></textarea></form>
+  <script src="catalogo.js?v=3.5"></script>
+</body>
+</html>
